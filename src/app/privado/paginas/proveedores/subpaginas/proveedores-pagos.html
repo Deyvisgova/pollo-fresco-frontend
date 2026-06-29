@@ -1,0 +1,66 @@
+<section class="tarjeta">
+  <header class="tarjeta__encabezado">
+    <h3>Historial de Pago</h3>
+  </header>
+
+  <div class="filtros-pagos">
+    <label class="campo-busqueda">
+      <span>Busqueda</span>
+      <input [(ngModel)]="busqueda" (ngModelChange)="cargarPagos()" type="text" placeholder="Buscar por ID o estado" />
+    </label>
+
+    <label class="campo-busqueda">
+      <span>Proveedor</span>
+      <select [(ngModel)]="filtroProveedorId" (ngModelChange)="cargarPagos()">
+        <option value="">Todos</option>
+        <option *ngFor="let proveedor of proveedoresFiltro" [value]="proveedor.proveedor_id">{{ proveedor.nombre }}</option>
+      </select>
+    </label>
+
+    <label class="campo-busqueda">
+      <span>Fecha de pago</span>
+      <input [(ngModel)]="filtroFecha" (ngModelChange)="cargarPagos()" type="date" />
+    </label>
+
+    <button class="boton-pdf" type="button" title="Descargar PDF filtrado" (click)="descargarPdfFiltrado()">PDF</button>
+  </div>
+
+  <p class="mensaje" *ngIf="cargando">Cargando historial...</p>
+  <p class="mensaje mensaje--error" *ngIf="error">{{ error }}</p>
+
+  <div class="tabla-contenedor">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Total</th>
+          <th>Transferencia</th>
+          <th>Efectivo</th>
+          <th>Saldo</th>
+          <th>Estado</th>
+          <th>Entregas</th>
+          <th>Proveedor pagado</th>
+          <th>Rango fechas</th>
+          <th>Creado en</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pago of pagos">
+          <td data-label="ID">{{ pago.pago_id }}</td>
+          <td data-label="Total">S/ {{ pago.total | number: '1.2-2' }}</td>
+          <td data-label="Transferencia">S/ {{ pago.monto_transferencia | number: '1.2-2' }}</td>
+          <td data-label="Efectivo">S/ {{ pago.monto_efectivo | number: '1.2-2' }}</td>
+          <td data-label="Saldo">S/ {{ pago.saldo | number: '1.2-2' }}</td>
+          <td data-label="Estado"><span class="estado-badge" [class.estado-badge--pagado]="estadoEsPagado(pago.estado)">{{ pago.estado }}</span></td>
+          <td data-label="Entregas">{{ pago.cantidad_entregas }}</td>
+          <td data-label="Proveedor pagado">{{ proveedorPagadoTexto(pago) }}</td>
+          <td data-label="Rango fechas">{{ formatearRangoFechas(pago.fecha_desde, pago.fecha_hasta) }}</td>
+          <td data-label="Creado en">{{ pago.creado_en | date: 'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+        <tr *ngIf="!cargando && pagos.length === 0">
+          <td data-label="" colspan="10">Sin pagos registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

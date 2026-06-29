@@ -1,0 +1,137 @@
+<section class="tarjeta" *ngIf="!esVendedor">
+  <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+    <div>
+      <h3>Proveedores</h3>
+      <p>Administra tu cartera de proveedores con acciones rapidas.</p>
+    </div>
+    <button class="boton boton--primario" type="button" (click)="abrirModalRegistro()">+ Nuevo proveedor</button>
+  </header>
+
+  <p class="mensaje mensaje--error" *ngIf="consultaError">{{ consultaError }}</p>
+
+  <div class="busqueda">
+    <label class="campo">
+      <span>Buscar</span>
+      <input
+        [(ngModel)]="filtro"
+        (ngModelChange)="onFiltroChange()"
+        name="filtro"
+        type="text"
+        placeholder="Nombre, empresa, DNI, telefono o RUC"
+      />
+    </label>
+  </div>
+
+  <div class="tabla-contenedor">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Proveedor / Empresa</th>
+          <th>Documento</th>
+          <th>Contacto</th>
+          <th>Direccion</th>
+          <th>Registro</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let proveedor of proveedores; let i = index">
+          <td data-label="N°">{{ i + 1 }}</td>
+          <td data-label="Proveedor / Empresa">
+            <strong>{{ ((proveedor.nombres || '') + ' ' + (proveedor.apellidos || '')).trim() || '-' }}</strong>
+            <div class="nota">{{ proveedor.nombre_empresa || 'Sin empresa' }}</div>
+          </td>
+          <td data-label="Documento">
+            <div>DNI: {{ proveedor.dni || '-' }}</div>
+            <div class="nota">RUC: {{ proveedor.ruc || '-' }}</div>
+          </td>
+          <td data-label="Contacto">{{ proveedor.telefono || '-' }}</td>
+          <td data-label="Direccion">{{ proveedor.direccion || '-' }}</td>
+          <td data-label="Registro">
+            <div>Creado: {{ proveedor.creado_en | date: 'short' }}</div>
+            <div class="nota">Actualizado: {{ proveedor.actualizado_en | date: 'short' }}</div>
+          </td>
+          <td data-label="Acciones" class="acciones-tabla">
+            <button class="boton boton--secundario" type="button" (click)="editarProveedor(proveedor)">Editar</button>
+            <button class="boton boton--peligro-solido" type="button" (click)="eliminarProveedor(proveedor)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="proveedores.length === 0">
+          <td colspan="7">Todavia no hay proveedores registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="modal-fondo" *ngIf="mostrarModalRegistro">
+  <section class="modal-contenido">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <div>
+        <h3>{{ formulario.proveedor_id === null ? 'Registro de proveedor' : 'Edicion de proveedor' }}</h3>
+        <p>
+          Ingresa DNI o RUC para autocompletar datos. Luego completa lo necesario y guarda el proveedor.
+        </p>
+      </div>
+      <button class="boton boton--secundario" type="button" (click)="cerrarModalRegistro()">Cerrar</button>
+    </header>
+
+    <div class="consulta">
+      <label class="campo">
+        <span>DNI o RUC</span>
+        <div class="campo__acciones">
+          <input
+            [(ngModel)]="consultaDocumento"
+            name="consultaDocumento"
+            type="text"
+            placeholder="8 digitos (DNI) o 11 digitos (RUC)"
+          />
+          <button class="boton boton--primario" type="button" (click)="consultarDocumentoApi()" [disabled]="consultaCargando">
+            {{ consultaCargando ? 'Consultando...' : 'Consultar' }}
+          </button>
+        </div>
+      </label>
+    </div>
+
+    <form class="formulario" (ngSubmit)="guardarProveedor()">
+      <label class="campo">
+        <span>DNI</span>
+        <input [(ngModel)]="formulario.dni" name="dni" type="text" placeholder="8 digitos" />
+      </label>
+      <label class="campo">
+        <span>RUC</span>
+        <input [(ngModel)]="formulario.ruc" name="ruc" type="text" placeholder="11 digitos" />
+      </label>
+      <label class="campo">
+        <span>Nombres</span>
+        <input [(ngModel)]="formulario.nombres" name="nombres" type="text" />
+      </label>
+      <label class="campo">
+        <span>Nombre de la empresa</span>
+        <input [(ngModel)]="formulario.nombreEmpresa" name="nombreEmpresa" type="text" />
+      </label>
+      <label class="campo">
+        <span>Apellidos</span>
+        <input [(ngModel)]="formulario.apellidos" name="apellidos" type="text" />
+      </label>
+      <label class="campo">
+        <span>Direccion</span>
+        <input [(ngModel)]="formulario.direccion" name="direccion" type="text" />
+      </label>
+      <label class="campo">
+        <span>Telefono</span>
+        <input [(ngModel)]="formulario.telefono" name="telefono" type="text" />
+      </label>
+
+      <div class="acciones">
+        <button class="boton boton--primario" type="submit" [disabled]="guardando">
+          {{ formulario.proveedor_id === null ? 'Guardar proveedor' : 'Actualizar proveedor' }}
+        </button>
+        <button class="boton boton--secundario" type="button" (click)="limpiarFormulario()">Limpiar</button>
+      </div>
+    </form>
+  </section>
+</div>

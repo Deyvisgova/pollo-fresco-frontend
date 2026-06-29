@@ -1,0 +1,9 @@
+.slide-editor img,
+.banner-editor img {
+  object-fit: fill;
+}
+
+.banner-editor img {
+  height: auto;
+  aspect-ratio: 4 / 1;
+}

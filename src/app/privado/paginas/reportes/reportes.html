@@ -1,0 +1,99 @@
+<section class="reportes-page">
+  <header class="reportes-header">
+    <div>
+      <h2>Reportes</h2>
+      <p>Indicadores para controlar ventas, rentabilidad, stock, deudas y operaciones.</p>
+    </div>
+    <div class="acciones-reporte">
+      <button type="button" class="btn" (click)="descargarPdf()">Descargar PDF</button>
+      <button type="button" class="btn btn--primario" (click)="imprimir()">Imprimir</button>
+    </div>
+  </header>
+
+  <div class="filtros">
+    <label>Desde <input type="date" [(ngModel)]="fechaDesde" /></label>
+    <label>Hasta <input type="date" [(ngModel)]="fechaHasta" /></label>
+    <button type="button" class="btn" (click)="aplicarMesActual()">Mes actual</button>
+    <button type="button" class="btn btn--primario" (click)="cargarReporte()">Actualizar</button>
+  </div>
+
+  <div class="alerta alerta--error" *ngIf="mensajeError">{{ mensajeError }}</div>
+  <div class="alerta" *ngIf="cargando">Cargando informacion...</div>
+
+  <nav class="reportes-tabs" aria-label="Tipos de reporte">
+    <button
+      type="button"
+      *ngFor="let vista of vistas"
+      [class.activo]="vistaActiva === vista.codigo"
+      (click)="cambiarVista(vista.codigo)"
+    >{{ vista.nombre }}</button>
+  </nav>
+
+  <section class="panel" *ngIf="vistaActiva === 'resumen'">
+    <div class="panel__titulo">
+      <div><h3>Resumen ejecutivo</h3><p>Resultados del periodo seleccionado.</p></div>
+      <span>{{ fechaDesde | date: 'dd/MM/yyyy' }} - {{ fechaHasta | date: 'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="kpi-grid">
+      <article class="kpi kpi--principal"><span>Resultado neto</span><strong>S/ {{ dinero(resumen['resultado_neto']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Ventas generadas</span><strong>S/ {{ dinero(resumen['ventas_generadas']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Dinero cobrado</span><strong>S/ {{ dinero(resumen['dinero_cobrado'] || resumen['cobrado_periodo']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Ganancia bruta</span><strong>S/ {{ dinero(resumen['ganancia_bruta']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Gastos</span><strong>S/ {{ dinero(resumen['gastos']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Cuentas por cobrar</span><strong>S/ {{ dinero(resumen['cuentas_por_cobrar']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Deuda a proveedores</span><strong>S/ {{ dinero(resumen['deuda_proveedores']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Valor del stock</span><strong>S/ {{ dinero(resumen['valor_stock']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Venta pollo + gallina</span><strong>S/ {{ dinero(resumen['ventas_pollo_gallina']) | number: '1.2-2' }}</strong></article>
+      <article class="kpi"><span>Venta otros productos</span><strong>S/ {{ dinero(resumen['ventas_otros_productos']) | number: '1.2-2' }}</strong></article>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'ventas'">
+    <div class="panel__titulo"><div><h3>Ventas y ganancias</h3><p>Pedidos y ventas de otros productos.</p></div><strong>{{ ventas.length }} registros</strong></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Fecha</th><th>Origen</th><th>Cliente / producto</th><th>Detalle</th><th>Total</th><th>Costo</th><th>Ganancia</th><th>Saldo</th></tr></thead>
+      <tbody><tr *ngFor="let fila of ventas"><td data-label="Fecha">{{ fila.fecha | date: 'dd/MM/yyyy HH:mm' }}</td><td data-label="Origen">{{ fila.tipo }}</td><td data-label="Cliente / producto"><strong>{{ fila.cliente_producto }}</strong></td><td data-label="Detalle">{{ fila.detalle }}</td><td data-label="Total">S/ {{ fila.total | number: '1.2-2' }}</td><td data-label="Costo">S/ {{ fila.costo | number: '1.2-2' }}</td><td data-label="Ganancia">S/ {{ fila.ganancia | number: '1.2-2' }}</td><td data-label="Saldo">S/ {{ fila.saldo | number: '1.2-2' }}</td></tr></tbody>
+    </table></div><p class="vacio" *ngIf="!ventas.length && !cargando">No hay ventas en este periodo.</p>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'stock'">
+    <div class="panel__titulo"><div><h3>Stock y lotes</h3><p>Existencias y valor actual por producto.</p></div></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Producto</th><th>Grupo</th><th>Stock</th><th>Lotes abiertos</th><th>Valor stock</th><th>Estado</th></tr></thead>
+      <tbody><tr *ngFor="let fila of stock"><td data-label="Producto"><strong>{{ fila.producto }}</strong></td><td data-label="Grupo">{{ fila.grupo }}</td><td data-label="Stock">{{ fila.stock | number: '1.0-2' }} {{ fila.unidad }}</td><td data-label="Lotes abiertos">{{ fila.lotes_abiertos }}</td><td data-label="Valor stock">S/ {{ fila.valor_stock | number: '1.2-2' }}</td><td data-label="Estado"><span class="estado" [class.estado--alerta]="fila.alerta">{{ fila.alerta ? 'STOCK BAJO' : 'DISPONIBLE' }}</span></td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'cobrar'">
+    <div class="panel__titulo"><div><h3>Cuentas por cobrar</h3><p>Deudas acumuladas por cliente, aplicando sus pagos a cuenta.</p></div></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Cliente</th><th>Contacto</th><th>Pedidos</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Deuda desde</th></tr></thead>
+      <tbody><tr *ngFor="let fila of cuentasCobrar"><td data-label="Cliente"><strong>{{ fila.cliente }}</strong></td><td data-label="Contacto">{{ fila.celular || '-' }}</td><td data-label="Pedidos">{{ fila.pedidos }}</td><td data-label="Total">S/ {{ fila.total | number: '1.2-2' }}</td><td data-label="Pagado">S/ {{ fila.pagado | number: '1.2-2' }}</td><td data-label="Saldo"><strong class="texto-rojo">S/ {{ fila.saldo | number: '1.2-2' }}</strong></td><td data-label="Deuda desde">{{ fila.deuda_desde | date: 'dd/MM/yyyy' }}</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'proveedores'">
+    <div class="panel__titulo"><div><h3>Compras a proveedores</h3><p>Compras y obligaciones del periodo.</p></div></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Proveedor</th><th>Telefono</th><th>Entregas</th><th>Compras</th><th>Pendiente</th><th>Ultima entrega</th></tr></thead>
+      <tbody><tr *ngFor="let fila of proveedores"><td data-label="Proveedor"><strong>{{ fila.proveedor }}</strong></td><td data-label="Telefono">{{ fila.telefono || '-' }}</td><td data-label="Entregas">{{ fila.entregas }}</td><td data-label="Compras">S/ {{ fila.compras | number: '1.2-2' }}</td><td data-label="Pendiente">S/ {{ fila.pendiente | number: '1.2-2' }}</td><td data-label="Ultima entrega">{{ fila.ultima_entrega | date: 'dd/MM/yyyy HH:mm' }}</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'delivery'">
+    <div class="panel__titulo"><div><h3>Rendimiento delivery</h3><p>Cumplimiento y tiempos de entrega.</p></div></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Deliverista</th><th>Asignados</th><th>Entregados</th><th>No entregados</th><th>Efectividad</th><th>Tiempo promedio</th><th>Total entregado</th></tr></thead>
+      <tbody><tr *ngFor="let fila of delivery"><td data-label="Deliverista"><strong>{{ fila.delivery }}</strong></td><td data-label="Asignados">{{ fila.asignados }}</td><td data-label="Entregados">{{ fila.entregados }}</td><td data-label="No entregados">{{ fila.no_entregados }}</td><td data-label="Efectividad">{{ fila.efectividad | number: '1.0-1' }}%</td><td data-label="Tiempo promedio">{{ fila.minutos_promedio ? fila.minutos_promedio + ' min' : '-' }}</td><td data-label="Total entregado">S/ {{ fila.total_entregado | number: '1.2-2' }}</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'gastos'">
+    <div class="panel__titulo"><div><h3>Gastos del periodo</h3><p>Detalle por fondo, categoria y responsable.</p></div></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Fecha</th><th>Fondo</th><th>Categoria</th><th>Descripcion</th><th>Responsable</th><th>Estado</th><th>Monto</th></tr></thead>
+      <tbody><tr *ngFor="let fila of gastos"><td data-label="Fecha">{{ fila.fecha | date: 'dd/MM/yyyy' }}</td><td data-label="Fondo">{{ fila.fondo }}</td><td data-label="Categoria">{{ fila.categoria }}</td><td data-label="Descripcion"><strong>{{ fila.descripcion }}</strong></td><td data-label="Responsable">{{ fila.usuario }}</td><td data-label="Estado">{{ fila.estado }}</td><td data-label="Monto">S/ {{ fila.monto | number: '1.2-2' }}</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'auditoria'">
+    <div class="panel__titulo"><div><h3>Auditoria financiera</h3><p>Trazabilidad de cambios sensibles registrados en el sistema.</p></div></div>
+    <div class="tabla-scroll"><table class="tabla-sistema"><thead><tr><th>Fecha</th><th>Usuario</th><th>Accion</th><th>Entidad</th><th>Fondo</th><th>Descripcion</th></tr></thead>
+      <tbody><tr *ngFor="let fila of auditoria"><td data-label="Fecha">{{ fila.fecha | date: 'dd/MM/yyyy HH:mm' }}</td><td data-label="Usuario"><strong>{{ fila.usuario }}</strong></td><td data-label="Accion">{{ fila.accion }}</td><td data-label="Entidad">{{ fila.entidad }} #{{ fila.entidad_id || '-' }}</td><td data-label="Fondo">{{ fila.fondo || '-' }}</td><td data-label="Descripcion">{{ fila.descripcion }}</td></tr></tbody>
+    </table></div>
+  </section>
+</section>

@@ -1,0 +1,56 @@
+<section *ngIf="contenido().mostrar_contacto" id="contacto" class="contacto pb-5">
+  <div class="container">
+    <div class="pagina-banner pagina-banner--full-bleed">
+      <img [src]="contenido().banner_contacto_url" alt="Banner de Contacto">
+    </div>
+    <div class="row g-4">
+      <div class="col-12 col-lg-5">
+        <h2 class="fw-bold">{{ contenido().titulo_contacto }}</h2>
+        <p class="text-muted">{{ contenido().descripcion_contacto }}</p>
+        <div class="d-flex flex-column gap-3 contacto__datos">
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon>place</mat-icon>
+            <span>{{ contenido().direccion }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon>call</mat-icon>
+            <span>{{ contenido().telefono }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon>mail</mat-icon>
+            <span>{{ contenido().correo }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-7">
+        <div class="contacto__formulario p-4">
+          <h3 class="h5 fw-bold">Solicita tu pedido</h3>
+          <form class="row g-3">
+            <div class="col-12 col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Nombre</mat-label>
+                <input matInput type="text" placeholder="Tu nombre" />
+              </mat-form-field>
+            </div>
+            <div class="col-12 col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Telefono</mat-label>
+                <input matInput type="tel" placeholder="Numero de contacto" />
+              </mat-form-field>
+            </div>
+            <div class="col-12">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Pedido</mat-label>
+                <textarea matInput rows="4" placeholder="Describe tu pedido"></textarea>
+              </mat-form-field>
+            </div>
+            <div class="col-12 d-flex flex-wrap gap-2">
+              <button mat-raised-button color="primary" type="submit">Enviar solicitud</button>
+              <button mat-stroked-button color="accent" type="button" (click)="abrirWhatsApp()">Abrir WhatsApp</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

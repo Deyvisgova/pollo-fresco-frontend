@@ -1,0 +1,94 @@
+<main class="recuperacion">
+  <section class="recuperacion__panel">
+    <div class="recuperacion__marca" aria-hidden="true">
+      <mat-icon>{{ esRestablecimiento ? 'lock_reset' : 'mark_email_read' }}</mat-icon>
+    </div>
+
+    <ng-container *ngIf="!completado; else resultadoExitoso">
+      <header class="recuperacion__encabezado">
+        <span>Pollo Fresco</span>
+        <h1>{{ esRestablecimiento ? 'Crea una nueva contrasena' : 'Recupera tu acceso' }}</h1>
+        <p *ngIf="!esRestablecimiento">
+          Ingresa el correo registrado en tu cuenta. Te enviaremos un enlace seguro para cambiar tu contrasena.
+        </p>
+        <p *ngIf="esRestablecimiento && enlaceValido">
+          Escribe una contrasena nueva de al menos 8 caracteres y confirmala antes de guardar.
+        </p>
+      </header>
+
+      <div class="recuperacion__alerta recuperacion__alerta--error" *ngIf="mensajeError" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ mensajeError }}</span>
+      </div>
+
+      <section class="recuperacion__enlace-invalido" *ngIf="esRestablecimiento && !enlaceValido">
+        <p>Este enlace no contiene un token valido.</p>
+        <a routerLink="/recuperar-contrasena">Solicitar un enlace nuevo</a>
+      </section>
+
+      <form *ngIf="!esRestablecimiento" [formGroup]="formularioSolicitud" (ngSubmit)="solicitarEnlace()">
+        <mat-form-field appearance="outline">
+          <mat-label>Correo electronico</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" placeholder="nombre@correo.com" />
+          <mat-icon matPrefix>mail</mat-icon>
+          <mat-error *ngIf="formularioSolicitud.controls.email.hasError('required')">Ingresa tu correo.</mat-error>
+          <mat-error *ngIf="formularioSolicitud.controls.email.hasError('email')">Ingresa un correo valido.</mat-error>
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          {{ enviando ? 'Enviando...' : 'Enviar enlace de recuperacion' }}
+        </button>
+      </form>
+
+      <form *ngIf="esRestablecimiento && enlaceValido" [formGroup]="formularioRestablecimiento" (ngSubmit)="guardarNuevaContrasena()">
+        <mat-form-field appearance="outline">
+          <mat-label>Correo electronico</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+          <mat-icon matPrefix>mail</mat-icon>
+          <mat-error>Ingresa el correo asociado a tu cuenta.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nueva contrasena</mat-label>
+          <input matInput [type]="ocultarPassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password" />
+          <button mat-icon-button matSuffix type="button" (click)="ocultarPassword = !ocultarPassword" aria-label="Mostrar u ocultar contrasena">
+            <mat-icon>{{ ocultarPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <mat-error>Debe tener al menos 8 caracteres.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Confirmar contrasena</mat-label>
+          <input matInput [type]="ocultarConfirmacion ? 'password' : 'text'" formControlName="password_confirmation" autocomplete="new-password" />
+          <button mat-icon-button matSuffix type="button" (click)="ocultarConfirmacion = !ocultarConfirmacion" aria-label="Mostrar u ocultar confirmacion">
+            <mat-icon>{{ ocultarConfirmacion ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <mat-error>Confirma la nueva contrasena.</mat-error>
+        </mat-form-field>
+
+        <p class="recuperacion__coincidencia" *ngIf="formularioRestablecimiento.controls.password_confirmation.touched && !passwordsCoinciden">
+          Las contrasenas no coinciden.
+        </p>
+
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          {{ enviando ? 'Guardando...' : 'Guardar nueva contrasena' }}
+        </button>
+      </form>
+
+      <a class="recuperacion__volver" routerLink="/ingresar">
+        <mat-icon>arrow_back</mat-icon>
+        Volver al inicio de sesion
+      </a>
+    </ng-container>
+
+    <ng-template #resultadoExitoso>
+      <section class="recuperacion__resultado">
+        <span class="recuperacion__check"><mat-icon>check</mat-icon></span>
+        <h1>{{ esRestablecimiento ? 'Contrasena actualizada' : 'Revisa tu correo' }}</h1>
+        <p>{{ mensaje }}</p>
+        <p *ngIf="!esRestablecimiento" class="recuperacion__nota">Revisa tambien la carpeta de correo no deseado.</p>
+        <button mat-flat-button type="button" (click)="irAlIngreso()">Ir al inicio de sesion</button>
+      </section>
+    </ng-template>
+  </section>
+</main>

@@ -1,0 +1,146 @@
+<!-- Configuracion visual del panel administrativo -->
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Configuracion interna</h2>
+    <p>Identidad utilizada dentro del panel privado. El contenido para clientes se administra en Pagina publica.</p>
+  </div>
+
+  <form class="seccion__tarjeta formulario" (ngSubmit)="guardarConfiguracion()">
+    <label class="formulario__campo">
+      <span>Nombre de empresa</span>
+      <input
+        type="text"
+        name="nombreEmpresa"
+        [(ngModel)]="configuracion.nombreEmpresa"
+        placeholder="Ejemplo: Pollos Frescos S.A."
+      />
+    </label>
+
+    <label class="formulario__campo">
+      <span>Subir logo (acepta cualquier tipo de imagen)</span>
+      <input type="file" accept="image/*" (change)="seleccionarLogo($event)" />
+    </label>
+
+    @if (configuracion.logoUrl.trim()) {
+      <div class="formulario__preview">
+        <p>Vista previa del logo:</p>
+        <img [src]="configuracion.logoUrl" alt="Vista previa del logo" />
+      </div>
+
+      <button
+        type="button"
+        class="formulario__boton formulario__boton--secundario"
+        [disabled]="subiendoLogo || eliminandoLogo"
+        (click)="eliminarLogo()"
+      >
+        Eliminar imagen
+      </button>
+    }
+
+    <button type="submit" class="formulario__boton" [disabled]="subiendoLogo || eliminandoLogo">
+      Guardar cambios
+    </button>
+
+    @if (subiendoLogo) {
+      <p class="formulario__mensaje">Subiendo logo...</p>
+    }
+
+    @if (eliminandoLogo) {
+      <p class="formulario__mensaje">Eliminando logo...</p>
+    }
+
+    @if (mensajeGuardado) {
+      <p class="formulario__mensaje">{{ mensajeGuardado }}</p>
+    }
+
+    @if (mensajeError) {
+      <p class="formulario__mensaje formulario__mensaje--error">{{ mensajeError }}</p>
+    }
+  </form>
+
+  <form class="seccion__tarjeta formulario" (ngSubmit)="guardarSunat()">
+    <div class="formulario__cabecera">
+      <div>
+        <h3>Facturación electrónica SUNAT</h3>
+        <p>Configura primero el ambiente beta. Cambia a producción únicamente después de validar comprobantes y CDR.</p>
+      </div>
+      <span class="estado" [class.estado--activo]="sunat.activo">{{ sunat.activo ? 'Activo' : 'Inactivo' }}</span>
+    </div>
+
+    <div class="formulario__grid">
+      <label class="formulario__campo">
+        <span>Ambiente</span>
+        <select name="ambiente" [(ngModel)]="sunat.ambiente">
+          <option value="beta">Beta / pruebas</option>
+          <option value="produccion">Producción</option>
+        </select>
+      </label>
+      <label class="formulario__campo">
+        <span>RUC emisor</span>
+        <input name="ruc" [(ngModel)]="sunat.ruc" maxlength="11" required />
+      </label>
+      <label class="formulario__campo">
+        <span>Razón social</span>
+        <input name="razonSocial" [(ngModel)]="sunat.razon_social" required />
+      </label>
+      <label class="formulario__campo">
+        <span>Nombre comercial</span>
+        <input name="nombreComercial" [(ngModel)]="sunat.nombre_comercial" />
+      </label>
+      <label class="formulario__campo formulario__campo--ancho">
+        <span>Dirección fiscal</span>
+        <input name="direccionFiscal" [(ngModel)]="sunat.direccion_fiscal" required />
+      </label>
+      <label class="formulario__campo">
+        <span>Ubigeo</span>
+        <input name="ubigeo" [(ngModel)]="sunat.ubigeo" maxlength="6" />
+      </label>
+      <label class="formulario__campo">
+        <span>Departamento</span>
+        <input name="departamento" [(ngModel)]="sunat.departamento" />
+      </label>
+      <label class="formulario__campo">
+        <span>Provincia</span>
+        <input name="provincia" [(ngModel)]="sunat.provincia" />
+      </label>
+      <label class="formulario__campo">
+        <span>Distrito</span>
+        <input name="distrito" [(ngModel)]="sunat.distrito" />
+      </label>
+      <label class="formulario__campo">
+        <span>Correo</span>
+        <input name="correoSunat" type="email" [(ngModel)]="sunat.correo" />
+      </label>
+      <label class="formulario__campo">
+        <span>Usuario SOL</span>
+        <input name="usuarioSol" [(ngModel)]="sunat.usuario_sol" autocomplete="off" />
+      </label>
+      <label class="formulario__campo">
+        <span>Clave SOL {{ sunat.clave_sol_configurada ? '(ya configurada)' : '' }}</span>
+        <input name="claveSol" type="password" [(ngModel)]="sunat.clave_sol" autocomplete="new-password" />
+      </label>
+      <label class="formulario__campo formulario__campo--check">
+        <input name="activoSunat" type="checkbox" [(ngModel)]="sunat.activo" />
+        <span>Habilitar facturación electrónica</span>
+      </label>
+    </div>
+
+    <div class="certificado">
+      <div>
+        <strong>Certificado digital</strong>
+        <p>{{ sunat.certificado_configurado ? 'Certificado configurado.' : 'Falta cargar certificado PEM.' }}</p>
+      </div>
+      <input type="file" accept=".pem,.txt" (change)="seleccionarCertificado($event)" />
+      <input name="claveCertificado" type="password" [(ngModel)]="sunat.certificado_clave" placeholder="Clave del certificado, si corresponde" />
+      <button type="button" class="formulario__boton" (click)="subirCertificado()" [disabled]="subiendoCertificado">
+        {{ subiendoCertificado ? 'Subiendo...' : 'Guardar certificado' }}
+      </button>
+    </div>
+
+    <button type="submit" class="formulario__boton" [disabled]="guardandoSunat">
+      {{ guardandoSunat ? 'Guardando...' : 'Guardar configuración SUNAT' }}
+    </button>
+    @if (mensajeSunat) { <p class="formulario__mensaje">{{ mensajeSunat }}</p> }
+    @if (errorSunat) { <p class="formulario__mensaje formulario__mensaje--error">{{ errorSunat }}</p> }
+  </form>
+</section>

@@ -1,0 +1,412 @@
+﻿<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Usuarios</h2>
+    <p>Administracion integral de usuarios con busqueda rapida y edicion segura.</p>
+  </div>
+
+  <div class="barra">
+    <div class="barra__busqueda">
+      <label for="busqueda">Buscar usuario</label>
+      <input
+        id="busqueda"
+        type="search"
+        placeholder="Busca por nombre, usuario, correo, rol o estado..."
+        [(ngModel)]="terminoBusqueda"
+      />
+    </div>
+    <button class="boton boton--primario" type="button" (click)="iniciarNuevo()">
+      Nuevo usuario
+    </button>
+  </div>
+
+  <div class="alerta" *ngIf="mensajeError">{{ mensajeError }}</div>
+
+  <div class="contenido">
+    <div class="tarjeta tabla">
+      <div class="tabla__encabezado">
+        <h3>Listado de usuarios</h3>
+        <span>{{ usuariosFiltrados.length }} usuarios</span>
+      </div>
+      <div class="tabla__contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>Nro</th>
+              <th>Usuario</th>
+              <th>Rol y permisos</th>
+              <th>Contacto</th>
+              <th>Estado</th>
+              <th>Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!cargando && usuariosFiltrados.length === 0">
+              <td colspan="7" class="tabla__vacia">
+                No hay usuarios que coincidan con tu busqueda.
+              </td>
+            </tr>
+            <tr *ngFor="let usuario of usuariosFiltrados; let i = index">
+              <td data-label="Nro">{{ i + 1 }}</td>
+              <td data-label="Usuario" class="usuario-identidad">
+                <strong>{{ usuario.nombres }} {{ usuario.apellidos }}</strong>
+                <span>{{ usuario.usuario }}</span>
+              </td>
+              <td data-label="Rol y permisos">
+                <strong class="rol-principal">{{ obtenerNombreRol(usuario.rol_id) }}</strong>
+                <div class="roles-tabla">
+                  <span
+                    class="roles-tabla__item"
+                    *ngFor="let rolId of obtenerRolesPermitidos(usuario)"
+                    [class.roles-tabla__item--principal]="rolId === usuario.rol_id"
+                  >
+                    {{ obtenerNombreRol(rolId) }}
+                  </span>
+                </div>
+              </td>
+              <td data-label="Contacto">
+                <div>{{ usuario.email }}</div>
+                <div class="nota">Tel: {{ usuario.telefono || 'No registrado' }}</div>
+              </td>
+              <td data-label="Estado">
+                <span
+                  class="estado"
+                  [class.estado--activo]="usuario.activo"
+                  [class.estado--inactivo]="!usuario.activo"
+                >
+                  {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td data-label="Registro">
+                <div>Creado: {{ usuario.creado_en | date: 'short' }}</div>
+                <div class="nota">Actualizado: {{ usuario.actualizado_en | date: 'short' }}</div>
+              </td>
+              <td data-label="Acciones" class="tabla__acciones">
+                <div class="tabla__acciones-contenido">
+                  <label class="switch switch--tabla" title="Activar o desactivar usuario">
+                    <input
+                      type="checkbox"
+                      [checked]="usuario.activo"
+                      (change)="cambiarEstado(usuario)"
+                    />
+                    <span class="switch__slider"></span>
+                  </label>
+                  <button
+                    class="boton boton--secundario"
+                    type="button"
+                    (click)="seleccionarUsuario(usuario)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    class="boton boton--peligro"
+                    type="button"
+                    (click)="eliminarUsuario(usuario)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="modal" *ngIf="mostrarModal">
+  <div class="modal__overlay" (click)="cerrarModal()"></div>
+  <div class="modal__contenedor">
+    <div class="modal__encabezado">
+      <div>
+        <h3>{{ modoEdicion ? 'Editar usuario' : 'Registrar nuevo usuario' }}</h3>
+        <p class="formulario__descripcion">
+          Completa todos los campos para asegurar una gestion clara de permisos,
+          credenciales y estado del usuario.
+        </p>
+      </div>
+      <button class="boton boton--cerrar" type="button" (click)="cerrarModal()">
+        
+      </button>
+    </div>
+
+    <div class="alerta" *ngIf="mensajeError">{{ mensajeError }}</div>
+
+    <form (ngSubmit)="guardarUsuario()" #usuarioForm="ngForm">
+      <section class="consulta-reniec">
+        <div>
+          <strong>Buscar datos por DNI</strong>
+          <p>Consulta RENIEC para autocompletar nombres y apellidos del usuario.</p>
+        </div>
+        <div class="consulta-reniec__control">
+          <input
+            name="consultaDni"
+            type="text"
+            inputmode="numeric"
+            maxlength="8"
+            placeholder="DNI de 8 digitos"
+            [(ngModel)]="consultaDni"
+          />
+          <button
+            class="boton boton--primario"
+            type="button"
+            (click)="consultarDniReniec()"
+            [disabled]="consultaCargando"
+          >
+            {{ consultaCargando ? 'Consultando...' : 'Consultar' }}
+          </button>
+        </div>
+      </section>
+
+      <div class="formulario__grid">
+        <div class="campo">
+          <label for="rol">Rol principal</label>
+          <select id="rol" name="rol" [(ngModel)]="formulario.rol_id" (ngModelChange)="sincronizarRolPrincipal()" required>
+            <option *ngFor="let rol of roles" [ngValue]="rol.id">
+              {{ rol.nombre }}
+            </option>
+          </select>
+          <small>Se usa como rol por defecto si solo tiene un permiso.</small>
+        </div>
+        <div class="campo campo--roles">
+          <label>Roles permitidos</label>
+          <div class="roles-permitidos">
+            <label
+              class="roles-permitidos__opcion"
+              *ngFor="let rol of roles"
+              [class.roles-permitidos__opcion--activo]="rolPermitido(rol.id)"
+            >
+              <input
+                type="checkbox"
+                [checked]="rolPermitido(rol.id)"
+                [disabled]="rol.id === formulario.rol_id"
+                (change)="alternarRolPermitido(rol.id)"
+              />
+              <span>{{ rol.nombre }}</span>
+            </label>
+          </div>
+          <small>Si tiene mas de un rol, al iniciar sesion podra elegir con cual entrar.</small>
+        </div>
+        <div class="campo">
+          <label for="usuario">Usuario</label>
+          <input
+            id="usuario"
+            name="usuario"
+            type="text"
+            [(ngModel)]="formulario.usuario"
+            required
+            minlength="3"
+            #usuarioField="ngModel"
+          />
+          <small class="mensaje-error" *ngIf="usuarioField.invalid && usuarioField.touched">
+            El usuario es obligatorio (minimo 3 caracteres).
+          </small>
+        </div>
+        <div class="campo">
+          <label for="nombres">Nombres</label>
+          <input
+            id="nombres"
+            name="nombres"
+            type="text"
+            [(ngModel)]="formulario.nombres"
+            required
+            #nombresField="ngModel"
+          />
+          <small class="mensaje-error" *ngIf="nombresField.invalid && nombresField.touched">
+            Los nombres son obligatorios.
+          </small>
+        </div>
+        <div class="campo">
+          <label for="apellidos">Apellidos</label>
+          <input
+            id="apellidos"
+            name="apellidos"
+            type="text"
+            [(ngModel)]="formulario.apellidos"
+            required
+            #apellidosField="ngModel"
+          />
+          <small class="mensaje-error" *ngIf="apellidosField.invalid && apellidosField.touched">
+            Los apellidos son obligatorios.
+          </small>
+        </div>
+        <div class="campo">
+          <label for="email">Correo electronico</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="formulario.email"
+            required
+            #emailField="ngModel"
+          />
+          <small class="mensaje-error" *ngIf="emailField.invalid && emailField.touched">
+            Ingresa un correo valido.
+          </small>
+        </div>
+        <div class="campo">
+          <label for="telefono">Telefono</label>
+          <input
+            id="telefono"
+            name="telefono"
+            type="text"
+            maxlength="9"
+            inputmode="numeric"
+            [(ngModel)]="formulario.telefono"
+          />
+          <small>
+            Opcional: ingresa 9 digitos o deja el campo vacio.
+          </small>
+        </div>
+        <div class="campo">
+          <label for="password">
+            {{ modoEdicion ? 'Nueva contrasena' : 'Contrasena' }}
+          </label>
+          <div class="campo__password">
+            <input
+              id="password"
+              name="password"
+              [type]="mostrarPassword ? 'text' : 'password'"
+              [(ngModel)]="formulario.password"
+              [required]="!modoEdicion"
+              minlength="6"
+              pattern="^(?=.*[A-Za-z])(?=.*\\d).{6,}$"
+              #passwordField="ngModel"
+            />
+            <button
+              class="boton boton--icono"
+              type="button"
+              (click)="mostrarPassword = !mostrarPassword"
+              [attr.aria-label]="mostrarPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'"
+              [title]="mostrarPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'"
+            >
+              <svg *ngIf="!mostrarPassword" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="mostrarPassword" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.1-.9"></path>
+                <path d="M9.9 5.3A10.5 10.5 0 0 1 12 5c6.5 0 10 7 10 7a17.5 17.5 0 0 1-3.1 3.8"></path>
+                <path d="M6.6 6.6C3.6 8.5 2 12 2 12s3.5 7 10 7a10.9 10.9 0 0 0 4.1-.8"></path>
+              </svg>
+            </button>
+          </div>
+          <small>
+            {{
+              modoEdicion
+                ? 'Dejar en blanco si no deseas cambiarla.'
+                : 'Debe incluir letras y numeros.'
+            }}
+          </small>
+          <small class="mensaje-error" *ngIf="!passwordValida">
+            La contrasena debe incluir letras y numeros (minimo 6 caracteres).
+          </small>
+          <small class="mensaje-error" *ngIf="passwordField.invalid && passwordField.touched">
+            La contrasena es obligatoria y debe cumplir el formato solicitado.
+          </small>
+        </div>
+        <div class="campo">
+          <label for="confirmacion">Confirmar contrasena</label>
+          <div class="campo__password">
+            <input
+              id="confirmacion"
+              name="confirmacion"
+              [type]="mostrarConfirmacion ? 'text' : 'password'"
+              [(ngModel)]="formulario.password_confirmation"
+              [required]="!modoEdicion || formulario.password"
+              minlength="6"
+              #confirmacionField="ngModel"
+            />
+            <button
+              class="boton boton--icono"
+              type="button"
+              (click)="mostrarConfirmacion = !mostrarConfirmacion"
+              [attr.aria-label]="mostrarConfirmacion ? 'Ocultar contrasena' : 'Mostrar contrasena'"
+              [title]="mostrarConfirmacion ? 'Ocultar contrasena' : 'Mostrar contrasena'"
+            >
+              <svg *ngIf="!mostrarConfirmacion" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="mostrarConfirmacion" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.1-.9"></path>
+                <path d="M9.9 5.3A10.5 10.5 0 0 1 12 5c6.5 0 10 7 10 7a17.5 17.5 0 0 1-3.1 3.8"></path>
+                <path d="M6.6 6.6C3.6 8.5 2 12 2 12s3.5 7 10 7a10.9 10.9 0 0 0 4.1-.8"></path>
+              </svg>
+            </button>
+          </div>
+          <small class="mensaje-error" *ngIf="!passwordsCoinciden">
+            Las contrasenas no coinciden.
+          </small>
+          <small
+            class="mensaje-error"
+            *ngIf="confirmacionField.invalid && confirmacionField.touched"
+          >
+            Confirma la contrasena (minimo 6 caracteres).
+          </small>
+        </div>
+        <div class="campo campo--switch">
+          <label for="activo">Estado activo</label>
+          <label class="switch">
+            <input
+              id="activo"
+              name="activo"
+              type="checkbox"
+              [(ngModel)]="formulario.activo"
+            />
+            <span class="switch__slider"></span>
+          </label>
+          <small>
+            Activalo para permitir que el usuario pueda iniciar sesion.
+          </small>
+        </div>
+      </div>
+
+      <div class="formulario__acciones">
+        <button
+          class="boton boton--primario"
+          type="submit"
+          [disabled]="
+            cargando ||
+            !passwordsCoinciden ||
+            !passwordValida ||
+            !formularioValido
+          "
+        >
+          {{ modoEdicion ? 'Guardar cambios' : 'Crear usuario' }}
+        </button>
+        <button class="boton" type="button" (click)="cerrarModal()">
+          Cancelar
+        </button>
+      </div>
+      <small class="formulario__ayuda">
+        Verifica que todos los campos esten completos y que la contrasena cumpla con
+        los requisitos antes de guardar.
+      </small>
+      <small class="formulario__ayuda" *ngIf="!formularioValido">
+        Asegurate de completar todos los campos obligatorios.
+      </small>
+      <small class="formulario__ayuda" *ngIf="!passwordsCoinciden">
+        Las contrasenas deben coincidir para poder guardar.
+      </small>
+      <small class="formulario__ayuda" *ngIf="!passwordValida">
+        La contrasena debe contener letras y numeros.
+      </small>
+
+      <div class="formulario__resumen" *ngIf="usuarioSeleccionado">
+        <h4>Resumen del usuario</h4>
+        <p><strong>ID:</strong> {{ usuarioSeleccionado.usuario_id }}</p>
+        <p><strong>Creado:</strong> {{ usuarioSeleccionado.creado_en | date: 'medium' }}</p>
+        <p>
+          <strong>Actualizado:</strong>
+          {{ usuarioSeleccionado.actualizado_en | date: 'medium' }}
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+

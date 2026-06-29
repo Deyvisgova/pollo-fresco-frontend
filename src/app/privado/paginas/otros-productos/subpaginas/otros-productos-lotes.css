@@ -1,0 +1,370 @@
+.seccion__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.seccion__tarjeta {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+}
+
+.seccion__encabezado {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.seccion__tarjeta h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.seccion__tarjeta ol,
+.seccion__tarjeta ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #334155;
+}
+
+.seccion__acciones {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.seccion__acciones input {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+}
+
+.seccion__tabla {
+  width: 100%;
+  max-height: min(64vh, 620px);
+  overflow: auto;
+  position: relative;
+  border: 1px solid #d7e1f2;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+thead {
+  background: #e2e8f0;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #eef4ff;
+  box-shadow: 0 1px 0 #d7e1f2, 0 8px 14px rgba(15, 23, 42, 0.08);
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tabla__acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.etiqueta {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.etiqueta--cerrada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.boton {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton--primario {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.boton--secundario {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.boton--texto {
+  background: transparent;
+  padding: 6px 8px;
+  color: #1d4ed8;
+}
+
+.boton--accion {
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 10px;
+  color: #0f172a;
+}
+
+.boton--peligro {
+  color: #dc2626;
+}
+
+.boton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.modal__contenido {
+  width: min(960px, 100%);
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+}
+
+.modal__subtitulo {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.modal__encabezado {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.modal__grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.modal__grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.modal__grid input,
+.modal__tabla input {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+}
+
+.modal__grid select {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+}
+
+.modal__selector {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.selector-producto,
+.selector-proveedor {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.selector-producto__boton,
+.selector-proveedor__boton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  cursor: pointer;
+}
+
+.selector-producto__icono,
+.selector-proveedor__icono {
+  font-size: 12px;
+  color: #475569;
+}
+
+.selector-producto__menu,
+.selector-proveedor__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 10;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selector-producto__menu input,
+.selector-proveedor__menu input {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5f5;
+}
+
+.selector-producto__lista,
+.selector-proveedor__lista {
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selector-producto__item,
+.selector-proveedor__item {
+  background: #f8fafc;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.selector-producto__item:hover,
+.selector-proveedor__item:hover {
+  background: #e2e8f0;
+}
+
+.modal__cantidad {
+  max-width: 160px;
+}
+
+.modal__cantidad input {
+  max-width: 140px;
+}
+
+.modal__error {
+  margin: 0;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.modal__tabla {
+  width: 100%;
+  max-height: min(58vh, 520px);
+  overflow: auto;
+  position: relative;
+}
+
+.modal__tabla table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.modal__tabla th,
+.modal__tabla td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.modal__tabla th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #eef4ff;
+  box-shadow: 0 1px 0 #d7e1f2, 0 8px 14px rgba(15, 23, 42, 0.08);
+}
+
+.modal__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.seccion__tarjeta--destacado {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.seccion__tarjeta--info {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+
+.stock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stock--bajo {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.stock--bajo small {
+  color: #dc2626;
+  font-weight: 700;
+}

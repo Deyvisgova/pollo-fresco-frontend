@@ -1,0 +1,51 @@
+<section class="inicio-page">
+  <header class="cabecera">
+    <div><span class="eyebrow">Centro de decisiones</span><h1>Resumen del negocio</h1><p>Resultados reales, riesgos y oportunidades del periodo.</p></div>
+    <div class="filtros"><label>Desde<input type="date" [(ngModel)]="fechaDesde"></label><label>Hasta<input type="date" [(ngModel)]="fechaHasta"></label><button (click)="aplicarMes()">Mes actual</button><button class="primario" (click)="cargar()">Actualizar</button></div>
+  </header>
+  <div class="alerta" *ngIf="cargando">Actualizando indicadores...</div><div class="alerta error" *ngIf="error">{{ error }}</div>
+
+  <div class="kpis">
+    <article class="kpi principal"><span>Resultado neto</span><strong>S/ {{ dinero(indicadores['resultado_neto']) | number:'1.2-2' }}</strong><small>Ganancia generada menos gastos</small></article>
+    <article class="kpi"><span>Ventas generadas</span><strong>S/ {{ dinero(indicadores['ventas_generadas'] || indicadores['total_facturado']) | number:'1.2-2' }}</strong><small>Pedidos, pollo/gallina y otros productos</small></article>
+    <article class="kpi"><span>Dinero cobrado</span><strong>S/ {{ dinero(indicadores['dinero_cobrado'] || indicadores['cobrado_periodo']) | number:'1.2-2' }}</strong><small>Pagos que entraron a caja</small></article>
+    <article class="kpi riesgo"><span>Por cobrar</span><strong>S/ {{ dinero(indicadores['cuentas_por_cobrar']) | number:'1.2-2' }}</strong><small>Deuda pendiente actual</small></article>
+    <article class="kpi"><span>Valor del stock</span><strong>S/ {{ dinero(indicadores['valor_stock']) | number:'1.2-2' }}</strong><small>{{ stockBajo.length }} alertas de stock</small></article>
+    <article class="kpi"><span>Pedidos activos</span><strong>{{ indicadores['pedidos_activos'] || 0 }}</strong><small>{{ indicadores['pedidos_en_ruta'] || 0 }} en ruta</small></article>
+  </div>
+
+  <div class="decision-grid">
+    <article class="panel tendencia">
+      <div class="titulo"><div><h2>Movimiento de ventas</h2><p>Ventas generadas por dia del periodo</p></div><strong>S/ {{ dinero(indicadores['ventas_generadas'] || indicadores['total_facturado']) | number:'1.2-2' }}</strong></div>
+      <div class="barras" *ngIf="ventasDiarias.length"><div class="barra-item" *ngFor="let dia of ventasDiarias"><div class="barra-valor">S/ {{ dia.total | number:'1.0-0' }}</div><div class="barra" [style.height.%]="altura(dia.total)"></div><span>{{ dia.etiqueta }}</span></div></div>
+    </article>
+    <article class="panel canales">
+      <div class="titulo"><div><h2>Origen de ingresos</h2><p>Participación por línea</p></div></div>
+      <div class="dona-wrap">
+        <div class="dona" [style.background]="estiloDona()">
+          <div class="dona-centro"><span>Total</span><strong>S/ {{ totalDistribucion() | number:'1.2-2' }}</strong></div>
+        </div>
+      </div>
+      <div class="canal" *ngFor="let item of distribucion"><div class="canal-linea"><span><i [style.background]="item.color"></i>{{ item.nombre }}</span><strong>{{ porcentaje(item.valor) }}%</strong></div><div class="progreso"><b [style.width.%]="porcentaje(item.valor)" [style.background]="item.color"></b></div><small>S/ {{ item.valor | number:'1.2-2' }}</small></div>
+    </article>
+  </div>
+
+  <div class="decision-grid inferior">
+    <article class="panel">
+      <div class="titulo"><div><h2>Productos que más venden</h2><p>Ranking por ingreso generado</p></div><a routerLink="/privado/otros-productos">Ver productos</a></div>
+      <div class="ranking" *ngFor="let p of productos; index as i"><span class="pos">{{ i + 1 }}</span><div><strong>{{ p.producto }}</strong><div class="mini-barra"><b [style.width.%]="anchoProducto(p.total)"></b></div><small>{{ p.cantidad | number:'1.0-2' }} vendidos</small></div><strong>S/ {{ p.total | number:'1.2-2' }}</strong></div>
+      <p class="vacio" *ngIf="!productos.length">Aún no hay ventas de productos en este periodo.</p>
+    </article>
+    <article class="panel alertas">
+      <div class="titulo"><div><h2>Atención requerida</h2><p>Prioridades para actuar hoy</p></div></div>
+      <a routerLink="/privado/otros-productos" class="alerta-item" *ngFor="let s of stockBajo"><span class="indicador naranja"></span><div><strong>Stock bajo: {{ s.producto }}</strong><small>Quedan {{ s.stock }} {{ s.unidad }}</small></div><b>Reponer</b></a>
+      <a routerLink="/privado/pedidos" class="alerta-item" *ngFor="let d of deudores"><span class="indicador rojo"></span><div><strong>{{ d.cliente }}</strong><small>Debe desde {{ d.deuda_desde | date:'dd/MM/yyyy' }}</small></div><b>S/ {{ d.saldo | number:'1.2-2' }}</b></a>
+      <p class="vacio" *ngIf="!stockBajo.length && !deudores.length">No hay alertas críticas pendientes.</p>
+    </article>
+  </div>
+
+  <div class="decision-grid inferior">
+    <article class="panel cobranza"><div class="titulo"><div><h2>Salud de cobranza</h2><p>Dinero cobrado y deuda pendiente</p></div></div><div class="cobranza-numero">{{ indicadores['porcentaje_cobrado'] || 0 }}%</div><div class="progreso grande"><b [style.width.%]="indicadores['porcentaje_cobrado'] || 0"></b></div><div class="cobranza-leyenda"><span>Cobrado en periodo<strong>S/ {{ dinero(indicadores['dinero_cobrado'] || indicadores['cobrado_periodo']) | number:'1.2-2' }}</strong></span><span>Por cobrar actual<strong>S/ {{ dinero(indicadores['cuentas_por_cobrar']) | number:'1.2-2' }}</strong></span></div></article>
+    <article class="panel"><div class="titulo"><div><h2>Rendimiento delivery</h2><p>Entregas y efectividad</p></div><a routerLink="/privado/reportes">Ver reporte</a></div><div class="delivery" *ngFor="let d of delivery"><div><strong>{{ d.delivery }}</strong><small>{{ d.entregados }} de {{ d.asignados }} entregados</small></div><strong>{{ d.efectividad }}%</strong></div><p class="vacio" *ngIf="!delivery.length">Sin actividad delivery en este periodo.</p></article>
+  </div>
+</section>

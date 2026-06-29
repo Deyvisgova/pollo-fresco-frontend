@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="Pollo entero">
+  <defs>
+    <linearGradient id="fondo" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="520" rx="32" fill="url(#fondo)"/>
+  <circle cx="1010" cy="80" r="155" fill="#fff7ed" opacity=".65"/>
+  <circle cx="240" cy="425" r="140" fill="#ffedd5" opacity=".8"/>
+  <text x="90" y="190" fill="#7c2d12" font-family="Arial, sans-serif" font-size="76" font-weight="800">Pollo entero</text>
+  <text x="94" y="280" fill="#9a3412" font-family="Arial, sans-serif" font-size="36">Frescura diaria para tu cocina</text>
+  <path d="M680 345c55-118 210-154 318-76 54 39 91 48 142 33-38 84-127 138-244 138-103 0-177-34-216-95z" fill="#fff7ed" opacity=".9"/>
+  <path d="M715 330c78-58 182-58 263-6" fill="none" stroke="#f97316" stroke-width="18" stroke-linecap="round" opacity=".55"/>
+</svg>

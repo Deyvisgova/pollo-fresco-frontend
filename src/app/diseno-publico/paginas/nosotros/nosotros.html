@@ -1,0 +1,41 @@
+<section *ngIf="contenido().mostrar_nosotros" id="nosotros" class="nosotros pb-5 bg-light">
+  <div class="container">
+    <div class="pagina-banner pagina-banner--full-bleed">
+      <img [src]="contenido().banner_nosotros_url" alt="Banner de Nosotros">
+    </div>
+    <div class="row g-4 align-items-center">
+      <div class="col-12 col-lg-6">
+        <h2 class="fw-bold">{{ contenido().titulo_nosotros }}</h2>
+        <p class="text-muted">{{ contenido().descripcion_nosotros }}</p>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <mat-card class="h-100 nosotros__tarjeta">
+              <mat-card-title>Mision</mat-card-title>
+              <mat-card-content>
+                {{ contenido().mision }}
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div class="col-12 col-md-6">
+            <mat-card class="h-100 nosotros__tarjeta">
+              <mat-card-title>Vision</mat-card-title>
+              <mat-card-content>
+                {{ contenido().vision }}
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div class="col-12">
+            <mat-card class="h-100 nosotros__tarjeta">
+              <mat-card-title>Valores</mat-card-title>
+              <mat-card-content>
+                {{ contenido().valores }}
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

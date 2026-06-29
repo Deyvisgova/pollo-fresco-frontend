@@ -1,0 +1,126 @@
+<section class="ingresar py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-5">
+        <mat-card class="ingresar__card">
+          <mat-card-content>
+            <div class="text-center mb-4">
+              <span class="badge text-bg-warning text-uppercase"
+                >Pollo Fresco</span
+              >
+              <h2 class="fw-bold mt-3">Bienvenido de vuelta</h2>
+              <p class="text-muted mb-0">
+
+                Ingresa al sistema de ventas y facturacion electronica.
+
+                Ingresa con tu cuenta para gestionar tus pedidos.
+
+              </p>
+            </div>
+
+            <form
+              *ngIf="!esperandoSeleccionRol"
+              class="d-grid gap-3"
+              [formGroup]="formulario"
+              (ngSubmit)="enviarIngreso()"
+            >
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Usuario o correo</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Tu usuario o correo"
+                  autocomplete="username"
+                  formControlName="usuario"
+                />
+                <mat-icon matPrefix>person</mat-icon>
+                <mat-error *ngIf="formulario.get('usuario')?.hasError('required')">
+                  El usuario es obligatorio.
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Contrasena</mat-label>
+                <input
+                  matInput
+                  [type]="hidePassword ? 'password' : 'text'"
+                  placeholder="Tu contrasena"
+                  autocomplete="current-password"
+                  formControlName="password"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                  [attr.aria-label]="hidePassword ? 'Mostrar contrasena' : 'Ocultar contrasena'"
+                >
+                  <mat-icon
+                    >{{ hidePassword ? 'visibility' : 'visibility_off'
+                    }}</mat-icon
+                  >
+                </button>
+                <mat-error *ngIf="formulario.get('password')?.hasError('required')">
+                  La contrasena es obligatoria.
+                </mat-error>
+              </mat-form-field>
+
+              <div
+                class="alert alert-danger py-2 mb-0"
+                role="alert"
+                *ngIf="mensajeError"
+              >
+                {{ mensajeError }}
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <a class="ingresar__link" routerLink="/recuperar-contrasena"
+                  >Olvide mi contrasena</a
+                >
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="estaCargando"
+                >
+                  {{ estaCargando ? 'Ingresando...' : 'Ingresar' }}
+                </button>
+              </div>
+            </form>
+
+            <section class="seleccion-rol" *ngIf="esperandoSeleccionRol">
+              <div class="seleccion-rol__encabezado">
+                <h3>Elige como ingresar</h3>
+                <p>Tu usuario tiene mas de un permiso. Selecciona el rol que usaras en esta sesion.</p>
+              </div>
+
+              <div class="seleccion-rol__grid">
+                <button
+                  type="button"
+                  class="seleccion-rol__opcion"
+                  *ngFor="let rol of rolesDisponibles"
+                  (click)="seleccionarRol(rol)"
+                  [disabled]="estaCargando"
+                >
+                  <span class="seleccion-rol__icono" [attr.data-role]="rol.role" aria-hidden="true"></span>
+                  <strong>{{ rol.nombre }}</strong>
+                </button>
+              </div>
+
+              <button type="button" class="seleccion-rol__volver" (click)="volverACredenciales()" [disabled]="estaCargando">
+                Cambiar usuario o contrasena
+              </button>
+            </section>
+
+            <mat-divider class="my-4"></mat-divider>
+            <div class="text-center">
+              <p class="text-muted mb-0">
+                El acceso lo habilita el administrador del sistema.
+              </p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,79 @@
+.carrusel {
+  width: 100%;
+  background: #f5f8fc;
+  padding: 2.5rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #dde6f1;
+}
+
+.carrusel__contenido {
+  padding-left: clamp(0.75rem, 2vw, 2rem);
+  padding-right: clamp(0.75rem, 2vw, 2rem);
+}
+
+.carrusel__tarjeta {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #eef3f8;
+  box-shadow: 0 18px 40px rgba(24, 51, 88, 0.14);
+}
+
+.carrusel__tarjeta img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1600 / 700;
+  object-fit: fill;
+}
+
+.carrusel__controles {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.carrusel__indicadores {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.carrusel__indicador {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(122, 46, 13, 0.25);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.carrusel__indicador--activo {
+  background: #7a2e0d;
+  transform: scale(1.1);
+}
+
+.carrusel :is(h2, mat-card-title) {
+  color: #12376c;
+}
+
+.carrusel :is(p, mat-card-content) {
+  color: #52647f;
+}
+
+@media (max-width: 991.98px) {
+  .carrusel {
+    padding: 1.75rem 0;
+  }
+
+  .carrusel__acciones {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .carrusel {
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .carrusel__tarjeta img { height: auto; }
+}

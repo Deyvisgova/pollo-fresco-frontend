@@ -1,0 +1,136 @@
+<section class="seccion__tarjeta">
+  <header class="seccion__encabezado">
+    <div>
+      <h3>Productos</h3>
+      <p>Administra los productos disponibles para otros productos.</p>
+    </div>
+    <button class="boton boton--primario" (click)="abrirModalNuevo()">
+      Nuevo producto
+    </button>
+  </header>
+
+  <div class="seccion__acciones">
+    <input
+      type="search"
+      placeholder="Buscar por nombre, grupo o estado..."
+      [(ngModel)]="filtro"
+    />
+    <button class="boton boton--secundario">Buscar</button>
+  </div>
+
+  <p class="seccion__error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+  <div class="seccion__tabla">
+    <table class="tabla-productos">
+      <colgroup>
+        <col class="col-id" />
+        <col class="col-nombre" />
+        <col class="col-grupo" />
+        <col class="col-estado" />
+        <col class="col-acciones" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Nombre</th>
+          <th>Grupo venta</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productosFiltrados; let i = index">
+          <td data-label="N°">{{ i + 1 }}</td>
+          <td data-label="Nombre">{{ producto.nombre }}</td>
+          <td data-label="Grupo venta">{{ producto.grupoVenta }}</td>
+          <td data-label="Estado">
+            <span
+              class="etiqueta"
+              [class.etiqueta--cerrada]="!producto.activo"
+            >
+              {{ obtenerEstadoTexto(producto) }}
+            </span>
+          </td>
+          <td data-label="Acciones" class="tabla__acciones">
+            <div class="tabla__acciones-contenido">
+              <button
+                type="button"
+                class="toggle"
+                [class.toggle--activo]="producto.activo"
+                (click)="toggleActivo(producto)"
+                [attr.aria-label]="producto.activo ? 'Desactivar producto' : 'Activar producto'"
+                [title]="producto.activo ? 'Desactivar producto' : 'Activar producto'"
+              >
+                <span class="toggle__circulo"></span>
+                <span class="toggle__texto">{{ producto.activo ? 'Activo' : 'Inactivo' }}</span>
+              </button>
+              <button
+                class="boton boton--accion"
+                (click)="seleccionarProducto(producto)"
+                title="Editar producto"
+              >
+                Editar
+              </button>
+              <button
+                class="boton boton--accion boton--peligro"
+                (click)="eliminarProducto(producto)"
+                title="Eliminar producto"
+              >
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="productosFiltrados.length === 0">
+          <td colspan="5">No hay productos con ese filtro.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="modal" *ngIf="mostrarModal">
+  <div class="modal__contenido">
+    <header class="modal__encabezado">
+      <div>
+        <h3>{{ modoEdicion ? 'Editar producto' : 'Nuevo producto' }}</h3>
+        <p>Registra o actualiza el nombre del producto.</p>
+      </div>
+      <button class="boton boton--texto" (click)="cerrarModal()">Cerrar</button>
+    </header>
+
+    <div class="modal__grid">
+      <label>
+        Nombre del producto
+        <input
+          type="text"
+          [(ngModel)]="formulario.nombre"
+          placeholder="Ej: Huevos de codorniz"
+        />
+      </label>
+      <label>
+        Grupo venta
+        <select [(ngModel)]="formulario.grupoVenta">
+          <option value="HUEVOS">Huevos</option>
+          <option value="CONGELADO">Congelado</option>
+          <option value="OTROS">Otros</option>
+        </select>
+      </label>
+      <label class="modal__switch">
+        <span>Estado</span>
+        <select [(ngModel)]="formulario.activo">
+          <option [ngValue]="true">Activo</option>
+          <option [ngValue]="false">Inactivo</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="modal__error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+    <div class="modal__acciones">
+      <button class="boton boton--primario" (click)="guardarProducto()">
+        {{ modoEdicion ? 'Actualizar producto' : 'Guardar producto' }}
+      </button>
+    </div>
+  </div>
+</div>

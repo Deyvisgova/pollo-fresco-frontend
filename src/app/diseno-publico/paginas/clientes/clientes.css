@@ -1,0 +1,18 @@
+.clientes__card {
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid #e0e8f2;
+  box-shadow: 0 12px 28px rgba(25, 45, 76, 0.09);
+}
+
+.clientes__icono {
+  font-size: 2.5rem;
+  color: #ff6f00;
+}
+
+@media (max-width: 575.98px) {
+  .clientes__card {
+    padding: 1.25rem;
+  }
+}

@@ -1,0 +1,20 @@
+<!-- Contenido base para la vista de clientes -->
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Clientes</h2>
+    <p>
+      Gestiona la cartera de clientes y actualiza sus datos desde el panel
+      privado.
+    </p>
+  </div>
+
+  <nav class="seccion__tabs">
+    <a routerLink="crud" routerLinkActive="tab--activa" class="tab"
+      >Control de Clientes</a
+    >
+  </nav>
+
+  <div class="seccion__contenido">
+    <router-outlet></router-outlet>
+  </div>
+</section>

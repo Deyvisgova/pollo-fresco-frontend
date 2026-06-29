@@ -1,0 +1,243 @@
+<section class="seccion__tarjeta">
+  <header class="seccion__encabezado">
+    <div>
+      <h3>Registro manual de ventas diarias</h3>
+      <p class="seccion__descripcion">Agrega lineas durante el dia. Selecciona producto, cantidad y precio.</p>
+    </div>
+    <div class="seccion__acciones" *ngIf="!esVendedor">
+      <button type="button" class="boton boton--primario" (click)="cerrarDia()">Cerrar dia</button>
+    </div>
+  </header>
+
+  <p class="seccion__error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+  <div class="seccion__tabla">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-fecha">Fecha y hora</th>
+          <th class="col-nombre">Nombre usuario</th>
+          <th>Productos</th>
+          <th>Presentacion</th>
+          <th>Cantidad</th>
+          <th>Precio (S/)</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr #filaVenta *ngFor="let venta of ventas; let i = index">
+          <td data-label="Fecha y hora">
+            <div class="fecha-usuario">
+              <input
+                type="datetime-local"
+                [ngModel]="venta.fechaHora"
+                name="fecha-hora-{{ i }}"
+                class="fecha-usuario__fecha"
+                disabled
+                readonly
+              />
+            </div>
+          </td>
+          <td data-label="Nombre usuario">
+            <span class="fecha-usuario__nombre" title="Nombre del usuario">{{ usuarioActual }}</span>
+          </td>
+          <td data-label="Productos">
+            <div class="selector-producto">
+              <button
+                type="button"
+                class="selector-producto__boton"
+                #productoTrigger
+                (click)="toggleDropdownProducto(i, $event)"
+                (keydown)="onTriggerProductoKeydown(i, $event)"
+                [attr.aria-expanded]="dropdownAbiertoEnFila(i)"
+                [attr.aria-controls]="dropdownAbiertoEnFila(i) ? 'producto-dropdown-panel' : null"
+                aria-haspopup="listbox"
+                [disabled]="cerrado"
+              >
+                <span class="selector-producto__texto">
+                  {{ venta.productoNombre || 'Selecciona producto' }}
+                </span>
+                <span class="selector-producto__icono" aria-hidden="true"></span>
+              </button>
+            </div>
+          </td>
+          <td data-label="Presentacion">
+            <select
+              *ngIf="esFilaHuevos(venta); else presentacionNormal"
+              [(ngModel)]="venta.presentacionVenta"
+              (ngModelChange)="actualizarCampoNumerico(i, 'cantidad', venta.cantidad)"
+              [disabled]="cerrado"
+            >
+              <option *ngFor="let presentacion of presentacionesHuevo" [value]="presentacion.id">{{ presentacion.etiqueta }}</option>
+            </select>
+            <ng-template #presentacionNormal><span>-</span></ng-template>
+          </td>
+          <td data-label="Cantidad">
+            <div class="cantidad-celda">
+              <input
+                type="text"
+                inputmode="decimal"
+                placeholder="0.00"
+                [(ngModel)]="venta.cantidad"
+                (ngModelChange)="actualizarCampoNumerico(i, 'cantidad', $event)"
+                (blur)="normalizarCampoNumerico(i, 'cantidad')"
+                name="cantidad-{{ i }}"
+                autocomplete="off"
+                [disabled]="cerrado"
+              />
+              <small class="stock-advertencia" *ngIf="esFilaHuevos(venta)">Descuenta {{ cantidadBaseFila(venta) | number : '1.0-2' }} huevos</small>
+              <small class="stock-advertencia" *ngIf="mostrarAdvertenciaStock(i)">Stock restante: {{ stockRestanteFila(i) | number : '1.0-2' }}</small>
+            </div>
+          </td>
+          <td data-label="Precio (S/)">
+            <input
+              type="text"
+              inputmode="decimal"
+              placeholder="0.00"
+              [(ngModel)]="venta.precio"
+              (ngModelChange)="actualizarCampoNumerico(i, 'precio', $event)"
+              (blur)="normalizarCampoNumerico(i, 'precio')"
+              name="precio-{{ i }}"
+              autocomplete="off"
+              [disabled]="cerrado"
+            />
+            <small class="stock-advertencia" *ngIf="esFilaHuevos(venta)">Precio total libre</small>
+          </td>
+          <td data-label="Acciones" class="seccion__acciones-fila">
+            <button type="button" class="boton boton--texto boton--peligro" (click)="quitarFila(i)" [disabled]="cerrado">Quitar fila</button>
+            <button type="button" class="boton boton--texto" (click)="limpiarFila(i)" [disabled]="cerrado">Limpiar fila</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button type="button" class="boton boton--secundario seccion__agregar-fila" (click)="agregarFila()" [disabled]="cerrado">+ Agregar fila</button>
+
+  <div *ngIf="dropdownAbierto" class="selector-producto__overlay-capa">
+    <div
+      id="producto-dropdown-panel"
+      class="selector-producto__menu selector-producto__overlay"
+      [class.selector-producto__menu--arriba]="dropdownAbrirHaciaArriba"
+      [style.top.px]="dropdownPosicion.top"
+      [style.left.px]="dropdownPosicion.left"
+      [style.width.px]="dropdownPosicion.width"
+    >
+      <input
+        #buscadorDropdown
+        type="text"
+        class="selector-producto__buscador"
+        placeholder="Buscar producto..."
+        [ngModel]="filtroDropdownActivo"
+        (ngModelChange)="actualizarFiltroProductoActivo($event)"
+        (keydown)="onBuscadorProductoKeydown($event)"
+        autocomplete="off"
+      />
+      <div class="selector-producto__lista" [style.max-height.px]="dropdownPosicion.maxHeight">
+        <button
+          type="button"
+          class="selector-producto__item"
+          [class.selector-producto__item--activo]="idx === indiceProductoResaltado"
+          *ngFor="let producto of productosDropdownActivos; let idx = index"
+          (mouseenter)="indiceProductoResaltado = idx"
+          (click)="seleccionarProductoDesdeDropdown(producto)"
+        >
+          <span>{{ producto.nombre }}</span>
+          <small *ngIf="producto.stockDisponible <= 0">Sin lote abierto</small>
+          <small *ngIf="producto.stockDisponible > 0">Stock: {{ producto.stockDisponible | number : '1.0-2' }}</small>
+        </button>
+        <p class="selector-producto__sin-resultados" *ngIf="productosDropdownActivos.length === 0">
+          No hay productos disponibles con lote registrado
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="seccion__pie" *ngIf="!esVendedor">
+    <div class="seccion__totales">
+      <div>
+        <span>Total Huevos</span>
+        <strong>S/ {{ totalHuevos | number : '1.2-2' }}</strong>
+      </div>
+      <div>
+        <span>Total Congelados</span>
+        <strong>S/ {{ totalCongelados | number : '1.2-2' }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <section *ngIf="!esVendedor && cierresHistoricos.length > 0" class="seccion__cierre">
+    <div class="seccion__cierre-encabezado">
+      <strong>Historial de cierres</strong>
+    </div>
+
+    <div class="seccion__tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora cierre</th>
+            <th>Total Huevos</th>
+            <th>Total Congelados</th>
+            <th>Total General</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cierre of cierresHistoricos">
+            <td data-label="Fecha">{{ formatearFechaDMY(cierre.fecha) }}</td>
+            <td data-label="Hora cierre">{{ formatearHora(cierre.cerrado_en) }}</td>
+            <td data-label="Total Huevos">S/ {{ cierre.total_huevos | number : '1.2-2' }}</td>
+            <td data-label="Total Congelados">S/ {{ cierre.total_congelados | number : '1.2-2' }}</td>
+            <td data-label="Total General">S/ {{ cierre.total_general | number : '1.2-2' }}</td>
+            <td data-label="Acciones" class="seccion__acciones-fila">
+              <button type="button" class="boton boton--texto" (click)="reabrirDia(cierre.fecha)" *ngIf="puedeReabrirDia(cierre)">Reabrir dia</button>
+              <button type="button" class="boton boton--texto" (click)="abrirDetalle(cierre)">Detalle</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<div class="modal" *ngIf="modalDetalleAbierto && cierreDetalle">
+  <div class="modal__contenido">
+    <header class="modal__encabezado">
+      <div>
+        <h3>Detalle del cierre {{ tituloCierre(cierreDetalle) }}</h3>
+      </div>
+      <button type="button" class="boton boton--texto" (click)="cerrarModalDetalle()">Cerrar</button>
+    </header>
+
+    <div class="seccion__tabla">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Hora</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Total</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of cierreDetalle.items">
+            <td data-label="Producto">{{ item.productoNombre }}</td>
+            <td data-label="Hora">{{ formatearHora(item.fechaHora) }}</td>
+            <td data-label="Cantidad">{{ item.cantidad | number : '1.0-2' }}</td>
+            <td data-label="Precio">S/ {{ item.precio | number : '1.2-2' }}</td>
+            <td data-label="Total">S/ {{ item.total | number : '1.2-2' }}</td>
+            <td data-label="Tipo">{{ item.categoria }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal__totales">
+      <strong>Total Huevos: S/ {{ cierreDetalle.total_huevos | number : '1.2-2' }}</strong>
+      <strong>Total Congelados: S/ {{ cierreDetalle.total_congelados | number : '1.2-2' }}</strong>
+    </div>
+  </div>
+</div>

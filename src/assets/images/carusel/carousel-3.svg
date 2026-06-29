@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="Atencion mayorista">
+  <defs>
+    <linearGradient id="fondo" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#dcfce7"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="520" rx="32" fill="url(#fondo)"/>
+  <circle cx="1035" cy="105" r="160" fill="#eff6ff" opacity=".6"/>
+  <circle cx="170" cy="420" r="135" fill="#bbf7d0" opacity=".75"/>
+  <text x="90" y="188" fill="#052e16" font-family="Arial, sans-serif" font-size="70" font-weight="800">Atencion mayorista</text>
+  <text x="94" y="276" fill="#064e3b" font-family="Arial, sans-serif" font-size="34">Pedidos coordinados y entregas puntuales</text>
+  <rect x="715" y="270" width="320" height="160" rx="28" fill="#eff6ff" opacity=".9"/>
+  <path d="M760 330h230M760 378h180" stroke="#16a34a" stroke-width="18" stroke-linecap="round" opacity=".65"/>
+</svg>

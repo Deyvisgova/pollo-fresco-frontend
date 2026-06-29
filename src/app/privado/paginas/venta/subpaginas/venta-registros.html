@@ -1,0 +1,203 @@
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Ventas registradas</h2>
+    <p>Historial de comprobantes emitidos en el sistema.</p>
+  </div>
+
+  <article class="tarjeta">
+    <section class="operacion-sunat">
+      <div class="operacion-sunat__cabecera">
+        <div>
+          <h3>Resumen SUNAT de boletas</h3>
+          <p>Selecciona el dia de boletas pendientes y envia el resumen diario para recibir el CDR.</p>
+        </div>
+        <span class="operacion-sunat__etiqueta">Solo boletas</span>
+      </div>
+      <div class="operacion-sunat__acciones">
+        <label>
+          Fecha de boletas
+          <input type="date" [(ngModel)]="fechaResumen" />
+        </label>
+        <button type="button" class="boton boton--sunat" (click)="enviarResumen()" [disabled]="operandoSunat">
+          {{ operandoSunat ? 'Procesando...' : 'Enviar resumen' }}
+        </button>
+      </div>
+      <div class="resumenes" *ngIf="resumenes.length">
+        <div class="resumen-item" *ngFor="let resumen of resumenes">
+          <span>{{ resumen.fecha_documentos | date: 'dd/MM/yyyy' }}</span>
+          <strong>{{ resumen.cantidad_boletas }} boletas</strong>
+          <span class="estado-sunat" [attr.data-estado]="resumen.estado">{{ resumen.estado }}</span>
+          <button *ngIf="resumen.ticket && resumen.estado === 'EN_PROCESO'" type="button" class="boton" (click)="consultarResumen(resumen)" [disabled]="operandoSunat">Consultar ticket</button>
+        </div>
+      </div>
+      <div class="resumenes" *ngIf="bajas.length">
+        <h4>Comunicaciones de baja</h4>
+        <div class="resumen-item" *ngFor="let baja of bajas">
+          <strong>{{ baja.serie }}-{{ baja.numero }}</strong>
+          <span>{{ baja.cliente_nombre || 'Publico general' }}</span>
+          <span class="estado-sunat" [attr.data-estado]="baja.estado">{{ baja.estado }}</span>
+          <button *ngIf="baja.ticket && baja.estado === 'EN_PROCESO'" type="button" class="boton" (click)="consultarBaja(baja)" [disabled]="operandoSunat">Consultar baja</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="historial-panel">
+      <header class="historial-panel__cabecera">
+        <div>
+          <h3>Historial de comprobantes</h3>
+          <p>Filtra por tipo, cliente, documento, fecha y formato para imprimir o descargar.</p>
+        </div>
+        <strong>{{ ventasRegistradas.length }} resultado(s)</strong>
+      </header>
+
+      <div class="filtros">
+        <label class="filtro-busqueda">
+          Buscar
+          <input type="text" [(ngModel)]="buscando" placeholder="Cliente, serie, numero o documento" />
+        </label>
+        <label>
+          Tipo
+          <select [(ngModel)]="tipoFiltro" (ngModelChange)="aplicarFiltroTipo()">
+            <option value="">Todos</option>
+            <option value="factura">Factura</option>
+            <option value="boleta">Boleta</option>
+            <option value="nota-venta">Nota de venta</option>
+            <option value="nota-credito">Nota de credito</option>
+            <option value="nota-debito">Nota de debito</option>
+          </select>
+        </label>
+        <label>
+          Desde
+          <input type="date" [(ngModel)]="fechaDesde" />
+        </label>
+        <label>
+          Hasta
+          <input type="date" [(ngModel)]="fechaHasta" />
+        </label>
+        <label>
+          Formato
+          <select [(ngModel)]="formatoVoucher">
+            <option value="a4">A4</option>
+            <option value="ticket-80">Tiquetera laser 8 cm</option>
+            <option value="ticket-57">Tiquetera laser 5.7 cm</option>
+          </select>
+        </label>
+        <button type="button" class="boton" (click)="cargarVentas()">Buscar</button>
+        <button type="button" class="boton boton--suave" (click)="limpiarFiltros()">Limpiar</button>
+      </div>
+    </section>
+
+    <p *ngIf="cargando" class="estado">Cargando ventas...</p>
+    <p *ngIf="error" class="error">{{ error }}</p>
+
+    <div class="tabla-ventas" *ngIf="!cargando">
+      <table>
+        <thead>
+          <tr>
+            <th>Comprobante</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Estado SUNAT</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let venta of ventasRegistradas">
+            <td data-label="Comprobante">{{ venta.serie }}-{{ venta.numero }}</td>
+            <td data-label="Tipo">{{ venta.tipo_comprobante }}</td>
+            <td data-label="Fecha">{{ venta.fecha_emision | date: 'dd/MM/yyyy' }}</td>
+            <td data-label="Cliente">{{ venta.cliente_nombre || 'Publico general' }}</td>
+            <td data-label="Total">{{ venta.moneda }} {{ venta.total | number: '1.2-2' }}</td>
+            <td data-label="Estado SUNAT">
+              <span class="estado-sunat" [attr.data-estado]="venta.estado_sunat">{{ venta.estado_sunat || 'NO_ENVIADO' }}</span>
+            </td>
+            <td data-label="Acciones">
+              <div class="acciones-fila">
+                <button type="button" class="icono" (click)="imprimir(venta)" title="Imprimir">Imprimir</button>
+                <button type="button" class="icono" (click)="descargar(venta)" title="Descargar PDF">PDF</button>
+                <button type="button" class="icono" (click)="compartir(venta)" title="Compartir">Enviar</button>
+                <button type="button" class="icono" (click)="descargarXml(venta)" title="Descargar XML">XML</button>
+                <button *ngIf="tieneCdr(venta)" type="button" class="icono" (click)="descargarCdr(venta)" title="Descargar CDR">CDR</button>
+                <button *ngIf="puedeEnviarSunat(venta)" type="button" class="icono icono--sunat" (click)="enviarSunat(venta)" title="Enviar o reintentar SUNAT">SUNAT</button>
+                <button *ngIf="puedeCrearNota(venta)" type="button" class="icono icono--nota" (click)="abrirNota(venta)" title="Crear nota de credito">NC</button>
+                <button *ngIf="puedeCrearNotaDebito(venta)" type="button" class="icono icono--debito" (click)="abrirNotaDebito(venta)" title="Crear nota de debito">ND</button>
+                <button *ngIf="puedeDarBaja(venta)" type="button" class="icono icono--baja" (click)="abrirBaja(venta)" title="Comunicar baja a SUNAT">Baja</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!ventasRegistradas.length">
+            <td colspan="7">No hay ventas registradas todavia.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+
+<div class="modal-nota" *ngIf="ventaNota">
+  <div class="modal-nota__contenido">
+    <h3>Nota de credito</h3>
+    <p>Factura afectada: <strong>{{ ventaNota.serie }}-{{ ventaNota.numero }}</strong></p>
+    <label>Motivo SUNAT
+      <select [(ngModel)]="motivoNotaCodigo" (ngModelChange)="actualizarDescripcionNota()">
+        <option value="01">Anulacion de la operacion</option>
+        <option value="06">Devolucion total</option>
+      </select>
+    </label>
+    <label>Descripcion
+      <input [(ngModel)]="motivoNotaDescripcion" maxlength="250" />
+    </label>
+    <div class="modal-nota__acciones">
+      <button type="button" class="boton boton--suave" (click)="cerrarNota()">Cancelar</button>
+      <button type="button" class="boton boton--sunat" (click)="crearNotaCredito()" [disabled]="operandoSunat">Crear nota</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-nota" *ngIf="ventaNotaDebito">
+  <div class="modal-nota__contenido">
+    <h3>Nota de debito</h3>
+    <p>Factura afectada: <strong>{{ ventaNotaDebito.serie }}-{{ ventaNotaDebito.numero }}</strong></p>
+    <p class="ayuda-nota">La nota de debito aumenta el importe que debe pagar el cliente.</p>
+    <label>Motivo SUNAT
+      <select [(ngModel)]="motivoDebitoCodigo" (ngModelChange)="actualizarDescripcionDebito()">
+        <option value="01">Intereses por mora</option>
+        <option value="02">Aumento en el valor</option>
+        <option value="03">Penalidades u otros conceptos</option>
+      </select>
+    </label>
+    <label>Sustento
+      <input [(ngModel)]="motivoDebitoDescripcion" maxlength="250" />
+    </label>
+    <label>Concepto cobrado
+      <input [(ngModel)]="conceptoDebito" maxlength="120" />
+    </label>
+    <label>Importe adicional (S/)
+      <input type="number" [(ngModel)]="montoDebito" min="0.01" step="0.01" inputmode="decimal" />
+    </label>
+    <div class="modal-nota__acciones">
+      <button type="button" class="boton boton--suave" (click)="cerrarNotaDebito()">Cancelar</button>
+      <button type="button" class="boton boton--debito" (click)="crearNotaDebito()"
+        [disabled]="operandoSunat || !montoDebito || montoDebito <= 0 || !conceptoDebito.trim()">
+        Crear nota de debito
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-nota" *ngIf="ventaBaja">
+  <div class="modal-nota__contenido">
+    <h3>Comunicar baja a SUNAT</h3>
+    <p>Factura: <strong>{{ ventaBaja.serie }}-{{ ventaBaja.numero }}</strong></p>
+    <p class="advertencia-baja">Esta operacion anula fiscalmente la factura aceptada. No debe usarse para una devolucion comercial.</p>
+    <label>Motivo de baja
+      <textarea [(ngModel)]="motivoBaja" maxlength="250" rows="3"></textarea>
+    </label>
+    <div class="modal-nota__acciones">
+      <button type="button" class="boton boton--suave" (click)="cerrarBaja()">Cancelar</button>
+      <button type="button" class="boton boton--peligro" (click)="enviarBaja()" [disabled]="operandoSunat || !motivoBaja.trim()">Comunicar baja</button>
+    </div>
+  </div>
+</div>

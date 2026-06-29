@@ -1,0 +1,343 @@
+<section class="tarjeta">
+  <header class="tarjeta__encabezado">
+    <h3>Registro de entregas</h3>
+    <p>Busca un proveedor y registralo en una tarjeta independiente con sus propias lineas.</p>
+  </header>
+
+  <form class="formulario" (ngSubmit)="$event.preventDefault()">
+    <label class="campo">
+      <span>Fecha de entrega</span>
+      <input [(ngModel)]="fechaEntrega" name="fechaEntrega" type="date" disabled />
+    </label>
+    <label class="campo">
+      <span>Usuario</span>
+      <input [(ngModel)]="usuarioNombre" name="usuarioNombre" type="text" disabled />
+    </label>
+
+    <label class="campo campo--completo">
+      <span>Buscar proveedor guardado</span>
+      <input
+        [(ngModel)]="busquedaProveedor"
+        name="busquedaProveedor"
+        type="text"
+        (input)="buscarProveedor()"
+        placeholder="Escribe nombre, DNI o RUC"
+      />
+      <div class="sugerencias" *ngIf="proveedores.length > 0">
+        <button
+          class="sugerencia"
+          type="button"
+          *ngFor="let proveedor of proveedores; trackBy: trackByProveedor"
+          (click)="seleccionarProveedor(proveedor)"
+        >
+          {{ proveedor.nombres }} {{ proveedor.apellidos }} ({{ proveedor.ruc || proveedor.dni }})
+        </button>
+      </div>
+    </label>
+  </form>
+
+  <p class="mensaje mensaje--error" *ngIf="error">{{ error }}</p>
+</section>
+
+<section class="tarjeta tarjeta-proveedor" *ngFor="let tarjeta of tarjetasProveedor; trackBy: trackByTarjetaProveedor">
+  <header class="tarjeta__encabezado tarjeta-proveedor__encabezado">
+    <h3>{{ tarjeta.proveedor.nombre_empresa || 'Sin empresa' }}</h3>
+    <p class="tarjeta-proveedor__nombre">Proveedor: {{ tarjeta.proveedor.nombres }} {{ tarjeta.proveedor.apellidos }}</p>
+
+    <div class="tarjeta-proveedor__iconos">
+      <button
+        class="icono-btn"
+        type="button"
+        (click)="alternarTarjeta(tarjeta.proveedor.proveedor_id)"
+        [attr.aria-label]="tarjeta.expandida ? 'Contraer tarjeta' : 'Expandir tarjeta'"
+        [title]="tarjeta.expandida ? 'Contraer' : 'Expandir'"
+      >
+        <span aria-hidden="true">{{ tarjeta.expandida ? '−' : '+' }}</span>
+      </button>
+      <button
+        class="icono-btn icono-btn--cerrar"
+        type="button"
+        (click)="cerrarTarjeta(tarjeta.proveedor.proveedor_id)"
+        aria-label="Quitar proveedor"
+        title="Quitar proveedor"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+  </header>
+
+  <ng-container *ngIf="tarjeta.expandida">
+    <p class="tarjeta-proveedor__documento">{{ tarjeta.proveedor.ruc || tarjeta.proveedor.dni }}</p>
+
+    <div class="lineas">
+      <label class="campo campo--estado" *ngIf="!esVendedor">
+        <span>Estado de pago</span>
+        <select [(ngModel)]="tarjeta.estadoPago" (ngModelChange)="persistirTarjetas()" name="estadoPago{{ tarjeta.proveedor.proveedor_id }}">
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="PAGADO">Pagado</option>
+        </select>
+      </label>
+
+      <div class="linea" *ngFor="let linea of tarjeta.lineas; let i = index; trackBy: trackByLinea">
+        <label class="campo">
+          <span>Tipo</span>
+          <select [(ngModel)]="linea.tipoAve" (ngModelChange)="persistirTarjetas()" name="tipoAve{{ tarjeta.proveedor.proveedor_id }}{{ i }}">
+            <option *ngFor="let tipo of tiposAveDisponibles" [value]="tipo">{{ tipo }}</option>
+          </select>
+        </label>
+        <label class="campo">
+          <span>Cantidad</span>
+          <input
+            [(ngModel)]="linea.cantidadPollos"
+            (ngModelChange)="persistirTarjetas()"
+            name="cantidadPollos{{ tarjeta.proveedor.proveedor_id }}{{ i }}"
+            type="number"
+            min="0"
+          />
+        </label>
+        <label class="campo">
+          <span>Peso total (kg)</span>
+          <input
+            [(ngModel)]="linea.pesoTotalKg"
+            (ngModelChange)="persistirTarjetas()"
+            name="pesoTotalKg{{ tarjeta.proveedor.proveedor_id }}{{ i }}"
+            type="number"
+            min="0"
+            step="0.01"
+          />
+        </label>
+        <label class="campo" *ngIf="!esVendedor">
+          <span>Merma</span>
+          <input
+            [(ngModel)]="linea.mermaKg"
+            (ngModelChange)="persistirTarjetas()"
+            name="mermaKg{{ tarjeta.proveedor.proveedor_id }}{{ i }}"
+            type="number"
+            min="0"
+            step="0.01"
+          />
+        </label>
+        <label class="campo" *ngIf="!esVendedor">
+          <span>Precio por kg (S/)</span>
+          <input
+            [(ngModel)]="linea.precioKg"
+            (ngModelChange)="persistirTarjetas()"
+            name="precioKg{{ tarjeta.proveedor.proveedor_id }}{{ i }}"
+            type="number"
+            min="0"
+            step="0.01"
+          />
+        </label>
+        <label class="campo">
+          <span>Hora</span>
+          <input [(ngModel)]="linea.horaEntrega" name="horaEntrega{{ tarjeta.proveedor.proveedor_id }}{{ i }}" type="time" disabled />
+        </label>
+        <button
+          class="boton boton--link boton--peligro"
+          type="button"
+          (click)="eliminarLinea(tarjeta.proveedor.proveedor_id, i)"
+          *ngIf="tarjeta.lineas.length > 1"
+        >
+          Quitar
+        </button>
+      </div>
+    </div>
+
+    <p class="mensaje mensaje--error" *ngIf="tarjeta.error">{{ tarjeta.error }}</p>
+
+
+    <p class="mensaje mensaje--error" *ngIf="!esVendedor && entregasParaPagarIds.length === 0">No hay entregas pendientes para pagar con el filtro actual.</p>
+    <div class="acciones">
+      <button class="boton boton--secundario boton--compacto" type="button" (click)="agregarLinea(tarjeta.proveedor.proveedor_id)">
+        Agregar linea
+      </button>
+      <button
+        class="boton boton--primario boton--compacto"
+        type="button"
+        [disabled]="tarjeta.guardando"
+        (click)="guardarRegistro(tarjeta.proveedor.proveedor_id)"
+      >
+        Guardar
+      </button>
+      <button class="boton boton--secundario boton--compacto" type="button" (click)="limpiarFormulario(tarjeta.proveedor.proveedor_id)">
+        Limpiar
+      </button>
+    </div>
+  </ng-container>
+</section>
+
+<section class="tarjeta" *ngIf="!esVendedor">
+  <header class="tarjeta__encabezado">
+    <h3>Historial de entregas</h3>
+    <p>Filtra, edita o elimina filas para encontrar y gestionar la informacion rapidamente.</p>
+  </header>
+
+  <div class="filtros-historial">
+    <label class="campo">
+      <span>Buscar</span>
+      <input [(ngModel)]="filtros.texto" (ngModelChange)="aplicarFiltros()" name="filtroTexto" type="text" placeholder="Proveedor, documento o tipo" />
+    </label>
+
+    <label class="campo">
+      <span>Proveedor</span>
+      <select [(ngModel)]="filtros.proveedorId" (ngModelChange)="aplicarFiltros()" name="filtroProveedorId">
+        <option value="">Todos</option>
+        <option *ngFor="let proveedor of proveedoresHistorial; trackBy: trackByProveedor" [value]="proveedor.proveedor_id">
+          {{ proveedor.nombres }} {{ proveedor.apellidos }}
+        </option>
+      </select>
+    </label>
+
+    <label class="campo">
+      <span>Tipo</span>
+      <select [(ngModel)]="filtros.tipo" (ngModelChange)="aplicarFiltros()" name="filtroTipo">
+        <option value="">Todos</option>
+        <option *ngFor="let tipo of tiposAveDisponibles" [value]="tipo">{{ tipo }}</option>
+      </select>
+    </label>
+
+    <label class="campo">
+      <span>Estado</span>
+      <select [(ngModel)]="filtros.estado" (ngModelChange)="aplicarFiltros()" name="filtroEstado">
+        <option value="">Todos</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="PAGADO">Pagado</option>
+      </select>
+    </label>
+
+    <label class="campo">
+      <span>Fecha desde</span>
+      <input [(ngModel)]="filtros.fechaDesde" (ngModelChange)="aplicarFiltros()" name="filtroFechaDesde" type="date" />
+    </label>
+
+    <label class="campo">
+      <span>Fecha hasta</span>
+      <input [(ngModel)]="filtros.fechaHasta" (ngModelChange)="aplicarFiltros()" name="filtroFechaHasta" type="date" />
+    </label>
+
+    <button class="boton boton--secundario boton--compacto" type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+
+  <div class="resumen-pagos">
+    <p>Total filtrado: <strong>S/ {{ totalFiltrado | number: '1.2-2' }}</strong></p>
+    <button class="boton boton--primario boton--compacto" type="button" (click)="abrirModalPago(undefined, $event)">
+      Pagar todo
+    </button>
+  </div>
+
+  <div class="tabla-contenedor">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Proveedor</th>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th>Cantidad</th>
+          <th>Peso total</th>
+          <th>Merma</th>
+          <th>Costo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let registro of registrosFiltrados; trackBy: trackByRegistro">
+          <td data-label="Proveedor">
+            {{ registro.proveedor?.nombres }} {{ registro.proveedor?.apellidos }}
+            <div class="nota">{{ registro.proveedor?.ruc || registro.proveedor?.dni }}</div>
+          </td>
+
+          <ng-container *ngIf="editandoEntregaId !== registro.entrega_id; else modoEdicion">
+            <td data-label="Tipo">{{ registro.tipo || '-' }}</td>
+            <td data-label="Fecha">{{ formatearFechaExacta(registro.fecha_hora) }}</td>
+            <td data-label="Cantidad">{{ registro.cantidad_pollos }}</td>
+            <td data-label="Peso total">{{ registro.peso_total_kg | number: '1.2-2' }} kg</td>
+            <td data-label="Merma">{{ registro.merma_kg | number: '1.2-2' }}</td>
+            <td data-label="Costo">S/ {{ registro.costo_total | number: '1.2-2' }}</td>
+            <td data-label="Estado">
+              <span class="estado-chip" [class.estado-chip--pagado]="esPagado(registro)" [class.estado-chip--pendiente]="esPendiente(registro)">
+                {{ registro.estado_pago }}
+              </span>
+            </td>
+            <td data-label="Acciones" class="acciones-tabla">
+              <button class="boton boton--primario boton--compacto" type="button" (click)="abrirModalPago(registro, $event)">Pagar</button>
+              <button class="boton boton--secundario boton--compacto" type="button" (click)="iniciarEdicion(registro)">Editar</button>
+              <button class="boton boton--peligro boton--compacto" type="button" (click)="eliminarRegistro(registro.entrega_id)">Eliminar</button>
+            </td>
+          </ng-container>
+
+          <ng-template #modoEdicion>
+            <td data-label="Tipo">
+              <select [(ngModel)]="formularioEdicion.tipo" name="editTipo{{ registro.entrega_id }}">
+                <option *ngFor="let tipo of tiposAveDisponibles" [value]="tipo">{{ tipo }}</option>
+              </select>
+            </td>
+            <td data-label="Fecha">
+              <input [(ngModel)]="formularioEdicion.fecha_hora" name="editFecha{{ registro.entrega_id }}" type="datetime-local" />
+            </td>
+            <td data-label="Cantidad">
+              <input [(ngModel)]="formularioEdicion.cantidad_pollos" name="editCantidad{{ registro.entrega_id }}" type="number" min="0" />
+            </td>
+            <td data-label="Peso total">
+              <input [(ngModel)]="formularioEdicion.peso_total_kg" name="editPeso{{ registro.entrega_id }}" type="number" min="0" step="0.01" />
+            </td>
+            <td data-label="Merma">
+              <input [(ngModel)]="formularioEdicion.merma_kg" name="editMerma{{ registro.entrega_id }}" type="number" min="0" step="0.01" />
+            </td>
+            <td data-label="Costo">
+              <input [(ngModel)]="formularioEdicion.costo_total" name="editCosto{{ registro.entrega_id }}" type="number" min="0" step="0.01" />
+            </td>
+            <td data-label="Estado">
+              <span class="estado-chip" [class.estado-chip--pagado]="esPagado(registro)" [class.estado-chip--pendiente]="esPendiente(registro)">
+                {{ registro.estado_pago }}
+              </span>
+            </td>
+            <td data-label="Acciones" class="acciones-tabla">
+              <button class="boton boton--primario boton--compacto" type="button" [disabled]="guardandoEdicion" (click)="guardarEdicion(registro.entrega_id)">Guardar</button>
+              <button class="boton boton--secundario boton--compacto" type="button" (click)="cancelarEdicion()">Cancelar</button>
+            </td>
+          </ng-template>
+        </tr>
+        <tr *ngIf="registrosFiltrados.length === 0">
+          <td colspan="9">No hay registros para los filtros seleccionados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="modal" [class.modal--abierto]="modalPagoAbierto" [attr.aria-hidden]="!modalPagoAbierto">
+  <div class="modal__fondo" (click)="cerrarModalPago()"></div>
+  <div class="modal__contenido">
+    <h3 class="modal__titulo">Registrar pago</h3>
+    <p class="modal__subtitulo">Completa transferencia y efectivo para cerrar el pago.</p>
+
+    <div class="resumen-modal">
+      <p class="resumen-modal__etiqueta">Saldo por pagar</p>
+      <p class="resumen-modal__monto" [class.resumen-modal__monto--completo]="pagoCompleto()">
+        S/ {{ saldoPago() | number: '1.2-2' }}
+      </p>
+      <small>Total seleccionado: S/ {{ totalPagoActual() | number: '1.2-2' }}</small>
+    </div>
+
+    <label class="campo">
+      <span>Transferencia</span>
+      <input [(ngModel)]="montoTransferencia" type="number" min="0" step="0.01" />
+    </label>
+    <label class="campo">
+      <span>Efectivo</span>
+      <input [(ngModel)]="montoEfectivo" type="number" min="0" step="0.01" />
+    </label>
+
+    <p *ngIf="pagoCompleto()" class="estado-pagado">PAGO COMPLETO</p>
+
+    <p class="mensaje mensaje--error" *ngIf="errorPagoModal">{{ errorPagoModal }}</p>
+
+    <div class="acciones">
+      <button class="boton boton--secundario boton--compacto" type="button" (click)="cerrarModalPago()">Cancelar</button>
+      <button class="boton boton--primario boton--compacto" type="button" [disabled]="!puedePagarTodo() || procesandoPago" (click)="pagarTodo()">
+        Pagar
+      </button>
+    </div>
+  </div>
+</section>

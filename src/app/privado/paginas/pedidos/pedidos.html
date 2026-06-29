@@ -1,0 +1,933 @@
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Pedidos</h2>
+    <p>Gestion integral de pedidos delivery.</p>
+  </div>
+
+  <div class="tabs-vista" *ngIf="!usuarioEsDelivery()">
+    <button type="button" [class.activo]="subpaginaActiva === 'registrar'" (click)="cambiarSubpagina('registrar')">Registrar pedido</button>
+    <button *ngIf="!usuarioEsVendedor()" type="button" [class.activo]="subpaginaActiva === 'registros'" (click)="cambiarSubpagina('registros')">Pedidos registrados</button>
+    <button *ngIf="!usuarioEsVendedor()" type="button" [class.activo]="subpaginaActiva === 'cuentas'" (click)="cambiarSubpagina('cuentas')">Cuentas por cobrar</button>
+    <button *ngIf="!usuarioEsVendedor()" type="button" [class.activo]="subpaginaActiva === 'delivery'" (click)="cambiarSubpagina('delivery')">Vista delivery</button>
+  </div>
+
+  <p class="mensaje-error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+  <div class="contenido-pedidos" *ngIf="subpaginaActiva === 'registrar'">
+    <article class="tarjeta">
+      <div class="tarjeta__titulo">
+        <h4>Registrar pedido</h4>
+        <span class="nota">Inicio: <strong>PENDIENTE</strong></span>
+      </div>
+
+      <div class="pedido-tipo-grid">
+        <label class="campo">
+          <span>Tipo de pedido</span>
+          <select [(ngModel)]="tipoPedidoFormulario">
+            <option value="DELIVERY">Delivery</option>
+            <option value="MESA">Mesa</option>
+          </select>
+        </label>
+
+      </div>
+
+      <div class="cliente-top">
+        <div class="cliente-buscador">
+          <label>Buscar cliente (nombre, DNI o referencia)</label>
+          <div class="cliente-buscador__control">
+            <input type="text" [(ngModel)]="terminoCliente" (input)="buscarClientes()" placeholder="Nombre, DNI o referencia" />
+            <button type="button" class="boton boton--secundario" (click)="abrirModalCliente()">+ Nuevo cliente</button>
+          </div>
+          <div class="cliente-sugerencias" *ngIf="clientesSugeridos.length">
+            <button type="button" *ngFor="let cliente of clientesSugeridos" (click)="seleccionarCliente(cliente)">
+              {{ cliente.nombres }} {{ cliente.apellidos || '' }} - DNI: {{ cliente.dni || 'S/D' }}<span *ngIf="cliente.referencias"> - Ref: {{ cliente.referencias }}</span>
+            </button>
+          </div>
+        </div>
+
+        <label class="campo campo--fecha">
+          <span>Fecha y hora</span>
+          <input type="datetime-local" [(ngModel)]="fechaHoraCreacion" />
+        </label>
+      </div>
+
+      <div class="cliente-seleccionado" *ngIf="clienteSeleccionado">
+        <strong>Cliente:</strong>
+        {{ clienteSeleccionado.nombres }} {{ clienteSeleccionado.apellidos || '' }}
+        <span>DNI: {{ clienteSeleccionado.dni || 'S/D' }}</span>
+      </div>
+
+      <div class="tarjeta__titulo">
+        <h4>Detalle del pedido</h4>
+        <div class="acciones-detalle">
+          <div class="buscador-producto">
+            <label for="productoBusqueda">Producto</label>
+            <div class="buscador-producto__control">
+              <input
+                id="productoBusqueda"
+                [(ngModel)]="productoSeleccionado"
+                (input)="actualizarBusquedaProductos()"
+                (change)="seleccionarProductoDesdeBuscador()"
+                type="text"
+                placeholder="Buscar producto..."
+                list="productosDisponibles"
+              />
+            </div>
+          </div>
+          <datalist id="productosDisponibles">
+            <option *ngFor="let producto of productosFiltrados" [value]="producto"></option>
+          </datalist>
+          <button type="button" class="boton boton--primario" (click)="agregarLineaDetalle()">Agregar fila</button>
+        </div>
+      </div>
+
+      <div class="tabla-detalle">
+        <div class="tabla-detalle__encabezado">
+          <span>Cant.</span>
+          <span>Unidad</span>
+          <span>Descripcion</span>
+          <span>Precio</span>
+          <span>Total</span>
+          <span></span>
+        </div>
+        <div class="tabla-detalle__fila" *ngFor="let item of detalles; let i = index">
+          <input [(ngModel)]="item.cantidad" (ngModelChange)="validarCantidadPorStock(i)" type="number" min="0" step="0.01" />
+          <select [(ngModel)]="item.unidad" *ngIf="!esDetalleHuevos(item); else presentacionHuevoPedido">
+            <option value="KG">KG</option>
+            <option value="UND">UND</option>
+          </select>
+          <ng-template #presentacionHuevoPedido>
+            <select [(ngModel)]="item.presentacionVenta" (ngModelChange)="validarCantidadPorStock(i)">
+              <option *ngFor="let presentacion of presentacionesHuevo" [value]="presentacion.id">{{ presentacion.etiqueta }}</option>
+            </select>
+          </ng-template>
+          <input [(ngModel)]="item.descripcion" type="text" placeholder="Escribe nombre del producto" />
+          <input
+            [(ngModel)]="item.precioUnitario"
+            type="number"
+            min="0"
+            step="0.01"
+            [placeholder]="esDetalleHuevos(item) ? 'Precio total' : 'Precio unitario'"
+          />
+          <span class="tabla-detalle__total">S/ {{ totalDetalle(item) | number: '1.2-2' }}</span>
+          <button
+            type="button"
+            class="boton-icono"
+            aria-label="Eliminar detalle"
+            title="Eliminar"
+            (click)="eliminarLineaDetalle(i)"
+          >
+            x
+          </button>
+        </div>
+      </div>
+
+      <div class="resumen">
+        <span>Total</span>
+        <strong>S/ {{ totalPedido() | number: '1.2-2' }}</strong>
+      </div>
+
+      <button type="button" class="boton boton--primario boton-registrar" [disabled]="guardandoPedido" (click)="guardarPedido()">
+        {{ guardandoPedido ? 'Guardando...' : 'Registrar pedido' }}
+      </button>
+    </article>
+
+  </div>
+
+  <div class="contenido-pedidos" *ngIf="subpaginaActiva === 'registros'">
+    <article class="tarjeta tabla-pedidos">
+      <div class="tarjeta__titulo">
+        <h4>Pedidos registrados</h4>
+        <input type="text" [(ngModel)]="filtro" (ngModelChange)="aplicarFiltro()" placeholder="Buscar pedido, cliente o referencia..." />
+      </div>
+
+      <div class="filtros-registros filtros-registros--panel">
+        <div class="filtros-registros__encabezado">
+          <div>
+            <strong>Filtros avanzados</strong>
+            <p>Encuentra pedidos por cliente, fechas y estados.</p>
+          </div>
+
+          <button type="button" class="boton boton--secundario filtros-registros__limpiar" (click)="limpiarFiltrosRegistros()">
+            Limpiar filtros
+          </button>
+        </div>
+
+        <div class="filtros-registros__grid">
+          <label class="filtros-registros__campo">
+            <span>Cliente</span>
+            <input class="filtros-registros__control" type="text" [(ngModel)]="filtroClienteRegistros" (ngModelChange)="aplicarFiltro()" placeholder="Nombre o DNI del cliente" />
+          </label>
+
+          <label class="filtros-registros__campo">
+            <span>Fecha desde</span>
+            <input class="filtros-registros__control" type="date" [(ngModel)]="filtroFechaDesdeRegistros" (ngModelChange)="aplicarFiltro()" />
+          </label>
+
+          <label class="filtros-registros__campo">
+            <span>Fecha hasta</span>
+            <input class="filtros-registros__control" type="date" [(ngModel)]="filtroFechaHastaRegistros" (ngModelChange)="aplicarFiltro()" />
+          </label>
+
+          <label class="filtros-registros__campo">
+            <span>Estado del pedido</span>
+            <select class="filtros-registros__control" [(ngModel)]="filtroEstadoRegistros" (ngModelChange)="aplicarFiltro()">
+              <option value="">Todos los estados</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="ENTREGADO">Entregado</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+          </label>
+
+          <label class="filtros-registros__campo">
+            <span>Estado de pago</span>
+            <select class="filtros-registros__control" [(ngModel)]="filtroEstadoPagoRegistros" (ngModelChange)="aplicarFiltro()">
+              <option value="">Todos los pagos</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="PARCIAL">Pago recibido, queda saldo</option>
+              <option value="COMPLETO">Completo</option>
+              <option value="SIN REGISTRO">Sin registro</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="tabla-pedidos__contenedor">
+        <table class="tabla tabla--registros">
+        <thead>
+          <tr>
+            <th>Nro</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Estado de pago</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pedido of pedidosFiltrados">
+            <td data-label="Nro">{{ obtenerNumeroVisualPedido(pedido) }}</td>
+            <td data-label="Cliente">{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos || '' }}</td>
+            <td data-label="Fecha">{{ obtenerFechaHoraCorta(pedido.fecha_hora_creacion) }}</td>
+            <td data-label="Total">S/ {{ pedido.total | number: '1.2-2' }}</td>
+            <td data-label="Estado">{{ obtenerEtiquetaEstado(pedido.estado_id) }}</td>
+            <td data-label="Estado de pago">
+              <div class="estado-pago-tabla">
+                <span class="badge badge--wrap badge--tabla" [ngClass]="obtenerClaseBadgePago(pedido)">{{ obtenerEstadoPagoTabla(pedido) }}</span>
+                <button
+                  *ngIf="mostrarAccionPagarTodo(pedido)"
+                  type="button"
+                  class="boton boton-tabla boton-tabla--estado-pago"
+                  (click)="pagarTodoPedido(pedido)">
+                  Pagar todo
+                </button>
+                <button
+                  *ngIf="mostrarAccionPagarVuelto(pedido)"
+                  type="button"
+                  class="boton boton-tabla boton-tabla--estado-pago boton-tabla--vuelto"
+                  (click)="pagarVueltoPedido(pedido)">
+                  Pagar vuelto
+                </button>
+              </div>
+            </td>
+            <td data-label="Acciones">
+              <div class="tabla-acciones tabla-acciones--centradas">
+                <button
+                  *ngIf="mostrarAccionVerDetalle(pedido)"
+                  type="button"
+                  class="boton-icono boton-icono--ojo"
+                  title="Ver detalle del pedido"
+                  aria-label="Ver detalle del pedido"
+                  (click)="abrirDetallePedido(pedido)">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
+                </button>
+                <button
+                  *ngIf="puedeEmitirComprobante(pedido)"
+                  type="button"
+                  class="boton boton-tabla boton-tabla--comprobante"
+                  (click)="emitirComprobantePedido(pedido)">
+                  Emitir comprobante
+                </button>
+                <span *ngIf="pedido.comprobante" class="badge badge--comprobante" title="Comprobante ya emitido">
+                  {{ obtenerEtiquetaComprobante(pedido) }}
+                </span>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!cargando && pedidosFiltrados.length === 0">
+            <td data-label="" colspan="7">No hay pedidos registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </article>
+  </div>
+
+  <div class="contenido-pedidos" *ngIf="subpaginaActiva === 'cuentas'">
+    <article class="tarjeta cuentas-cartera">
+      <div class="tarjeta__titulo cuentas-cartera__header">
+        <div>
+          <h4>Cuentas por cobrar</h4>
+          <p>Cuenta corriente por cliente. Los pagos se aplican primero a la deuda mas antigua.</p>
+        </div>
+        <input type="text" [(ngModel)]="filtro" (ngModelChange)="aplicarFiltro()" placeholder="Buscar cliente, DNI, referencia o pedido..." />
+      </div>
+
+      <div class="cuentas-grid" *ngIf="cuentasFiltradas.length; else sinCuentasPendientes">
+        <article class="cuenta-card" *ngFor="let cuenta of cuentasFiltradas">
+          <div class="cuenta-card__top">
+            <div class="cuenta-card__avatar">{{ obtenerInicialesCliente(cuenta.cliente) }}</div>
+            <div>
+              <h5>{{ obtenerNombreCliente(cuenta.cliente) }}</h5>
+              <p>{{ cuenta.cliente.celular || cuenta.cliente.dni || cuenta.cliente.ruc || 'Sin contacto registrado' }}</p>
+            </div>
+          </div>
+
+          <div class="cuenta-card__saldo">
+            <span>Saldo pendiente</span>
+            <strong>S/ {{ cuenta.saldo_pendiente | number: '1.2-2' }}</strong>
+          </div>
+
+          <div class="cuenta-card__metricas">
+            <span><small>Pagado</small><strong>S/ {{ cuenta.monto_pagado | number: '1.2-2' }}</strong></span>
+            <span><small>Pedidos</small><strong>{{ cuenta.cantidad_pedidos_pendientes }}</strong></span>
+            <span><small>Deuda antigua</small><strong>{{ obtenerFechaHoraCorta(cuenta.fecha_deuda_mas_antigua) }}</strong></span>
+          </div>
+
+          <div class="cuenta-card__ultimo">
+            <span>Ultimo pago</span>
+            <strong *ngIf="cuenta.ultimo_pago; else sinPagoCliente">{{ obtenerFechaHoraCorta(cuenta.ultimo_pago.fecha_hora) }} - S/ {{ cuenta.ultimo_pago.monto | number: '1.2-2' }}</strong>
+            <ng-template #sinPagoCliente><strong>Sin pagos registrados</strong></ng-template>
+          </div>
+
+          <div class="cuenta-card__detalle">
+            <strong>Detalle pendiente</strong>
+            <div class="cuenta-card__pedido" *ngFor="let pedido of cuenta.pedidos.slice(0, 2)">
+              <div class="cuenta-card__pedido-top">
+                <span>Pedido #{{ pedido.pedido_id }} - {{ obtenerFechaHoraCorta(pedido.fecha_hora_creacion) }}</span>
+                <strong>Debe S/ {{ obtenerSaldoPendiente(pedido) | number: '1.2-2' }}</strong>
+              </div>
+              <div class="cuenta-card__producto" *ngFor="let detalle of pedido.detalles">
+                <span>{{ detalle.cantidad }} {{ detalle.unidad }} {{ detalle.descripcion }}</span>
+                  <strong>S/ {{ detalle.subtotal | number: '1.2-2' }}</strong>
+                </div>
+                <div class="cuenta-card__pedido-acciones">
+                  <button
+                    type="button"
+                    class="boton boton--primario boton--compacto"
+                    (click)="abrirRegistroPagoCuenta(pedido)">
+                    Pagar pedido
+                  </button>
+                  <button
+                    type="button"
+                    class="boton boton--whatsapp boton--compacto"
+                    [disabled]="!tieneWhatsappCliente(cuenta.cliente)"
+                    (click)="abrirWhatsappPedidoPendiente(cuenta, pedido)">
+                    WhatsApp pedido
+                  </button>
+                </div>
+            </div>
+            <small *ngIf="cuenta.pedidos.length > 2">Hay {{ cuenta.pedidos.length - 2 }} pedido(s) mas. Usa Ver cuenta.</small>
+          </div>
+
+          <div class="cuenta-card__acciones">
+            <button type="button" class="boton boton--primario" (click)="abrirRegistroPagoCliente(cuenta)">Registrar pago</button>
+            <button type="button" class="boton boton--secundario" (click)="abrirCuentaCliente(cuenta)">Ver cuenta</button>
+            <button
+              type="button"
+              class="boton boton--whatsapp"
+              [disabled]="!tieneWhatsappCliente(cuenta.cliente)"
+              (click)="abrirWhatsappCuenta(cuenta)">
+              {{ tieneWhatsappCliente(cuenta.cliente) ? 'WhatsApp cuenta' : 'Sin WhatsApp' }}
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #sinCuentasPendientes>
+        <p class="tabla__sin-resultados" *ngIf="!cargando">No hay cuentas pendientes.</p>
+      </ng-template>
+    </article>
+  </div>
+
+  <div class="contenido-delivery contenido-delivery--movil" *ngIf="subpaginaActiva === 'delivery'">
+    <article class="tarjeta tarjetas-delivery tarjetas-delivery--movil">
+      <div class="tarjeta__titulo delivery-header">
+        <div>
+          <h4>{{ vistaDeliveryActiva === 'hoy' ? 'Entregas de hoy' : 'Cobros atrasados' }}</h4>
+          <p>{{ vistaDeliveryActiva === 'hoy' ? 'Pedidos visibles solo durante el dia actual.' : 'Pagos de clientes que deben de dias anteriores.' }}</p>
+        </div>
+        <input *ngIf="vistaDeliveryActiva === 'hoy'" type="text" [(ngModel)]="filtro" (ngModelChange)="aplicarFiltro()" placeholder="Buscar cliente o referencia..." />
+        <input *ngIf="vistaDeliveryActiva === 'cobros'" type="text" [(ngModel)]="filtroCobrosAtrasados" placeholder="Buscar cliente, referencia o producto..." />
+      </div>
+
+      <div class="delivery-switch">
+        <button type="button" [class.activo]="vistaDeliveryActiva === 'hoy'" (click)="cambiarVistaDelivery('hoy')">Entregas de hoy</button>
+        <button type="button" [class.activo]="vistaDeliveryActiva === 'cobros'" (click)="cambiarVistaDelivery('cobros')">
+          Cobros atrasados
+          <span *ngIf="cobrosAtrasadosDelivery.length">{{ cobrosAtrasadosDelivery.length }}</span>
+        </button>
+      </div>
+
+      <div class="delivery-ruta-toolbar" *ngIf="vistaDeliveryActiva === 'hoy'">
+        <button
+          type="button"
+          class="boton boton--primario"
+          [disabled]="!pedidosRutaDelivery().length"
+          (click)="abrirMapaDelivery()"
+        >
+          Mapa de ruta
+        </button>
+        <span>{{ pedidosRutaDelivery().length }} pedido(s) pendientes o en ruta</span>
+      </div>
+
+      <section class="delivery-bloque delivery-bloque--cobros" *ngIf="vistaDeliveryActiva === 'cobros' && cobrosAtrasadosFiltrados().length">
+        <p class="delivery-bloque__ayuda">Clientes que pagan de dias anteriores. Se muestra el detalle exacto de lo entregado.</p>
+        <div class="delivery-grid delivery-grid--movil">
+          <article class="delivery-card delivery-card--movil delivery-card--cobro" *ngFor="let cuenta of cobrosAtrasadosFiltrados()">
+            <div class="delivery-card__cabecera">
+              <h5>{{ obtenerNombreCliente(cuenta.cliente) }}</h5>
+              <strong class="badge badge--warning">Debe S/ {{ cuenta.saldo_pendiente | number: '1.2-2' }}</strong>
+            </div>
+
+            <div class="delivery-card__fila"><span>Pedidos</span><strong>{{ cuenta.cantidad_pedidos_pendientes }}</strong></div>
+            <div class="delivery-card__fila"><span>Deuda antigua</span><strong>{{ obtenerFechaHoraCorta(cuenta.fecha_deuda_mas_antigua) }}</strong></div>
+
+            <div class="cobro-pedido" *ngFor="let pedido of cuenta.pedidos">
+              <div class="cobro-pedido__cabecera">
+                <strong>Pedido #{{ pedido.pedido_id }}</strong>
+                <span>{{ obtenerFechaLarga(pedido.fecha_hora_creacion) }}</span>
+              </div>
+              <div class="cobro-detalle" *ngFor="let detalle of pedido.detalles">
+                <span>{{ detalle.cantidad }} {{ detalle.unidad }} {{ detalle.descripcion }}</span>
+                <strong>S/ {{ detalle.subtotal | number: '1.2-2' }}</strong>
+              </div>
+              <div class="cobro-pedido__total">
+                <span>Total S/ {{ pedido.total | number: '1.2-2' }}</span>
+                <strong>Saldo S/ {{ obtenerSaldoPendiente(pedido) | number: '1.2-2' }}</strong>
+              </div>
+              <div class="delivery-card__acciones delivery-card__acciones--movil">
+                <button type="button" (click)="abrirDetallePedido(pedido)">Detalle</button>
+                <button type="button" (click)="abrirRegistroPagoCuenta(pedido)">Registrar pago</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <p class="tabla__sin-resultados" *ngIf="vistaDeliveryActiva === 'cobros' && !cargando && cobrosAtrasadosFiltrados().length === 0">
+        No hay cobros atrasados pendientes.
+      </p>
+
+      <ng-container *ngIf="vistaDeliveryActiva === 'hoy'">
+      <section class="delivery-bloque" *ngIf="pedidosPendientesDelivery().length">
+        <h5>Pendientes</h5>
+        <div class="delivery-grid delivery-grid--movil">
+          <div class="delivery-card delivery-card--movil" *ngFor="let pedido of pedidosPendientesDelivery()" (click)="seleccionarPedido(pedido)">
+            <div class="delivery-card__cabecera">
+              <h5>Pedido {{ obtenerNumeroVisualPedido(pedido) }}</h5>
+              <strong class="badge" [ngClass]="obtenerClaseBadgeEstado(pedido.estado_id)">{{ obtenerEtiquetaEstado(pedido.estado_id) }}</strong>
+            </div>
+            <div class="delivery-card__fila"><span>Cliente</span><strong>{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos || '' }}</strong></div>
+            <div class="delivery-card__fila"><span>Direccion</span><strong>{{ pedido.cliente.direccion || pedido.cliente.direccion_fiscal || 'Sin direccion' }}</strong></div>
+            <div class="delivery-card__fila"><span>Referencia</span><strong>{{ pedido.cliente.referencias || 'Sin referencia' }}</strong></div>
+            <div class="delivery-card__fila"><span>Por cobrar</span><strong>S/ {{ obtenerSaldoPendiente(pedido) | number: '1.2-2' }}</strong></div>
+            <ng-container *ngTemplateOutlet="accesosDirectosDelivery; context: { pedido: pedido }"></ng-container>
+            <div class="delivery-card__acciones delivery-card__acciones--movil">
+              <button *ngIf="pedidoDisponibleParaTomar(pedido)" type="button" (click)="$event.stopPropagation(); tomarPedido(pedido)">Tomar</button>
+              <button *ngIf="pedidoTomadoPorMi(pedido)" type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 4)">En ruta</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="delivery-bloque" *ngIf="pedidosEnRutaDelivery().length">
+        <h5>En ruta</h5>
+        <div class="delivery-grid delivery-grid--movil">
+          <div class="delivery-card delivery-card--movil delivery-card--en-ruta" *ngFor="let pedido of pedidosEnRutaDelivery()" (click)="seleccionarPedido(pedido)">
+            <div class="delivery-card__cabecera">
+              <h5>Pedido {{ obtenerNumeroVisualPedido(pedido) }}</h5>
+              <strong class="badge" [ngClass]="obtenerClaseBadgeEstado(pedido.estado_id)">{{ obtenerEtiquetaEstado(pedido.estado_id) }}</strong>
+            </div>
+            <div class="delivery-card__fila"><span>Cliente</span><strong>{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos || '' }}</strong></div>
+            <div class="delivery-card__fila"><span>Estado pago</span><strong class="badge badge--wrap" [ngClass]="obtenerClaseBadgePago(pedido)">{{ obtenerResumenEstadoPago(pedido) }}</strong></div>
+            <div class="delivery-card__fila"><span>Por cobrar</span><strong>S/ {{ obtenerSaldoPendiente(pedido) | number: '1.2-2' }}</strong></div>
+            <ng-container *ngTemplateOutlet="accesosDirectosDelivery; context: { pedido: pedido }"></ng-container>
+            <div class="delivery-card__acciones delivery-card__acciones--movil">
+              <button type="button" (click)="$event.stopPropagation(); abrirRegistroPagoCuenta(pedido)">Pago</button>
+              <button type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 2)">Entregado</button>
+              <button type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 5)">No entregado</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="delivery-bloque" *ngIf="pedidosEntregadosDelivery().length">
+        <h5>Entregados hoy</h5>
+        <div class="delivery-grid delivery-grid--movil">
+          <div class="delivery-card delivery-card--movil delivery-card--entregado" *ngFor="let pedido of pedidosEntregadosDelivery()" (click)="seleccionarPedido(pedido)">
+            <div class="delivery-card__cabecera">
+              <h5>Pedido {{ obtenerNumeroVisualPedido(pedido) }}</h5>
+              <strong class="badge" [ngClass]="obtenerClaseBadgeEstado(pedido.estado_id)">{{ obtenerEtiquetaEstado(pedido.estado_id) }}</strong>
+            </div>
+            <div class="delivery-card__fila"><span>Cliente</span><strong>{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos || '' }}</strong></div>
+            <div class="delivery-card__fila"><span>Pago</span><strong class="badge badge--wrap" [ngClass]="obtenerClaseBadgePago(pedido)">{{ obtenerResumenEstadoPago(pedido) }}</strong></div>
+            <ng-container *ngTemplateOutlet="accesosDirectosDelivery; context: { pedido: pedido }"></ng-container>
+          </div>
+        </div>
+      </section>
+
+      <section class="delivery-bloque" *ngIf="pedidosNoEntregadosDelivery().length">
+        <h5>No entregados</h5>
+        <div class="delivery-grid delivery-grid--movil">
+          <div class="delivery-card delivery-card--movil delivery-card--no-entregado" *ngFor="let pedido of pedidosNoEntregadosDelivery()" (click)="seleccionarPedido(pedido)">
+            <div class="delivery-card__cabecera">
+              <h5>Pedido {{ obtenerNumeroVisualPedido(pedido) }}</h5>
+              <strong class="badge" [ngClass]="obtenerClaseBadgeEstado(pedido.estado_id)">{{ obtenerEtiquetaEstado(pedido.estado_id) }}</strong>
+            </div>
+            <div class="delivery-card__fila"><span>Cliente</span><strong>{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos || '' }}</strong></div>
+            <div class="delivery-card__fila" *ngIf="pedido.motivo_cancelacion"><span>Motivo</span><strong>{{ pedido.motivo_cancelacion }}</strong></div>
+            <ng-container *ngTemplateOutlet="accesosDirectosDelivery; context: { pedido: pedido }"></ng-container>
+          </div>
+        </div>
+      </section>
+
+      <p class="tabla__sin-resultados" *ngIf="!cargando && pedidosFiltrados.length === 0">
+        No hay pedidos visibles para hoy en la vista delivery.
+      </p>
+      </ng-container>
+    </article>
+  </div>
+</section>
+
+<div class="modal-fondo" *ngIf="mostrarMapaDelivery" (click)="cerrarMapaDelivery()">
+  <article class="modal-contenido modal-contenido--mapa-delivery" (click)="$event.stopPropagation()">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <div>
+        <h4>Mapa de ruta delivery</h4>
+        <p>Pedidos pendientes y en ruta ordenados por cercania.</p>
+      </div>
+      <button type="button" class="boton boton--secundario" (click)="cerrarMapaDelivery()">Cerrar</button>
+    </header>
+
+    <section class="mapa-delivery-layout">
+      <div class="mapa-delivery-panel">
+        <div #mapaDeliveryContenedor class="mapa-delivery"></div>
+        <div class="mapa-delivery-acciones">
+          <button type="button" class="boton boton--secundario" [disabled]="cargandoUbicacionRuta" (click)="usarMiUbicacionRuta()">
+            {{ cargandoUbicacionRuta ? 'Ubicando...' : 'Usar mi ubicacion' }}
+          </button>
+          <button type="button" class="boton boton--primario" (click)="abrirRutaCompletaGoogleMaps()">
+            Abrir ruta completa
+          </button>
+        </div>
+      </div>
+
+      <aside class="ruta-delivery-lista">
+        <div class="ruta-delivery-resumen">
+          <strong>{{ puntosRutaDelivery.length }} punto(s) en mapa</strong>
+          <span *ngIf="pedidosSinUbicacionRuta.length">{{ pedidosSinUbicacionRuta.length }} sin coordenadas</span>
+        </div>
+
+        <article class="ruta-delivery-item" *ngFor="let punto of puntosRutaDelivery">
+          <div class="ruta-delivery-item__orden">{{ punto.orden }}</div>
+          <div class="ruta-delivery-item__contenido">
+            <strong>Pedido {{ obtenerNumeroVisualPedido(punto.pedido) }}</strong>
+            <span>{{ obtenerNombreCliente(punto.pedido.cliente) }}</span>
+            <small>{{ punto.pedido.cliente.direccion || punto.pedido.cliente.direccion_fiscal || 'Sin direccion' }}</small>
+            <small *ngIf="punto.distanciaKm !== null">Aprox. {{ punto.distanciaKm | number: '1.1-2' }} km del punto anterior</small>
+          </div>
+          <button type="button" class="boton boton--secundario" (click)="abrirUbicacionPedido(punto.pedido)">Ir</button>
+        </article>
+
+        <div class="ruta-delivery-sin-ubicacion" *ngIf="pedidosSinUbicacionRuta.length">
+          <strong>Pedidos sin ubicacion</strong>
+          <span *ngFor="let pedido of pedidosSinUbicacionRuta">
+            Pedido {{ obtenerNumeroVisualPedido(pedido) }} - {{ obtenerNombreCliente(pedido.cliente) }}
+          </span>
+        </div>
+      </aside>
+    </section>
+  </article>
+</div>
+
+<ng-template #accesosDirectosDelivery let-pedido="pedido">
+  <div class="delivery-card__acciones delivery-card__acciones--movil">
+    <button type="button" title="Abrir ruta en Google Maps" aria-label="Abrir ruta en Google Maps" (click)="$event.stopPropagation(); abrirUbicacionPedido(pedido)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
+      <span>Mapa</span>
+    </button>
+    <button type="button" title="Ver foto del frontis" aria-label="Ver foto del frontis" (click)="$event.stopPropagation(); verFotoFrontis(pedido)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2ZM8.5 11.5l2.5 3.01L14.5 10l4.5 6H5l3.5-4.5Z"/></svg>
+      <span>Foto</span>
+    </button>
+    <button type="button" title="Enviar WhatsApp" aria-label="Enviar WhatsApp" (click)="$event.stopPropagation(); abrirWhatsapp(pedido)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.88 11.88 0 0 0 12.06 0 11.94 11.94 0 0 0 1.73 17.9L0 24l6.3-1.65A11.95 11.95 0 0 0 24 12.06a11.88 11.88 0 0 0-3.48-8.58ZM12.06 21.8a9.7 9.7 0 0 1-4.95-1.35l-.36-.22-3.74.98 1-3.65-.24-.38a9.73 9.73 0 1 1 8.29 4.62Zm5.34-7.27c-.3-.15-1.77-.87-2.05-.97s-.48-.15-.69.15-.78.97-.96 1.17-.36.22-.66.07a7.95 7.95 0 0 1-2.34-1.44 8.67 8.67 0 0 1-1.6-1.98c-.17-.3 0-.47.13-.62.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.52-.08-.15-.7-1.68-.96-2.3-.25-.59-.5-.52-.69-.53h-.58a1.11 1.11 0 0 0-.81.37 3.33 3.33 0 0 0-1.03 2.48c0 1.47 1.08 2.89 1.23 3.09.15.2 2.12 3.23 5.14 4.53.72.3 1.29.48 1.73.62.73.23 1.39.2 1.91.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg>
+      <span>WhatsApp</span>
+    </button>
+    <button type="button" title="Llamar cliente" aria-label="Llamar cliente" (click)="$event.stopPropagation(); llamarCliente(pedido)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.46 15.46 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.56 0 1 .45 1 1V20c0 .55-.44 1-1 1C10.85 21 3 13.15 3 3.99c0-.55.45-1 1-1H7.5c.55 0 1 .44 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.21Z"/></svg>
+      <span>Llamar</span>
+    </button>
+  </div>
+</ng-template>
+
+<div class="modal-fondo modal-fondo--lightbox" *ngIf="fotoFrontisLightboxUrl" (click)="cerrarFotoFrontisLightbox()">
+  <article class="modal-contenido modal-contenido--foto-frontis" (click)="$event.stopPropagation()">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <div>
+        <h4>Foto del frontis</h4>
+        <p>Imagen registrada para llegar al domicilio del cliente.</p>
+      </div>
+      <button type="button" class="boton boton--secundario" (click)="cerrarFotoFrontisLightbox()">Cerrar</button>
+    </header>
+
+    <figure class="foto-frontis-lightbox">
+      <img [src]="fotoFrontisLightboxUrl" alt="Foto del frontis de la casa" />
+    </figure>
+
+    <div class="foto-frontis-acciones">
+      <button type="button" class="boton boton--secundario" (click)="abrirFotoFrontisEnPestana()">Abrir en pestana</button>
+    </div>
+  </article>
+</div>
+
+<div class="modal-fondo" *ngIf="pedidoDetalleModal" (click)="cerrarModalDetallePedido()">
+  <article class="modal-contenido modal-contenido--detalle-pedido" (click)="$event.stopPropagation()">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <div>
+        <h4>Detalle del pedido #{{ obtenerNumeroVisualPedido(pedidoDetalleModal) }}</h4>
+        <p>Solo se muestra el detalle de productos registrados para este pedido.</p>
+      </div>
+      <button type="button" class="boton boton--secundario" (click)="cerrarModalDetallePedido()">Cerrar</button>
+    </header>
+
+    <section class="bloque bloque--sin-borde">
+      <div class="detalle-pedido detalle-pedido--modal" *ngIf="pedidoDetalleModal.detalles?.length; else sinDetallePedidoModal">
+        <div class="detalle-pedido__fila" *ngFor="let detalle of pedidoDetalleModal.detalles">
+          <span>{{ detalle.cantidad }} {{ detalle.unidad }}</span>
+          <strong>{{ detalle.descripcion }}</strong>
+          <span>S/ {{ detalle.subtotal | number: '1.2-2' }}</span>
+        </div>
+        <div class="detalle-pedido__total">
+          <span>Total</span>
+          <strong>S/ {{ pedidoDetalleModal.total | number: '1.2-2' }}</strong>
+        </div>
+        <div class="detalle-pedido__comprobante" *ngIf="puedeEmitirComprobante(pedidoDetalleModal)">
+          <span>El pedido esta completamente pagado.</span>
+          <button type="button" class="boton boton--primario" (click)="emitirComprobantePedido(pedidoDetalleModal)">
+            Emitir boleta o factura
+          </button>
+        </div>
+        <div class="detalle-pedido__comprobante detalle-pedido__comprobante--emitido" *ngIf="pedidoDetalleModal.comprobante">
+          <span>Comprobante emitido</span>
+          <strong>{{ obtenerEtiquetaComprobante(pedidoDetalleModal) }}</strong>
+        </div>
+      </div>
+      <ng-template #sinDetallePedidoModal>
+        <p class="detalle-pedido__vacio">Sin detalle registrado.</p>
+      </ng-template>
+    </section>
+  </article>
+</div>
+
+
+<div class="modal-fondo" *ngIf="cuentaClienteSeleccionada" (click)="cerrarCuentaCliente()">
+  <article class="modal-contenido modal-contenido--cuenta-cliente" (click)="$event.stopPropagation()">
+    <header class="cuenta-modal-header">
+      <div>
+        <h4>{{ obtenerNombreCliente(cuentaClienteSeleccionada.cliente) }}</h4>
+        <p>Resumen de deuda, pedidos pendientes y pagos registrados.</p>
+      </div>
+      <button type="button" class="boton boton--secundario" (click)="cerrarCuentaCliente()">Cerrar</button>
+    </header>
+
+    <section class="cuenta-modal-resumen">
+      <span><small>Total deuda</small><strong>S/ {{ cuentaClienteSeleccionada.total_deuda | number: '1.2-2' }}</strong></span>
+      <span><small>Pagado</small><strong>S/ {{ cuentaClienteSeleccionada.monto_pagado | number: '1.2-2' }}</strong></span>
+      <span class="cuenta-modal-resumen__saldo"><small>Saldo pendiente</small><strong>S/ {{ cuentaClienteSeleccionada.saldo_pendiente | number: '1.2-2' }}</strong></span>
+    </section>
+
+    <section class="cuenta-modal-grid">
+      <div class="cuenta-modal-panel">
+        <div class="cuenta-modal-panel__titulo">
+          <h5>Pedidos pendientes</h5>
+          <span>{{ cuentaClienteSeleccionada.pedidos.length }} pedido(s)</span>
+        </div>
+
+        <div class="cuenta-lista">
+          <article class="cuenta-pedido" *ngFor="let pedido of cuentaClienteSeleccionada.pedidos">
+            <header class="cuenta-pedido__cabecera">
+              <div class="cuenta-pedido__info">
+                <strong>Pedido #{{ obtenerNumeroVisualPedido(pedido) }}</strong>
+                <span>{{ obtenerTipoPedido(pedido) }}</span>
+                <small>{{ obtenerFechaLarga(pedido.fecha_hora_creacion) }}</small>
+              </div>
+              <div class="cuenta-pedido__saldo">
+                <small>Debe</small>
+                <strong>S/ {{ obtenerSaldoPendiente(pedido) | number: '1.2-2' }}</strong>
+              </div>
+            </header>
+
+            <div class="cuenta-pedido__detalle">
+              <div class="cuenta-pedido__producto" *ngFor="let detalle of pedido.detalles">
+                <span>{{ detalle.cantidad }} {{ detalle.unidad }} {{ detalle.descripcion }}</span>
+                <strong>S/ {{ detalle.subtotal | number: '1.2-2' }}</strong>
+              </div>
+            </div>
+
+            <footer class="cuenta-pedido__pie">
+              <div class="cuenta-pedido__total">
+                <span>Total pedido</span>
+                <strong>S/ {{ pedido.total | number: '1.2-2' }}</strong>
+              </div>
+              <button
+                type="button"
+                class="boton boton--primario cuenta-pedido__pagar"
+                (click)="abrirRegistroPagoCuenta(pedido)"
+              >
+                Pagar este pedido
+              </button>
+            </footer>
+          </article>
+        </div>
+      </div>
+
+      <div class="cuenta-modal-panel">
+        <div class="cuenta-modal-panel__titulo">
+          <h5>Historial de pagos</h5>
+          <span>{{ cuentaClienteSeleccionada.historial_pagos.length }} pago(s)</span>
+        </div>
+
+        <div class="cuenta-lista cuenta-lista--pagos" *ngIf="cuentaClienteSeleccionada.historial_pagos.length; else sinPagosCuentaModal">
+          <article class="cuenta-pago" *ngFor="let pago of cuentaClienteSeleccionada.historial_pagos">
+            <div>
+              <strong>{{ obtenerFechaLarga(pago.fecha_hora) }}</strong>
+              <span>Pedido #{{ pago.pedido_id }} - {{ pago.registrado_por }}</span>
+            </div>
+            <strong class="cuenta-pago__monto">S/ {{ pago.monto | number: '1.2-2' }}</strong>
+          </article>
+        </div>
+
+        <ng-template #sinPagosCuentaModal>
+          <p class="detalle-pedido__vacio cuenta-modal-vacio">Sin pagos registrados.</p>
+        </ng-template>
+      </div>
+    </section>
+
+    <footer class="cuenta-modal-footer">
+      <button type="button" class="boton boton--primario" (click)="abrirRegistroPagoCliente(cuentaClienteSeleccionada)">Registrar pago</button>
+    </footer>
+  </article>
+</div>
+
+<div class="modal-fondo" *ngIf="pedidoPagoPendiente || cuentaPagoPendiente" (click)="cerrarRegistroPagoCuenta()">
+  <article class="modal-contenido modal-contenido--pago-cuenta" (click)="$event.stopPropagation()">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <div>
+        <h4>Registrar pago</h4>
+        <p *ngIf="pedidoPagoPendiente">{{ obtenerNombreCliente(pedidoPagoPendiente.cliente) }} - {{ obtenerTipoPedido(pedidoPagoPendiente) }}</p>
+        <p *ngIf="cuentaPagoPendiente">{{ obtenerNombreCliente(cuentaPagoPendiente.cliente) }} - se aplicara a la deuda mas antigua.</p>
+      </div>
+      <button type="button" class="boton boton--secundario" (click)="cerrarRegistroPagoCuenta()">Cerrar</button>
+    </header>
+
+    <section class="bloque bloque--sin-borde">
+      <div class="resumen-cuenta" *ngIf="pedidoPagoPendiente">
+        <span>Total: <strong>S/ {{ pedidoPagoPendiente.total | number: '1.2-2' }}</strong></span>
+        <span>Pagado: <strong>S/ {{ obtenerMontoPagado(pedidoPagoPendiente) | number: '1.2-2' }}</strong></span>
+        <span>Saldo: <strong>S/ {{ obtenerSaldoPendiente(pedidoPagoPendiente) | number: '1.2-2' }}</strong></span>
+      </div>
+      <div class="resumen-cuenta" *ngIf="cuentaPagoPendiente">
+        <span>Total: <strong>S/ {{ cuentaPagoPendiente.total_deuda | number: '1.2-2' }}</strong></span>
+        <span>Pagado: <strong>S/ {{ cuentaPagoPendiente.monto_pagado | number: '1.2-2' }}</strong></span>
+        <span>Saldo: <strong>S/ {{ cuentaPagoPendiente.saldo_pendiente | number: '1.2-2' }}</strong></span>
+      </div>
+
+      <label class="campo">
+        <span>Monto recibido</span>
+        <input type="number" min="0" step="0.01" [(ngModel)]="montoPagoCuenta" placeholder="Escribe el monto recibido" />
+      </label>
+
+      <button type="button" class="boton boton--primario" [disabled]="registrandoPago" (click)="registrarPagoCuenta()">
+        {{ registrandoPago ? 'Guardando...' : 'Guardar pago' }}
+      </button>
+    </section>
+  </article>
+</div>
+
+
+<div class="modal-fondo" *ngIf="pedidoSeleccionado" (click)="cerrarModalGestion()">
+  <article class="modal-contenido modal-contenido--gestion" (click)="$event.stopPropagation()">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <h4>Gestion de entrega A Pedido #{{ obtenerNumeroVisualPedido(pedidoSeleccionado) }}</h4>
+      <button type="button" class="boton boton--secundario" (click)="cerrarModalGestion()">Cerrar</button>
+    </header>
+
+    <div class="gestion-layout">
+      <div class="gestion-layout__principal">
+        <section class="bloque">
+          <h5>Estado del pedido</h5>
+          <div class="formulario-grid formulario-grid--comprobante">
+            <div class="campo">
+              <label>Estado</label>
+              <select [(ngModel)]="estadoDestino">
+                <option [ngValue]="4">EN RUTA</option>
+                <option [ngValue]="2">ENTREGADO</option>
+                <option [ngValue]="5">NO ENTREGADO</option>
+                <option [ngValue]="3">CANCELADO</option>
+              </select>
+            </div>
+            <div class="campo" *ngIf="estadoDestino === 3 || estadoDestino === 5">
+              <label>Motivo</label>
+              <input type="text" [(ngModel)]="motivoCancelacion" />
+            </div>
+          </div>
+        </section>
+
+        <section class="bloque">
+          <h5>Control de pagos</h5>
+          <div class="formulario-grid formulario-grid--comprobante">
+            <div class="campo">
+              <label>Monto recibido del cliente</label>
+              <input type="number" min="0" step="0.01" [(ngModel)]="montoRecibido" />
+              <small *ngIf="calcularSaldoPendiente() > 0">Queda pendiente: S/ {{ calcularSaldoPendiente() | number: '1.2-2' }}</small>
+              <small *ngIf="calcularVuelto() > 0">Dar vuelto: S/ {{ calcularVuelto() | number: '1.2-2' }}</small>
+              <small *ngIf="calcularSaldoPendiente() === 0 && calcularVuelto() === 0">Pago exacto.</small>
+            </div>
+
+            <div class="campo">
+              <label>Fecha y hora de pago</label>
+              <input type="text" [ngModel]="obtenerFechaPago(pedidoSeleccionado) | date: 'short'" readonly disabled />
+            </div>
+          </div>
+          <button type="button" class="boton boton--primario" [disabled]="guardandoGestion" (click)="guardarEstadoYPago()">
+            {{ guardandoGestion ? 'Guardando...' : 'Guardar estado y pago' }}
+          </button>
+        </section>
+      </div>
+
+      <aside class="gestion-layout__detalle bloque">
+        <h5>Detalle del pedido</h5>
+        <div class="detalle-pedido" *ngIf="pedidoSeleccionado?.detalles?.length; else sinDetallePedido">
+          <div class="detalle-pedido__fila" *ngFor="let detalle of pedidoSeleccionado?.detalles">
+            <span>{{ detalle.cantidad }} {{ detalle.unidad }}</span>
+            <strong>{{ detalle.descripcion }}</strong>
+            <span>S/ {{ detalle.subtotal | number: '1.2-2' }}</span>
+          </div>
+          <div class="detalle-pedido__total">
+            <span>Total</span>
+            <strong>S/ {{ pedidoSeleccionado.total | number: '1.2-2' }}</strong>
+          </div>
+        </div>
+        <ng-template #sinDetallePedido>
+          <p class="detalle-pedido__vacio">Sin detalle registrado.</p>
+        </ng-template>
+      </aside>
+    </div>
+
+    <section class="bloque">
+      <h5>Ficha de domicilio</h5>
+      <div class="acciones-ubicacion">
+        <button type="button" class="boton boton--secundario" (click)="capturarUbicacionActual()">Y Capturar GPS</button>
+        <button type="button" class="boton boton--secundario" [disabled]="comprimiendoFotoFrontis || guardandoUbicacion" (click)="frontisInput.click()">
+          {{ comprimiendoFotoFrontis || guardandoUbicacion ? 'Guardando frontis...' : 'Tomar y guardar frontis' }}
+        </button>
+        <input #frontisInput type="file" accept="image/*" capture="environment" hidden (change)="manejarFotoFrontis($event)" />
+      </div>
+      <div class="formulario-grid formulario-grid--comprobante">
+        <div class="campo">
+          <label>Latitud</label>
+          <input type="number" step="0.0000001" [(ngModel)]="latitud" />
+        </div>
+        <div class="campo">
+          <label>Longitud</label>
+          <input type="number" step="0.0000001" [(ngModel)]="longitud" />
+        </div>
+        <div class="campo campo--doble">
+          <label>URL foto frontis</label>
+          <input type="text" [(ngModel)]="fotoFrontisUrl" />
+          <small *ngIf="comprimiendoFotoFrontis">Optimizando foto para ahorrar espacio...</small>
+          <small *ngIf="!comprimiendoFotoFrontis && fotoFrontisArchivo">Foto lista para subir: {{ fotoFrontisInfo }}</small>
+        </div>
+        <div class="campo campo--doble">
+          <label>Referencia del domicilio</label>
+          <input type="text" [(ngModel)]="referenciasUbicacion" />
+        </div>
+      </div>
+      <button type="button" class="boton boton--primario" [disabled]="guardandoUbicacion || comprimiendoFotoFrontis" (click)="guardarUbicacionEvidencia()">
+        {{ comprimiendoFotoFrontis ? 'Optimizando foto...' : (guardandoUbicacion ? 'Guardando...' : 'Guardar ficha de domicilio') }}
+      </button>
+    </section>
+  </article>
+</div>
+
+<div class="modal-fondo" *ngIf="mostrarModalCliente">
+  <section class="modal-contenido">
+    <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
+      <div>
+        <h3>Registro de cliente</h3>
+        <p>Ingresa DNI o RUC para autocompletar datos y guardar.</p>
+      </div>
+      <button class="boton boton--secundario" type="button" (click)="cerrarModalCliente()">Cerrar</button>
+    </header>
+
+    <div class="consulta">
+      <label class="campo">
+        <span>DNI o RUC</span>
+        <div class="campo__acciones">
+          <input [(ngModel)]="consultaDocumento" type="text" placeholder="8 digitos (DNI) o 11 digitos (RUC)" />
+          <button class="boton boton--primario" type="button" (click)="consultarDocumentoApi()" [disabled]="consultaCargando">
+            {{ consultaCargando ? 'Consultando...' : 'Consultar' }}
+          </button>
+        </div>
+      </label>
+    </div>
+
+    <form class="formulario" (ngSubmit)="guardarClienteDesdeModal()">
+      <label class="campo">
+        <span>DNI</span>
+        <input [(ngModel)]="formularioCliente.dni" name="dni" type="text" placeholder="8 digitos" />
+      </label>
+      <label class="campo">
+        <span>RUC</span>
+        <input [(ngModel)]="formularioCliente.ruc" name="ruc" type="text" placeholder="11 digitos" />
+      </label>
+      <label class="campo">
+        <span>Nombres</span>
+        <input [(ngModel)]="formularioCliente.nombres" name="nombres" type="text" />
+      </label>
+      <label class="campo">
+        <span>Nombre de la empresa</span>
+        <input [(ngModel)]="formularioCliente.nombreEmpresa" name="nombreEmpresa" type="text" />
+      </label>
+      <label class="campo">
+        <span>Apellidos</span>
+        <input [(ngModel)]="formularioCliente.apellidos" name="apellidos" type="text" />
+      </label>
+      <label class="campo">
+        <span>Celular</span>
+        <input [(ngModel)]="formularioCliente.celular" name="celular" type="text" placeholder="9 digitos" />
+      </label>
+      <label class="campo">
+        <span>Direccion</span>
+        <input [(ngModel)]="formularioCliente.direccion" name="direccion" type="text" />
+      </label>
+      <label class="campo">
+        <span>Direccion fiscal</span>
+        <input [(ngModel)]="formularioCliente.direccionFiscal" name="direccionFiscal" type="text" />
+      </label>
+      <label class="campo">
+        <span>Referencias</span>
+        <input [(ngModel)]="formularioCliente.referencias" name="referencias" type="text" />
+      </label>
+
+      <div class="acciones">
+        <button class="boton boton--primario" type="submit" [disabled]="guardandoCliente">Guardar cliente</button>
+        <button class="boton boton--secundario" type="button" (click)="limpiarFormularioCliente()">Limpiar</button>
+      </div>
+    </form>
+  </section>
+</div>

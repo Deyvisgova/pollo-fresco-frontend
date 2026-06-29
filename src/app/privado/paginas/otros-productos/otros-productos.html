@@ -1,0 +1,17 @@
+<!-- Contenido base para la vista de otros-productos -->
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Otros productos</h2>
+    <p>Congelados y huevos con control independiente por lote y ventas diarias.</p>
+  </div>
+
+  <nav class="seccion__tabs">
+    <a *ngIf="!esVendedor" routerLink="lotes" routerLinkActive="tab--activa" class="tab">Lotes</a>
+    <a routerLink="ventas-diarias" routerLinkActive="tab--activa" class="tab">Ventas diarias</a>
+    <a *ngIf="!esVendedor" routerLink="productos" routerLinkActive="tab--activa" class="tab">Productos</a>
+  </nav>
+
+  <div class="seccion__contenido">
+    <router-outlet></router-outlet>
+  </div>
+</section>

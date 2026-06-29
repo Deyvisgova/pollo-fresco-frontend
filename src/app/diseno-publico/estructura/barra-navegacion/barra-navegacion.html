@@ -1,0 +1,49 @@
+<mat-toolbar color="primary" class="barra-navegacion">
+  <div class="container-fluid barra-navegacion__contenido">
+    <div class="d-flex flex-column">
+      <span class="barra-navegacion__logo">Pollo Fresco</span>
+      <span class="barra-navegacion__slogan">Mercado Ayaymama</span>
+    </div>
+    <button type="button" class="barra-navegacion__menu" (click)="alternarMenu()" [attr.aria-expanded]="menuAbierto" aria-label="Abrir menu"><mat-icon>{{ menuAbierto ? 'close' : 'menu' }}</mat-icon></button>
+    <nav class="barra-navegacion__nav" [class.abierto]="menuAbierto" aria-label="Navegacion principal">
+      <ul class="nav flex-wrap gap-2 barra-navegacion__enlaces">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenu()">
+            <mat-icon>home</mat-icon>
+            <span>Inicio</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/nosotros" routerLinkActive="active" (click)="cerrarMenu()">
+            <mat-icon>groups</mat-icon>
+            <span>Nosotros</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/productos" routerLinkActive="active" (click)="cerrarMenu()">
+            <mat-icon>storefront</mat-icon>
+            <span>Productos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/clientes" routerLinkActive="active" (click)="cerrarMenu()">
+            <mat-icon>verified_user</mat-icon>
+            <span>Clientes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/contacto" routerLinkActive="active" (click)="cerrarMenu()">
+            <mat-icon>support_agent</mat-icon>
+            <span>Contacto</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link barra-navegacion__ingresar" routerLink="/ingresar" routerLinkActive="active" (click)="cerrarMenu()">
+            <mat-icon>lock</mat-icon>
+            <span>Ingresar</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</mat-toolbar>

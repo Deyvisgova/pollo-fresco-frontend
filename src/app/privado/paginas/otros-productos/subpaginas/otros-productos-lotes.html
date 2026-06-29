@@ -1,0 +1,282 @@
+<section class="seccion__tarjeta">
+  <header class="seccion__encabezado">
+    <div>
+      <h3>Lotes</h3>
+      <p>
+        Registra lotes y su detalle de compra/venta. Aqui puedes editar o
+        eliminar si el lote esta abierto.
+      </p>
+    </div>
+    <button class="boton boton--primario" (click)="abrirModal()">
+      Nuevo lote
+    </button>
+  </header>
+
+  <div class="seccion__acciones">
+    <input
+      type="search"
+      placeholder="Buscar por lote, comprobante, producto o estado..."
+      [(ngModel)]="filtro"
+    />
+    <button class="boton boton--secundario">Buscar</button>
+  </div>
+
+  <div class="seccion__tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Lote</th>
+          <th>Comprobante</th>
+          <th>Producto</th>
+          <th>Proveedor</th>
+          <th>Cantidad</th>
+          <th>Costo/Kg</th>
+          <th>Precio venta</th>
+          <th>Total costo</th>
+          <th>Total venta</th>
+          <th>Fecha ingreso</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lote of lotesFiltrados">
+          <td data-label="Lote">{{ lote.numeroLote }}</td>
+          <td data-label="Comprobante">{{ lote.codigoComprobante }}</td>
+          <td data-label="Producto">{{ lote.nombre }}</td>
+          <td data-label="Proveedor">{{ lote.proveedorNombre }}</td>
+          <td data-label="Cantidad">
+            <div class="stock" [class.stock--bajo]="esStockBajo(lote)">
+              <span>{{ lote.cantidad | number : '1.0-2' }}</span>
+              <small *ngIf="lote.presentacionIngreso">{{ lote.cantidadPresentacion | number : '1.0-2' }} {{ lote.presentacionIngreso }}</small>
+              <small *ngIf="esStockBajo(lote)">Stock bajo</small>
+            </div>
+          </td>
+          <td data-label="Costo/Kg">
+            S/ {{ lote.costoKilo | number : lote.presentacionIngreso ? '1.2-6' : '1.2-2' }}
+          </td>
+          <td data-label="Precio venta">S/ {{ lote.precioVenta | number : '1.2-2' }}</td>
+          <td data-label="Total costo">S/ {{ lote.totalCosto | number : '1.2-2' }}</td>
+          <td data-label="Total venta">S/ {{ lote.totalVenta | number : '1.2-2' }}</td>
+          <td data-label="Fecha ingreso">{{ lote.fechaIngreso | date: 'dd/MM/yyyy' }}</td>
+          <td data-label="Estado">
+            <span
+              class="etiqueta"
+              [class.etiqueta--cerrada]="lote.estado === 'CERRADO'"
+            >
+              {{ lote.estado }}
+            </span>
+          </td>
+          <td data-label="Acciones" class="tabla__acciones">
+            <button
+              class="boton boton--accion"
+              [disabled]="lote.estado === 'CERRADO'"
+              (click)="editarLote(lote)"
+              title="Editar"
+            >
+              Editar
+            </button>
+            <button
+              class="boton boton--accion boton--peligro"
+              [disabled]="lote.estado === 'CERRADO'"
+              (click)="eliminarLote(lote)"
+              title="Eliminar"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="lotesFiltrados.length === 0">
+          <td colspan="12">No hay registros con ese filtro.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="modal" *ngIf="mostrarModal">
+  <div class="modal__contenido">
+    <header class="modal__encabezado">
+      <div>
+        <h3>Nuevo lote</h3>
+        <p>Completa primero los datos del lote y luego el detalle del lote.</p>
+      </div>
+      <button class="boton boton--texto" (click)="cerrarModal()">Cerrar</button>
+    </header>
+
+    <h4 class="modal__subtitulo">Datos de lote</h4>
+
+    <div class="modal__grid">
+      <label>
+        Lote (correlativo por producto)
+        <input
+          type="text"
+          [value]="loteForm.productoId ? siguienteNumeroLote(loteForm.productoId) : 'Pendiente'"
+          disabled
+        />
+      </label>
+      <label>
+        Fecha ingreso
+        <input type="date" [(ngModel)]="loteForm.fechaIngreso" />
+      </label>
+      <label>
+        Codigo comprobante
+        <input type="text" [(ngModel)]="loteForm.codigoComprobante" placeholder="Ej: F001-000123" />
+      </label>
+    </div>
+
+    <h4 class="modal__subtitulo">Detalle de lote</h4>
+
+    <div class="modal__selector">
+      <div class="selector-proveedor">
+        <label>Proveedor</label>
+        <button
+          type="button"
+          class="selector-proveedor__boton"
+          (click)="toggleDropdownProveedor()"
+        >
+          <span
+            >{{ nombreProveedorSeleccionado || 'Buscar proveedor...' }}</span
+          >
+          <span class="selector-proveedor__icono">v</span>
+        </button>
+        <div class="selector-proveedor__menu" *ngIf="dropdownProveedorAbierto">
+          <input
+            type="text"
+            placeholder="Buscar proveedor..."
+            [(ngModel)]="filtroProveedor"
+          />
+          <div class="selector-proveedor__lista">
+            <button
+              type="button"
+              class="selector-proveedor__item"
+              *ngFor="let proveedor of proveedoresFiltrados"
+              (click)="seleccionarProveedor(proveedor)"
+            >
+              {{ formatearProveedor(proveedor) }}
+            </button>
+            <p *ngIf="proveedoresFiltrados.length === 0">No hay proveedores</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal__selector">
+      <div class="selector-producto">
+        <label>Producto</label>
+        <button
+          type="button"
+          class="selector-producto__boton"
+          (click)="toggleDropdownProducto()"
+        >
+          <span>{{ nombreProductoSeleccionado || 'Buscar producto...' }}</span>
+          <span class="selector-producto__icono">v</span>
+        </button>
+        <div class="selector-producto__menu" *ngIf="dropdownProductoAbierto">
+          <input
+            type="text"
+            placeholder="Buscar producto..."
+            [(ngModel)]="filtroProducto"
+          />
+          <div class="selector-producto__lista">
+            <button
+              type="button"
+              class="selector-producto__item"
+              *ngFor="let producto of productosFiltrados"
+              (click)="seleccionarProductoId(producto)"
+            >
+              {{ producto.nombre }}
+            </button>
+            <p *ngIf="productosFiltrados.length === 0">No hay productos</p>
+          </div>
+        </div>
+      </div>
+      <button class="boton boton--secundario" (click)="abrirModalProducto()">
+        + Nuevo producto
+      </button>
+    </div>
+
+    <div class="modal__grid">
+      <label class="modal__cantidad" *ngIf="!loteEsHuevos">
+        Cantidad
+        <input type="number" [(ngModel)]="loteForm.cantidad" placeholder="0" />
+      </label>
+      <label *ngIf="loteEsHuevos">
+        Presentacion de ingreso
+        <select [(ngModel)]="loteForm.presentacionIngreso" (ngModelChange)="actualizarCantidadBaseHuevos()">
+          <option *ngFor="let presentacion of presentacionesHuevo" [value]="presentacion.id">{{ presentacion.etiqueta }}</option>
+        </select>
+      </label>
+      <label class="modal__cantidad" *ngIf="loteEsHuevos">
+        Cantidad comprada
+        <input type="number" [(ngModel)]="loteForm.cantidadPresentacion" (ngModelChange)="actualizarCantidadBaseHuevos()" placeholder="0" />
+      </label>
+      <label *ngIf="loteEsHuevos">
+        Stock calculado
+        <input type="text" [value]="(loteForm.cantidad || 0) + ' huevos'" disabled />
+      </label>
+      <label *ngIf="!loteEsHuevos">
+        Costo por unidad/kg (S/)
+        <input type="number" [(ngModel)]="loteForm.costoKilo" placeholder="0.00" />
+      </label>
+      <label *ngIf="loteEsHuevos">
+        Costo total compra (S/)
+        <input type="number" [(ngModel)]="loteForm.costoTotalHuevos" (ngModelChange)="actualizarCantidadBaseHuevos()" placeholder="0.00" />
+        <small *ngIf="costoUnitarioCalculadoHuevos !== null">
+          Costo unitario exacto: S/ {{ costoUnitarioCalculadoHuevos | number : '1.2-6' }}
+        </small>
+      </label>
+      <label *ngIf="!loteEsHuevos">
+        Precio de venta (S/)
+        <input type="number" [(ngModel)]="loteForm.precioVenta" placeholder="0.00" />
+      </label>
+    </div>
+
+    <p class="modal__error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+    <div class="modal__acciones">
+      <button class="boton boton--primario" (click)="guardarLote()">
+        {{ loteEnEdicion ? 'Actualizar lote' : 'Guardar lote' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" *ngIf="mostrarModalProducto">
+  <div class="modal__contenido">
+    <header class="modal__encabezado">
+      <div>
+        <h3>Nuevo producto</h3>
+        <p>Registra un producto nuevo y lo seleccionamos automaticamente.</p>
+      </div>
+      <button class="boton boton--texto" (click)="cerrarModalProducto()">
+        Cerrar
+      </button>
+    </header>
+
+    <div class="modal__grid">
+      <label>
+        Nombre del producto
+        <input
+          type="text"
+          [(ngModel)]="nuevoProducto"
+          placeholder="Ej: Huevo jumbo"
+        />
+      </label>
+      <label>
+        Grupo venta
+        <select [(ngModel)]="nuevoProductoGrupoVenta">
+          <option value="HUEVOS">Huevos</option>
+          <option value="CONGELADO">Congelado</option>
+          <option value="OTROS">Otros</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="modal__acciones">
+      <button class="boton boton--primario" (click)="guardarProducto()">
+        Guardar producto
+      </button>
+    </div>
+  </div>
+</div>

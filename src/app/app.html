@@ -1,0 +1,12 @@
+@if (!esModuloPrivado()) {
+  <app-pre-cabecera></app-pre-cabecera>
+  <app-barra-navegacion></app-barra-navegacion>
+}
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+@if (!esModuloPrivado()) {
+  <app-pie-pagina></app-pie-pagina>
+}

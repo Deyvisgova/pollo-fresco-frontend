@@ -1,0 +1,85 @@
+<section class="pagina-admin">
+  <header>
+    <div><h2>Pagina publica</h2><p>Administra textos e imagenes visibles para tus clientes.</p></div>
+    <a href="/inicio" target="_blank">Vista previa</a>
+  </header>
+
+  <nav class="tabs">
+    <button [class.activo]="seccion==='slider'" (click)="seccion='slider'">Slider e inicio</button>
+    <button [class.activo]="seccion==='paginas'" (click)="seccion='paginas'">Paginas internas</button>
+    <button [class.activo]="seccion==='contacto'" (click)="seccion='contacto'">Contacto y footer</button>
+  </nav>
+
+  <div class="mensaje" *ngIf="mensaje">{{ mensaje }}</div>
+  <div class="mensaje error" *ngIf="error">{{ error }}</div>
+
+  <form (ngSubmit)="guardar()">
+    <ng-container *ngIf="seccion==='slider'">
+      <section class="panel">
+        <h3>Presentacion de Inicio</h3>
+        <div class="grid">
+          <label>Titulo principal<input name="titulo" [(ngModel)]="form.titulo_portada"></label>
+          <label class="ancho">Descripcion<textarea name="descripcion" rows="3" [(ngModel)]="form.descripcion_portada"></textarea></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-titulo"><div><h3>Slider principal</h3><p class="ayuda">Medida final: <strong>1600 x 700 px</strong>. Las imagenes pequeñas se estiran y las grandes se recortan al centro automáticamente.</p></div><button type="button" class="agregar" (click)="agregarSlide()">+ Agregar promocion</button></div>
+        <article class="slide-editor" *ngFor="let slide of form.slides; index as i">
+          <div class="slide-numero">{{ i + 1 }}</div>
+          <img [src]="slide.imagen_url" alt="Vista previa">
+          <div class="grid">
+            <label>Titulo<input [name]="'slideTitulo'+i" [(ngModel)]="slide.titulo"></label>
+            <label>Resumen<input [name]="'slideResumen'+i" [(ngModel)]="slide.resumen"></label>
+            <label class="ancho">Detalle<textarea [name]="'slideDetalle'+i" rows="2" [(ngModel)]="slide.detalle"></textarea></label>
+            <label class="ancho">Cambiar imagen<input type="file" accept="image/*" (change)="subirA($event,'banner_nosotros_url',i)"></label>
+            <button type="button" class="quitar ancho" [disabled]="form.slides.length===1" (click)="quitarSlide(i)">Quitar promocion</button>
+          </div>
+        </article>
+      </section>
+    </ng-container>
+
+    <ng-container *ngIf="seccion==='paginas'">
+      <section class="panel">
+        <h3>Nosotros</h3>
+        <label class="check"><input type="checkbox" name="mostrarNosotros" [(ngModel)]="form.mostrar_nosotros"> Mostrar pagina</label>
+        <div class="banner-editor"><img [src]="form.banner_nosotros_url"><label>Medida final de cabecera: 1200 x 300 px<input type="file" accept="image/*" (change)="subirA($event,'banner_nosotros_url')"></label></div>
+        <div class="grid"><label>Titulo<input name="tituloNosotros" [(ngModel)]="form.titulo_nosotros"></label><label class="ancho">Descripcion<textarea name="descripcionNosotros" rows="4" [(ngModel)]="form.descripcion_nosotros"></textarea></label><label>Mision<textarea name="mision" rows="3" [(ngModel)]="form.mision"></textarea></label><label>Vision<textarea name="vision" rows="3" [(ngModel)]="form.vision"></textarea></label><label class="ancho">Valores<textarea name="valores" rows="2" [(ngModel)]="form.valores"></textarea></label></div>
+      </section>
+
+      <section class="panel">
+        <h3>Productos</h3>
+        <div class="banner-editor"><img [src]="form.banner_productos_url"><label>Medida final de cabecera: 1200 x 300 px<input type="file" accept="image/*" (change)="subirA($event,'banner_productos_url')"></label></div>
+        <div class="grid"><label>Titulo<input name="tituloProductos" [(ngModel)]="form.titulo_productos"></label><label>Descripcion<textarea name="descripcionProductos" rows="3" [(ngModel)]="form.descripcion_productos"></textarea></label></div>
+        <div class="panel-titulo subseccion"><div><h4>Productos destacados</h4><p class="ayuda">Medida final: <strong>900 x 650 px</strong>. El ajuste se realiza automáticamente.</p></div><button type="button" class="agregar" (click)="agregarProducto()">+ Agregar producto</button></div>
+        <article class="slide-editor slide-editor--sin-numero" *ngFor="let p of form.productos_destacados;index as i">
+          <img [src]="p.imagen_url" [alt]="p.nombre">
+          <div class="grid"><label>Nombre<input [name]="'productoNombre'+i" [(ngModel)]="p.nombre"></label><label>Precio referencial<input [name]="'productoPrecio'+i" [(ngModel)]="p.precio"></label><label class="ancho">Descripcion<textarea [name]="'productoDescripcion'+i" rows="2" [(ngModel)]="p.descripcion"></textarea></label><label class="ancho">Imagen recomendada: 900 x 650 px<input type="file" accept="image/*" (change)="subirProducto($event,i)"></label><button type="button" class="quitar ancho" [disabled]="form.productos_destacados.length===1" (click)="quitarProducto(i)">Quitar producto</button></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h3>Clientes</h3>
+        <div class="banner-editor"><img [src]="form.banner_clientes_url"><label>Medida final de cabecera: 1200 x 300 px<input type="file" accept="image/*" (change)="subirA($event,'banner_clientes_url')"></label></div>
+        <div class="grid"><label>Titulo<input name="tituloClientes" [(ngModel)]="form.titulo_clientes"></label><label>Descripcion<textarea name="descripcionClientes" rows="3" [(ngModel)]="form.descripcion_clientes"></textarea></label></div>
+        <div class="panel-titulo subseccion"><div><h4>Testimonios</h4><p class="ayuda">Agrega testimonios conforme tengas nuevos clientes.</p></div><button type="button" class="agregar" (click)="agregarTestimonio()">+ Agregar testimonio</button></div>
+        <article class="testimonio-editor" *ngFor="let t of form.testimonios;index as i"><div class="grid"><label>Cliente o negocio<input [name]="'autor'+i" [(ngModel)]="t.autor"></label><label>Testimonio<textarea [name]="'testimonio'+i" rows="2" [(ngModel)]="t.texto"></textarea></label><button type="button" class="quitar ancho" [disabled]="form.testimonios.length===1" (click)="quitarTestimonio(i)">Quitar testimonio</button></div></article>
+      </section>
+
+      <section class="panel">
+        <h3>Contacto</h3>
+        <label class="check"><input type="checkbox" name="mostrarContacto" [(ngModel)]="form.mostrar_contacto"> Mostrar pagina</label>
+        <div class="banner-editor"><img [src]="form.banner_contacto_url"><label>Medida final de cabecera: 1200 x 300 px<input type="file" accept="image/*" (change)="subirA($event,'banner_contacto_url')"></label></div>
+        <div class="grid"><label>Titulo<input name="tituloContacto" [(ngModel)]="form.titulo_contacto"></label><label>Descripcion<textarea name="descripcionContacto" rows="3" [(ngModel)]="form.descripcion_contacto"></textarea></label></div>
+      </section>
+    </ng-container>
+
+    <section class="panel" *ngIf="seccion==='contacto'">
+      <h3>Datos generales y footer</h3>
+      <p class="ayuda">El año del footer se actualiza automaticamente.</p>
+      <div class="grid"><label class="ancho">Descripcion del footer<textarea name="descripcionFooter" rows="2" [(ngModel)]="form.descripcion_footer"></textarea></label><label>Direccion<input name="direccion" [(ngModel)]="form.direccion"></label><label>Horario<input name="horario" [(ngModel)]="form.horario"></label><label>Telefono<input name="telefono" [(ngModel)]="form.telefono"></label><label>WhatsApp<input name="whatsapp" [(ngModel)]="form.whatsapp"></label><label>Correo<input type="email" name="correo" [(ngModel)]="form.correo"></label><label>Facebook URL<input name="facebook" [(ngModel)]="form.facebook_url"></label><label>Instagram URL<input name="instagram" [(ngModel)]="form.instagram_url"></label><label>TikTok URL<input name="tiktok" [(ngModel)]="form.tiktok_url"></label></div>
+    </section>
+
+    <button class="guardar" type="submit" [disabled]="guardando||subiendo">{{ guardando ? 'Guardando...' : subiendo ? 'Subiendo imagen...' : 'Guardar y publicar cambios' }}</button>
+  </form>
+</section>

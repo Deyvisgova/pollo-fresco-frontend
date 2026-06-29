@@ -1,0 +1,370 @@
+<section class="seccion">
+  <div class="seccion__encabezado">
+    <h2>Facturacion electronica</h2>
+    <p>Emite comprobantes peruanos de forma rapida y sin pasos innecesarios.</p>
+  </div>
+
+  <div class="seccion__contenido">
+    <div class="pedido-origen" *ngIf="pedidoOrigenId">
+      <div>
+        <strong>Comprobante del pedido #{{ pedidoOrigenId }}</strong>
+        <span>Cliente, productos y total fueron cargados automaticamente. Selecciona boleta o factura y revisa antes de emitir.</span>
+      </div>
+      <span>Pagado completamente</span>
+    </div>
+    <p class="pedido-origen pedido-origen--cargando" *ngIf="cargandoPedidoOrigen">Cargando informacion del pedido...</p>
+
+    <article class="tarjeta tarjeta--principal">
+      <header class="tarjeta__encabezado">
+        <div>
+          <span class="eyebrow">Emision de venta</span>
+          <h3>Comprobante electronico</h3>
+          <p>Completa cliente, productos y pago. Las notas se gestionan desde Ventas registradas.</p>
+        </div>
+        <span class="estado-emision">SUNAT: pendiente hasta enviar</span>
+      </header>
+
+      <div class="bloque-dos-columnas">
+        <div class="tarjeta__seccion tarjeta__seccion--sin-borde">
+          <div class="tarjeta__titulo">
+            <h4>Cliente</h4>
+          </div>
+
+          <div class="busqueda-documento">
+            <div class="campo">
+              <label>Tipo</label>
+              <select [(ngModel)]="tipoDocumentoCliente" (ngModelChange)="cambiarTipoDocumento()"
+                [disabled]="tipoComprobante === 'factura'">
+                <option value="ruc">RUC</option>
+                <option value="dni">DNI</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label>Numero</label>
+              <input
+                [(ngModel)]="consultaDocumento"
+                type="text"
+                inputmode="numeric"
+                [attr.maxlength]="tipoDocumentoCliente === 'ruc' ? 11 : 8"
+                placeholder="Ingresa DNI o RUC"
+              />
+            </div>
+            <div class="campo">
+              <button
+                type="button"
+                class="boton boton--secundario"
+                (click)="consultarDocumento()"
+                [disabled]="consultaCargando"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                {{ consultaCargando ? 'Consultando...' : 'Consultar' }}
+              </button>
+              <small *ngIf="mensajeError" class="mensaje-error"
+                >{{ mensajeError }}</small
+              >
+            </div>
+          </div>
+
+          <div class="cliente-identificado" *ngIf="cliente.documento || cliente.nombre">
+            <div><span>Cliente identificado</span><strong>{{ cliente.documento || 'Sin documento' }}</strong></div>
+            <button type="button" class="boton boton--texto" (click)="limpiarCliente()">Cambiar cliente</button>
+          </div>
+
+          <div class="formulario-grid formulario-grid--cliente">
+            <div class="campo">
+              <label>{{ tipoDocumentoCliente === 'ruc' ? 'Razon social' : 'Nombre completo' }}</label>
+              <input
+                [(ngModel)]="cliente.nombre"
+                type="text"
+                placeholder="Cliente"
+              />
+            </div>
+            <div class="campo campo--doble">
+              <label>Direccion</label>
+              <input
+                [(ngModel)]="cliente.direccion"
+                type="text"
+                placeholder="Direccion completa"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="tarjeta__seccion tarjeta__seccion--sin-borde">
+          <div class="tarjeta__titulo">
+            <h4>Comprobante</h4>
+            <span class="nota">Datos principales de emision.</span>
+          </div>
+
+          <div class="formulario-grid formulario-grid--comprobante">
+            <div class="campo">
+              <label>Tipo</label>
+              <select
+                [(ngModel)]="tipoComprobante"
+                (ngModelChange)="actualizarSerieNumero()"
+              >
+                <option value="factura">Factura</option>
+                <option value="boleta">Boleta</option>
+                <option value="nota-venta" *ngIf="!pedidoOrigenId">Nota de venta</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label>Serie</label>
+              <input [(ngModel)]="serie" type="text" placeholder="Automática" readonly />
+            </div>
+            <div class="campo">
+              <label>Numero</label>
+              <input [(ngModel)]="numero" type="text" placeholder="Automático" readonly />
+            </div>
+            <div class="campo">
+              <label>Fecha</label>
+              <input [(ngModel)]="fechaEmision" type="date" />
+            </div>
+            <div class="campo">
+              <label>Moneda</label>
+              <select [(ngModel)]="moneda">
+                <option value="PEN">Soles</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label>Pago</label>
+              <select [(ngModel)]="formaPago">
+                <option>Contado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </article>
+
+    <article class="tarjeta tarjeta--tabla">
+      <div class="tarjeta__titulo">
+        <h4>Detalle de la venta</h4>
+        <div class="acciones-detalle">
+          <div class="buscador-producto">
+            <label for="productoBusqueda">Producto</label>
+            <div class="buscador-producto__control">
+              <input
+                id="productoBusqueda"
+                [(ngModel)]="productoSeleccionado"
+                (input)="actualizarBusquedaProductos()"
+                (change)="seleccionarProductoDesdeBuscador()"
+                type="text"
+                placeholder="Buscar producto..."
+                list="productosDisponibles"
+              />
+            </div>
+          </div>
+          <datalist id="productosDisponibles">
+            <option
+              *ngFor="let producto of productosFiltrados"
+              [value]="producto"
+            ></option>
+          </datalist>
+          <button
+            type="button"
+            class="boton boton--secundario"
+            (click)="agregarDetalleVacio()"
+          >
+            Agregar fila
+          </button>
+        </div>
+      </div>
+
+      <div class="tabla-detalle">
+        <div class="tabla-detalle__encabezado">
+          <span>Cant.</span>
+          <span>Unidad</span>
+          <span>Descripcion</span>
+          <span>Precio</span>
+          <span>Total</span>
+          <span></span>
+        </div>
+        <div
+          class="tabla-detalle__fila"
+          *ngFor="let item of detalles; let i = index"
+        >
+          <input [(ngModel)]="item.cantidad" type="number" min="0" />
+          <select [(ngModel)]="item.unidad" *ngIf="!esDetalleHuevos(item); else presentacionHuevoVenta">
+            <option value="KG">KG</option>
+            <option value="UND">UND</option>
+          </select>
+          <ng-template #presentacionHuevoVenta>
+            <select [(ngModel)]="item.presentacionVenta">
+              <option *ngFor="let presentacion of presentacionesHuevo" [value]="presentacion.id">{{ presentacion.etiqueta }}</option>
+            </select>
+          </ng-template>
+          <input
+            [(ngModel)]="item.descripcion"
+            type="text"
+            placeholder="Escribe nombre del el producto"
+          />
+          <input [(ngModel)]="item.precioUnitario" type="number" min="0" [placeholder]="esDetalleHuevos(item) ? 'Precio total' : 'P. unitario'" />
+          <span class="tabla-detalle__total"
+            >S/ {{ totalDetalle(item) | number: '1.2-2' }}</span
+          >
+          <button
+            type="button"
+            class="boton-icono"
+            aria-label="Eliminar detalle"
+            title="Eliminar"
+            (click)="eliminarDetalle(i)"
+          ></button>
+        </div>
+        <div class="detalle-vacio" *ngIf="!detalles.length">
+          <strong>Agrega un producto para comenzar</strong>
+          <span>Usa el buscador superior para evitar errores al escribir.</span>
+        </div>
+      </div>
+
+      <div class="detalle-resumen">
+        <div class="metodos-pago">
+          <h5>Metodo de pago:</h5>
+          <div class="metodos-pago__opciones">
+            <button
+              type="button"
+              class="metodos-pago__opcion"
+              *ngFor="let metodo of metodosPago"
+              [class.metodos-pago__opcion--activa]="metodoPagoSeleccionado === metodo.id"
+              (click)="seleccionarMetodoPago(metodo.id)"
+            >
+              <span class="metodos-pago__icono" aria-hidden="true"
+                [ngSwitch]="metodo.id">
+                <svg *ngSwitchCase="'efectivo'" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"></rect><circle cx="12" cy="12" r="3"></circle><path d="M7 9h.01M17 15h.01"></path></svg>
+                <svg *ngSwitchCase="'tarjeta'" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18M7 15h4"></path></svg>
+                <svg *ngSwitchCase="'transferencia'" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4 4-4-4 4-4"></path></svg>
+                <svg *ngSwitchCase="'plin'" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 15V9h5a3 3 0 0 1 0 6H8"></path></svg>
+                <svg *ngSwitchCase="'yape'" viewBox="0 0 24 24"><path d="m5 5 7 8 7-8M12 13v6"></path></svg>
+                <svg *ngSwitchDefault viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="18" cy="12" r="1"></circle></svg>
+              </span>
+              <span class="metodos-pago__texto">{{ metodo.etiqueta }}</span>
+            </button>
+          </div>
+          <div
+            class="metodos-pago__efectivo"
+            *ngIf="metodoPagoSeleccionado === 'efectivo'"
+          >
+            <div class="campo">
+              <label>Pago con</label>
+              <input
+                [(ngModel)]="montoRecibido"
+                type="number"
+                min="0"
+                placeholder="S/ 0.00"
+              />
+            </div>
+            <div class="campo">
+              <label>Vuelto</label>
+              <input [value]="vuelto | number: '1.2-2'" type="text" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="resumen">
+          <div>
+            <span>Operacion exonerada</span>
+            <strong>S/ {{ subtotal | number: '1.2-2' }}</strong>
+          </div>
+          <div>
+            <span>IGV</span>
+            <strong>S/ 0.00</strong>
+          </div>
+          <div class="resumen__total">
+            <span>Total a pagar</span>
+            <strong>S/ {{ total | number: '1.2-2' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <footer class="acciones">
+        <small class="mensaje-ok" *ngIf="mensajeVenta">{{ mensajeVenta }}</small>
+        <small class="mensaje-error" *ngIf="errorVenta">{{ errorVenta }}</small>
+        <small class="mensaje-error" *ngIf="advertenciaVenta">{{ advertenciaVenta }}</small>
+        <button class="boton boton--primario" type="button" (click)="emitirComprobante()"
+          [disabled]="guardandoVenta || !detalles.length || total <= 0">
+          {{ guardandoVenta ? 'Guardando...' : 'Emitir comprobante' }}
+        </button>
+      </footer>
+
+    </article>
+
+  </div>
+</section>
+
+<div class="modal" *ngIf="mostrarModalProducto">
+  <div class="modal__contenido">
+    <h4>Nuevo producto</h4>
+    <div class="campo">
+      <label>Nombre del producto</label>
+      <input
+        [(ngModel)]="nuevoProducto"
+        type="text"
+        placeholder="Ej. Pollo fresco entero"
+      />
+    </div>
+    <div class="modal__acciones">
+      <button
+        type="button"
+        class="boton boton--secundario"
+        (click)="cerrarModalProducto()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="boton boton--primario"
+        (click)="guardarProductoNuevo()"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" *ngIf="mostrarModalVoucher && ultimaVentaEmitida">
+  <div class="modal__contenido modal__contenido--voucher">
+    <h4>Comprobante emitido</h4>
+    <p class="nota">Selecciona el formato y la accion que deseas realizar.</p>
+    <div class="campo">
+      <label>Formato de comprobante</label>
+      <select [(ngModel)]="formatoVoucher">
+        <option value="a4">A4</option>
+        <option value="ticket-80">Tiquetera laser 8 cm</option>
+        <option value="ticket-57">Tiquetera laser 5.7 cm</option>
+      </select>
+    </div>
+    <div class="acciones-voucher__botones">
+      <button class="boton-icono-accion" type="button" (click)="imprimirVoucher()" title="Imprimir">
+        Imp.
+      </button>
+      <button class="boton-icono-accion" type="button" (click)="descargarVoucher()" title="Descargar PDF">
+        PDF
+      </button>
+      <button class="boton-icono-accion" type="button" (click)="enviarVoucher()" title="Enviar">
+        Env.
+      </button>
+      <button class="boton-icono-accion" type="button" (click)="descargarXmlVoucher()" title="Descargar XML">
+        XML
+      </button>
+      <button
+        class="boton-icono-accion"
+        type="button"
+        (click)="enviarSunat()"
+        [disabled]="guardandoVenta || ultimaVentaEmitida.serie.startsWith('NV')"
+        title="Enviar factura a SUNAT"
+      >
+        SUNAT
+      </button>
+    </div>
+    <div class="modal__acciones">
+      <button
+        type="button"
+        class="boton boton--secundario"
+        (click)="cerrarModalVoucher()"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<footer class="pie-pagina">
+  <div class="container pie-pagina__contenido">
+    <section class="pie-pagina__marca">
+      <div class="pie-pagina__identidad"><span class="pie-pagina__simbolo">PF</span><div><strong>Pollo Fresco</strong><small>Mercado Ayaymama</small></div></div>
+      <p>{{ contenido().descripcion_footer }}</p>
+      <div class="pie-pagina__redes">
+        <a *ngIf="contenido().instagram_url" [href]="contenido().instagram_url" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+        <a *ngIf="contenido().facebook_url" [href]="contenido().facebook_url" target="_blank" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+        <a *ngIf="contenido().tiktok_url" [href]="contenido().tiktok_url" target="_blank" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+      </div>
+    </section>
+    <section><h4>Navegacion</h4><nav class="pie-pagina__enlaces"><a href="/inicio">Inicio</a><a href="/nosotros">Nosotros</a><a href="/productos">Productos</a><a href="/clientes">Clientes</a><a href="/contacto">Contacto</a></nav></section>
+    <section><h4>Atencion</h4><ul class="pie-pagina__datos"><li><i class="bi bi-clock"></i><span>{{ contenido().horario }}</span></li><li><i class="bi bi-geo-alt"></i><span>{{ contenido().direccion }}</span></li><li><i class="bi bi-truck"></i><span>Delivery coordinado</span></li></ul></section>
+    <section><h4>Contacto</h4><ul class="pie-pagina__datos"><li><i class="bi bi-telephone"></i><a [href]="'tel:' + contenido().telefono">{{ contenido().telefono }}</a></li><li><i class="bi bi-envelope"></i><a [href]="'mailto:' + contenido().correo">{{ contenido().correo }}</a></li></ul><a class="pie-pagina__whatsapp" [href]="'https://wa.me/' + contenido().whatsapp" target="_blank"><i class="bi bi-whatsapp"></i> Escribir por WhatsApp</a></section>
+  </div>
+  <div class="container pie-pagina__base"><span>&copy; {{ currentYear }} Pollo Fresco. Todos los derechos reservados.</span><span>Calidad y atencion todos los dias.</span></div>
+</footer>

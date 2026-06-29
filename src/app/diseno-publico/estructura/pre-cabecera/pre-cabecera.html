@@ -1,0 +1,16 @@
+<section class="pre-cabecera">
+  <div class="container pre-cabecera__contenido">
+      <span class="pre-cabecera__dato">
+        <mat-icon fontIcon="place"></mat-icon>
+        {{ contenido().direccion }}
+      </span>
+      <span class="pre-cabecera__dato">
+        <mat-icon fontIcon="schedule"></mat-icon>
+        {{ contenido().horario }}
+      </span>
+    <a class="pre-cabecera__dato pre-cabecera__telefono" [href]="'tel:' + contenido().telefono">
+      <mat-icon fontIcon="call"></mat-icon>
+      <span>Pedidos: {{ contenido().telefono }}</span>
+    </a>
+  </div>
+</section>

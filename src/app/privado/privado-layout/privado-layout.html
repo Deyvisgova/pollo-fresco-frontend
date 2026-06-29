@@ -1,0 +1,199 @@
+<section class="panel" [class.panel--tema-oscuro]="temaActual() === 'dark'">
+  <header class="panel__topbar" [class.panel__topbar--vendedor]="esVendedor">
+    <button
+      *ngIf="!esVendedor"
+      type="button"
+      class="panel__toggle"
+      (click)="toggleSidebar()"
+      [attr.aria-expanded]="esMovilOTablet ? sidebarMovilAbierto : !sidebarColapsadoDesktop"
+      aria-controls="panel-sidebar"
+      aria-label="Mostrar u ocultar menu lateral"
+    >
+      <span class="panel__toggle-linea" aria-hidden="true"></span>
+    </button>
+
+    <p class="panel__topbar-mensaje">Bienvenidos al sistema de EL POLLO FRESCO</p>
+
+    <div class="panel__acciones-usuario">
+      <button
+        type="button"
+        class="theme-toggle"
+        [class.theme-toggle--dark]="temaActual() === 'dark'"
+        (click)="toggleTema()"
+        [attr.aria-label]="temaActual() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+      >
+        <span class="theme-track-icon theme-track-icon-sun" aria-hidden="true"></span>
+        <span class="theme-track-icon theme-track-icon-moon" aria-hidden="true"></span>
+        <span class="theme-toggle__knob" aria-hidden="true"></span>
+      </button>
+
+      <div class="panel__usuario">
+      <button
+        type="button"
+        class="panel__usuario-trigger"
+        [attr.aria-expanded]="menuUsuarioAbierto"
+        (click)="toggleMenuUsuario($event)"
+      >
+        <span class="panel__usuario-icono" aria-hidden="true"></span>
+        <span class="panel__usuario-nombre">{{ nombreUsuario() }}</span>
+        <span class="panel__usuario-flecha" aria-hidden="true"></span>
+      </button>
+
+      <div class="panel__usuario-menu" *ngIf="menuUsuarioAbierto">
+        <p class="panel__usuario-titulo">{{ nombreUsuario() }}</p>
+        <button type="button" class="panel__usuario-item" (click)="irACambiarContrasena()">
+          Cambiar contrasena
+        </button>
+        <button type="button" class="panel__usuario-item panel__usuario-item--salir" (click)="cerrarSesion()">
+          Cerrar sesion
+        </button>
+      </div>
+      </div>
+    </div>
+  </header>
+
+  <div
+    class="panel__cuerpo"
+    [class.panel__cuerpo--compacto]="sidebarColapsadoDesktop"
+    [class.panel__cuerpo--vendedor]="esVendedor"
+  >
+    <aside
+      *ngIf="!esVendedor"
+      class="panel__sidebar"
+      id="panel-sidebar"
+      [class.panel__sidebar--abierto]="sidebarMovilAbierto"
+      [class.panel__sidebar--compacto]="sidebarColapsadoDesktop"
+    >
+      <div class="panel__logo">
+        @if (mostrarLogo()) {
+          <img
+            class="panel__logo-imagen"
+            [src]="configuracionEmpresa().logoUrl"
+            [alt]="'Logo de ' + configuracionEmpresa().nombreEmpresa"
+          />
+        } @else {
+          <div class="panel__logo-imagen panel__logo-imagen--placeholder">LOGO</div>
+        }
+        <p class="panel__empresa">{{ configuracionEmpresa().nombreEmpresa }}</p>
+      </div>
+
+      <nav class="panel__menu" aria-label="Navegacion del panel">
+        <a
+          *ngFor="let item of menuPrincipal"
+          [routerLink]="item.ruta"
+          routerLinkActive="panel__link--activo"
+          class="panel__link"
+          [attr.title]="item.etiqueta"
+          (click)="cerrarSidebarEnMovil()"
+        >
+          <span class="panel__link-icono" [attr.data-icon]="item.icono" aria-hidden="true"></span>
+          <span class="panel__link-texto">{{ item.etiqueta }}</span>
+        </a>
+
+        <div class="panel__accordion" *ngIf="!esDelivery" [class.panel__accordion--abierto]="ventaMenuAbierto">
+          <button
+            type="button"
+            class="panel__link panel__link--trigger"
+            [class.panel__link--activo]="rutaVentaActiva"
+            (click)="toggleVentaMenu()"
+            [attr.aria-expanded]="ventaMenuAbierto"
+            title="Venta"
+          >
+            <span class="panel__link-icono" data-icon="venta" aria-hidden="true"></span>
+            <span class="panel__link-texto">Venta</span>
+            <span class="panel__chevron" aria-hidden="true"></span>
+          </button>
+
+          <div class="panel__submenu" *ngIf="ventaMenuAbierto">
+            <a
+              [routerLink]="'venta'"
+              routerLinkActive="panel__sublink--activo"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="panel__sublink"
+              (click)="cerrarSidebarEnMovil()"
+            >
+              Emitir comprobante
+            </a>
+            <a
+              *ngIf="!esVendedor"
+              [routerLink]="'venta-registros'"
+              routerLinkActive="panel__sublink--activo"
+              class="panel__sublink"
+              (click)="cerrarSidebarEnMovil()"
+            >
+              Ventas registradas
+            </a>
+          </div>
+        </div>
+
+        <a
+          *ngFor="let item of menuPosterior"
+          [routerLink]="item.ruta"
+          routerLinkActive="panel__link--activo"
+          class="panel__link"
+          [attr.title]="item.etiqueta"
+          (click)="cerrarSidebarEnMovil()"
+        >
+          <span class="panel__link-icono" [attr.data-icon]="item.icono" aria-hidden="true"></span>
+          <span class="panel__link-texto">{{ item.etiqueta }}</span>
+        </a>
+      </nav>
+
+      <button class="panel__salir panel__salir--fijo" type="button" (click)="cerrarSesion()" title="Cerrar sesion">
+        <span class="panel__link-icono" data-icon="salir" aria-hidden="true"></span>
+        <span class="panel__link-texto">Cerrar sesion</span>
+      </button>
+    </aside>
+
+    <main class="panel__contenido" [class.panel__contenido--vendedor]="esVendedor">
+      <section class="panel-vendedor" *ngIf="esVendedor" aria-label="Accesos rapidos del vendedor">
+        <div class="panel-vendedor__encabezado">
+          <p class="panel-vendedor__eyebrow">Accesos de venta</p>
+          <h2>Panel rapido</h2>
+          <span>Todo lo permitido para registrar sin entrar a opciones de administracion.</span>
+        </div>
+
+        <nav class="panel-vendedor__grid">
+          <a
+            *ngFor="let acceso of accesosVendedor"
+            class="panel-vendedor__card"
+            [routerLink]="acceso.ruta"
+            routerLinkActive="panel-vendedor__card--activo"
+          >
+            <span class="panel__link-icono panel-vendedor__icono" [attr.data-icon]="acceso.icono" aria-hidden="true"></span>
+            <span class="panel-vendedor__texto">
+              <strong>{{ acceso.etiqueta }}</strong>
+              <small>{{ acceso.descripcion }}</small>
+            </span>
+          </a>
+        </nav>
+      </section>
+
+      <section class="panel__rutas">
+        <router-outlet></router-outlet>
+      </section>
+    </main>
+  </div>
+
+  <div class="confirmacion-sistema" *ngIf="confirmacionActiva() as confirmacion" role="dialog" aria-modal="true">
+    <button class="confirmacion-sistema__fondo" type="button" aria-label="Cancelar" (click)="cancelarConfirmacion()"></button>
+    <section class="confirmacion-sistema__panel" [class.confirmacion-sistema__panel--peligro]="confirmacion.tipo === 'peligro'">
+      <div class="confirmacion-sistema__icono" aria-hidden="true">
+        {{ confirmacion.tipo === 'peligro' ? '!' : '?' }}
+      </div>
+      <div class="confirmacion-sistema__contenido">
+        <h3>{{ confirmacion.titulo }}</h3>
+        <p>{{ confirmacion.mensaje }}</p>
+        <small *ngIf="confirmacion.detalle">{{ confirmacion.detalle }}</small>
+      </div>
+      <div class="confirmacion-sistema__acciones">
+        <button class="boton boton--suave" type="button" (click)="cancelarConfirmacion()">
+          {{ confirmacion.textoCancelar }}
+        </button>
+        <button class="boton boton--peligro-solido" type="button" (click)="aceptarConfirmacion()">
+          {{ confirmacion.textoConfirmar }}
+        </button>
+      </div>
+    </section>
+  </div>
+</section>

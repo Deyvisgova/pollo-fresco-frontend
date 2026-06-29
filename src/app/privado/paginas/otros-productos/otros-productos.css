@@ -1,0 +1,73 @@
+/* Estructura base para secciones internas */
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.seccion__encabezado h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.seccion__encabezado p {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+.seccion__tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  color: #1e3a8a;
+  background: #eff6ff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  background: #dbeafe;
+}
+
+.tab--activa {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.seccion__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 760px) {
+  .seccion {
+    gap: 14px;
+  }
+
+  .seccion__tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 8px;
+    padding: 0 2px 8px;
+    scroll-padding-left: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 10px 16px;
+    white-space: nowrap;
+    touch-action: manipulation;
+  }
+}

@@ -1,0 +1,327 @@
+<section class="gastos-page">
+  <header class="gastos-header">
+    <div>
+      <h2>Gastos</h2>
+      <p>Control de fondos, ganancias y gastos por linea de negocio.</p>
+    </div>
+    <div class="acciones-header">
+      <button type="button" class="btn" (click)="cambiarVista('capital')">+ Capital</button>
+      <button type="button" class="btn btn--primario" (click)="cambiarVista('gasto')">+ Gasto</button>
+    </div>
+  </header>
+
+  <div class="filtros">
+    <label>
+      Desde
+      <input type="date" [(ngModel)]="fechaDesde" (change)="cargarResumen()" />
+    </label>
+    <label>
+      Hasta
+      <input type="date" [(ngModel)]="fechaHasta" (change)="cargarResumen()" />
+    </label>
+    <button type="button" class="btn" (click)="aplicarMesActual()">Mes actual</button>
+    <button type="button" class="btn" (click)="cargarResumen()">Actualizar</button>
+  </div>
+
+  <div class="alerta alerta--error" *ngIf="mensajeError">{{ mensajeError }}</div>
+  <div class="alerta alerta--ok" *ngIf="mensajeOk">{{ mensajeOk }}</div>
+
+  <div class="fondos-tabs" role="tablist">
+    <button
+      type="button"
+      *ngFor="let fondo of fondos"
+      [class.activo]="fondo.codigo === fondoActivo"
+      (click)="seleccionarFondo(fondo.codigo)"
+    >
+      <span>{{ fondo.nombre }}</span>
+      <strong>S/ {{ fondo.saldo_disponible | number: '1.2-2' }}</strong>
+    </button>
+  </div>
+
+  <ng-container *ngIf="fondoActual() as fondo">
+    <div class="resumen-grid">
+      <article class="kpi kpi--saldo">
+        <span>Saldo disponible</span>
+        <strong>S/ {{ fondo.saldo_disponible | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Ventas</span>
+        <strong>S/ {{ fondo.ventas | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi kpi--capital">
+        <span>Capital</span>
+        <strong>S/ {{ fondo.capital | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Costo vendido</span>
+        <strong>S/ {{ fondo.costos | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Pagos compras</span>
+        <strong>S/ {{ fondo.pagos_compras | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Ganancia</span>
+        <strong>S/ {{ fondo.ganancia | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Gastos</span>
+        <strong>S/ {{ fondo.gastos | number: '1.2-2' }}</strong>
+      </article>
+      <article class="kpi">
+        <span>Saldo del periodo</span>
+        <strong>S/ {{ fondo.saldo_periodo | number: '1.2-2' }}</strong>
+      </article>
+    </div>
+  </ng-container>
+
+  <nav class="subtabs">
+    <button type="button" [class.activo]="vistaActiva === 'resumen'" (click)="cambiarVista('resumen')">Resumen</button>
+    <button type="button" [class.activo]="vistaActiva === 'gasto'" (click)="cambiarVista('gasto')">Registrar gasto</button>
+    <button type="button" [class.activo]="vistaActiva === 'capital'" (click)="cambiarVista('capital')">Agregar capital</button>
+    <button type="button" [class.activo]="vistaActiva === 'venta'" (click)="cambiarVista('venta')">Venta pollo/gallina</button>
+    <button type="button" [class.activo]="vistaActiva === 'categorias'" (click)="cambiarVista('categorias')">Categorias</button>
+    <button type="button" [class.activo]="vistaActiva === 'cierre'" (click)="cambiarVista('cierre')">Cierre mensual</button>
+    <button type="button" [class.activo]="vistaActiva === 'trazabilidad'" (click)="cambiarVista('trazabilidad')">Trazabilidad</button>
+  </nav>
+
+  <section class="panel" *ngIf="vistaActiva === 'resumen'">
+    <div class="panel__titulo">
+      <h3>Movimientos de {{ nombreFondo(fondoActivo) }}</h3>
+      <span *ngIf="cargando">Cargando...</span>
+    </div>
+
+    <div class="movimientos" *ngIf="movimientosDelFondo().length; else sinMovimientos">
+      <article
+        class="movimiento"
+        [ngClass]="claseMovimiento(movimiento)"
+        [class.movimiento--anulado]="movimiento.estado === 'ANULADO'"
+        *ngFor="let movimiento of movimientosDelFondo()"
+      >
+        <div>
+          <span class="movimiento__fecha">{{ movimiento.fecha }}</span>
+          <h4>{{ movimiento.titulo }}</h4>
+          <p>{{ movimiento.categoria }} <span *ngIf="movimiento.nota">- {{ movimiento.nota }}</span></p>
+          <p class="movimiento__estado" *ngIf="movimiento.estado === 'ANULADO'">Anulado: {{ movimiento.motivo_anulacion || 'Sin motivo registrado' }}</p>
+        </div>
+        <div class="movimiento__monto">
+          <strong>{{ signoMovimiento(movimiento) }} S/ {{ movimiento.monto | number: '1.2-2' }}</strong>
+          <button type="button" *ngIf="puedeAnularMovimiento(movimiento)" (click)="anularGasto(movimiento)">Anular</button>
+          <span class="badge-anulado" *ngIf="movimiento.estado === 'ANULADO'">ANULADO</span>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #sinMovimientos>
+      <div class="estado-vacio">No hay gastos registrados para este fondo en el rango seleccionado.</div>
+    </ng-template>
+  </section>
+
+  <section class="panel formulario-panel" *ngIf="vistaActiva === 'capital'">
+    <div class="panel__titulo">
+      <h3>Agregar capital</h3>
+      <span>{{ nombreFondo(capitalForm.fondo) }}</span>
+    </div>
+
+    <p class="ayuda-panel">
+      Usa esta opcion cuando pongas dinero propio o de caja para comprar mercaderia sin que el fondo quede en negativo.
+    </p>
+
+    <form class="form-grid" (ngSubmit)="guardarCapital()">
+      <label>
+        Fondo
+        <select [(ngModel)]="capitalForm.fondo" name="fondoCapital">
+          <option value="POLLO_GALLINA">Pollo + Gallina</option>
+          <option value="CONGELADOS_HUEVOS">Congelados + Huevos</option>
+        </select>
+      </label>
+
+      <label>
+        Fecha
+        <input type="date" [(ngModel)]="capitalForm.fecha" name="fechaCapital" />
+      </label>
+
+      <label class="span-2">
+        Origen del capital
+        <input type="text" [(ngModel)]="capitalForm.descripcion" name="descripcionCapital" placeholder="Ej. Capital inicial, prestamo, dinero de caja" />
+      </label>
+
+      <label>
+        Monto
+        <input type="number" min="0" step="0.01" [(ngModel)]="capitalForm.monto" name="montoCapital" placeholder="0.00" />
+      </label>
+
+      <label class="span-2">
+        Nota
+        <textarea rows="3" [(ngModel)]="capitalForm.nota" name="notaCapital" placeholder="Detalle opcional"></textarea>
+      </label>
+
+      <button type="submit" class="btn btn--primario span-2" [disabled]="guardandoCapital">
+        {{ guardandoCapital ? 'Guardando...' : 'Guardar capital' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="panel formulario-panel" *ngIf="vistaActiva === 'gasto'">
+    <div class="panel__titulo">
+      <h3>Registrar gasto</h3>
+      <span>{{ nombreFondo(gastoForm.fondo) }}</span>
+    </div>
+
+    <form class="form-grid" (ngSubmit)="guardarGasto()">
+      <label>
+        Fondo
+        <select [(ngModel)]="gastoForm.fondo" name="fondo">
+          <option value="POLLO_GALLINA">Pollo + Gallina</option>
+          <option value="CONGELADOS_HUEVOS">Congelados + Huevos</option>
+        </select>
+      </label>
+
+      <label>
+        Fecha
+        <input type="date" [(ngModel)]="gastoForm.fecha" name="fechaGasto" />
+      </label>
+
+      <label>
+        Categoria
+        <select [(ngModel)]="gastoForm.categoriaId" name="categoria">
+          <option [ngValue]="null">Seleccionar</option>
+          <option *ngFor="let categoria of categorias" [ngValue]="categoria.categoria_id">{{ categoria.nombre }}</option>
+        </select>
+      </label>
+
+      <label>
+        Nueva categoria
+        <input type="text" [(ngModel)]="gastoForm.categoriaNombre" name="categoriaNombre" placeholder="Opcional" />
+      </label>
+
+      <label class="span-2">
+        Nombre del gasto
+        <input type="text" [(ngModel)]="gastoForm.descripcion" name="descripcion" placeholder="Ej. Pago de personal" />
+      </label>
+
+      <label>
+        Monto
+        <input type="number" min="0" step="0.01" [(ngModel)]="gastoForm.monto" name="monto" placeholder="0.00" />
+      </label>
+
+      <label class="span-2">
+        Nota
+        <textarea rows="3" [(ngModel)]="gastoForm.nota" name="nota" placeholder="Detalle opcional"></textarea>
+      </label>
+
+      <button type="submit" class="btn btn--primario span-2" [disabled]="guardandoGasto">
+        {{ guardandoGasto ? 'Guardando...' : 'Guardar gasto' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="panel formulario-panel" *ngIf="vistaActiva === 'venta'">
+    <div class="panel__titulo">
+      <h3>Agregar venta pollo/gallina</h3>
+      <span>Abono S/ {{ totalVentaManual() | number: '1.2-2' }}</span>
+    </div>
+
+    <div class="venta-acumulada">
+      <span>Acumulado del dia</span>
+      <strong>S/ {{ totalVentaAcumulada() | number: '1.2-2' }}</strong>
+      <small>Pollo S/ {{ (ventaAcumulada?.venta_pollo || 0) | number: '1.2-2' }} - Gallina S/ {{ (ventaAcumulada?.venta_gallina || 0) | number: '1.2-2' }}</small>
+    </div>
+
+    <form class="form-grid" (ngSubmit)="guardarVentaPolloGallina()">
+      <label>
+        Fecha
+        <input type="date" [(ngModel)]="ventaForm.fecha" name="fechaVenta" />
+      </label>
+      <label>
+        Venta pollo
+        <input type="number" min="0" step="0.01" [(ngModel)]="ventaForm.ventaPollo" name="ventaPollo" />
+      </label>
+      <label>
+        Venta gallina
+        <input type="number" min="0" step="0.01" [(ngModel)]="ventaForm.ventaGallina" name="ventaGallina" />
+      </label>
+      <label class="span-2">
+        Observacion
+        <textarea rows="3" [(ngModel)]="ventaForm.observacion" name="observacion"></textarea>
+      </label>
+      <button type="submit" class="btn btn--primario span-2" [disabled]="guardandoVenta">
+        {{ guardandoVenta ? 'Sumando...' : 'Sumar venta al dia' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="panel formulario-panel" *ngIf="vistaActiva === 'cierre'">
+    <div class="panel__titulo">
+      <h3>Cierre mensual</h3>
+      <span>{{ cierreForm.periodo }}</span>
+    </div>
+
+    <form class="form-grid" (ngSubmit)="cerrarMes()">
+      <label>
+        Mes
+        <input type="month" [(ngModel)]="cierreForm.periodo" name="periodoCierre" />
+      </label>
+      <label class="span-2">
+        Observacion
+        <textarea rows="3" [(ngModel)]="cierreForm.observacion" name="observacionCierre"></textarea>
+      </label>
+      <button type="submit" class="btn btn--primario span-2" [disabled]="cerrandoMes">
+        {{ cerrandoMes ? 'Cerrando...' : 'Cerrar mes' }}
+      </button>
+    </form>
+
+    <div class="cierres-lista" *ngIf="cierresMensuales.length">
+      <article class="cierre-item" *ngFor="let cierre of cierresMensuales">
+        <div>
+          <strong>{{ cierre.periodo }}</strong>
+          <p>{{ cierre.fecha_desde }} al {{ cierre.fecha_hasta }}</p>
+        </div>
+        <div class="cierre-totales">
+          <span>Pollo S/ {{ cierre.pollo_saldo | number: '1.2-2' }}</span>
+          <span>Otros S/ {{ cierre.otros_saldo | number: '1.2-2' }}</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel formulario-panel" *ngIf="vistaActiva === 'categorias'">
+    <div class="panel__titulo">
+      <h3>Categorias de gasto</h3>
+      <span>{{ categorias.length }} registradas</span>
+    </div>
+
+    <div class="categoria-form">
+      <input type="text" [(ngModel)]="nuevaCategoria" placeholder="Nueva categoria" />
+      <button type="button" class="btn btn--primario" (click)="guardarCategoria()">Agregar</button>
+    </div>
+
+    <div class="chips">
+      <span *ngFor="let categoria of categorias">{{ categoria.nombre }}</span>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="vistaActiva === 'trazabilidad'">
+    <div class="panel__titulo">
+      <h3>Trazabilidad de {{ nombreFondo(fondoActivo) }}</h3>
+      <span>{{ auditoriaDelFondo().length }} acciones</span>
+    </div>
+
+    <div class="auditoria-lista" *ngIf="auditoriaDelFondo().length; else sinAuditoria">
+      <article class="auditoria-item" *ngFor="let item of auditoriaDelFondo()">
+        <div>
+          <strong>{{ item.accion }}</strong>
+          <p>{{ item.descripcion }}</p>
+        </div>
+        <div class="auditoria-meta">
+          <span>{{ item.usuario }}</span>
+          <small>{{ item.creado_en }}</small>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #sinAuditoria>
+      <div class="estado-vacio">No hay acciones registradas en el rango seleccionado.</div>
+    </ng-template>
+  </section>
+</section>
