@@ -42,7 +42,8 @@ export class PrivadoLayout implements AfterViewInit, OnDestroy {
     { etiqueta: 'Gastos', ruta: 'gastos', icono: 'gastos' },
     { etiqueta: 'Pagina publica', ruta: 'pagina-publica', icono: 'pagina-publica' },
     { etiqueta: 'Configuracion', ruta: 'configuracion', icono: 'configuracion' },
-    { etiqueta: 'Reportes', ruta: 'reportes', icono: 'reportes' }
+    { etiqueta: 'Reportes', ruta: 'reportes', icono: 'reportes' },
+    { etiqueta: 'Mantenimiento', ruta: 'mantenimiento', icono: 'configuracion' }
   ];
 
   ventaMenuAbierto = false;

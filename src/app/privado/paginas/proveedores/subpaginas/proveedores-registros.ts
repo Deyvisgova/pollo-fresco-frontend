@@ -4,6 +4,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { SesionServicio } from '../../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../../compartido/directivas/select-bonito.directive';
 
 interface RegistroEntrega {
   entrega_id: number;
@@ -70,7 +71,7 @@ interface PagoProveedor {
 @Component({
   selector: 'app-privado-proveedores-registros',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './proveedores-registros.html',
   styleUrl: './proveedores-registros.css'
 })

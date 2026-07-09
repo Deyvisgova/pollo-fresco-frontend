@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SesionServicio } from '../../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../../compartido/directivas/select-bonito.directive';
 
 interface LoteRegistro {
   compraLoteId: number;
@@ -89,7 +90,7 @@ interface ProveedorApi {
 @Component({
   selector: 'app-privado-otros-productos-lotes',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './otros-productos-lotes.html',
   styleUrl: './otros-productos-lotes.css'
 })

@@ -12,7 +12,7 @@
           Ingresa el correo registrado en tu cuenta. Te enviaremos un enlace seguro para cambiar tu contrasena.
         </p>
         <p *ngIf="esRestablecimiento && enlaceValido">
-          Escribe una contrasena nueva de al menos 8 caracteres y confirmala antes de guardar.
+          Usa al menos 12 caracteres, mayuscula, minuscula, numero y simbolo.
         </p>
       </header>
 
@@ -54,7 +54,7 @@
           <button mat-icon-button matSuffix type="button" (click)="ocultarPassword = !ocultarPassword" aria-label="Mostrar u ocultar contrasena">
             <mat-icon>{{ ocultarPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
           </button>
-          <mat-error>Debe tener al menos 8 caracteres.</mat-error>
+          <mat-error>Usa 12 caracteres, mayuscula, minuscula, numero y simbolo.</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">

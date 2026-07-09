@@ -7,6 +7,7 @@ import {
   ConfiguracionEmpresaServicio
 } from '../../../servicios/configuracion-empresa.servicio';
 import { SesionServicio } from '../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../compartido/directivas/select-bonito.directive';
 
 interface ConfiguracionSunat {
   ambiente: 'beta' | 'produccion';
@@ -31,7 +32,7 @@ interface ConfiguracionSunat {
   selector: 'app-privado-configuracion',
   // Componente para editar la configuracion visual del modulo privado.
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css'
 })
@@ -76,6 +77,15 @@ export class PrivadoConfiguracion implements OnInit {
   }
 
   ngOnInit(): void {
+    this.configuracionEmpresaServicio.sincronizarConServidor().subscribe({
+      next: (configuracion) => {
+        this.configuracion = {
+          nombreEmpresa: configuracion.nombreEmpresa,
+          logoUrl: configuracion.logoUrl
+        };
+      },
+      error: () => undefined
+    });
     this.cargarSunat();
   }
 
@@ -150,9 +160,17 @@ export class PrivadoConfiguracion implements OnInit {
   }
 
   guardarConfiguracion(): void {
-    this.configuracionEmpresaServicio.guardarConfiguracion(this.configuracion);
+    this.mensajeGuardado = '';
     this.mensajeError = '';
-    this.mensajeGuardado = 'Configuracion guardada correctamente.';
+    this.configuracionEmpresaServicio.guardarConfiguracionServidor(this.configuracion).subscribe({
+      next: (configuracion) => {
+        this.configuracion = configuracion;
+        this.mensajeGuardado = 'Configuracion guardada correctamente.';
+      },
+      error: () => {
+        this.mensajeError = 'No se pudo guardar la configuracion de la empresa.';
+      }
+    });
   }
 
   seleccionarLogo(evento: Event): void {

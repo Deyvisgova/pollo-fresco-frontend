@@ -1,9 +1,18 @@
 <mat-toolbar color="primary" class="barra-navegacion">
   <div class="container-fluid barra-navegacion__contenido">
-    <div class="d-flex flex-column">
-      <span class="barra-navegacion__logo">Pollo Fresco</span>
-      <span class="barra-navegacion__slogan">Mercado Ayaymama</span>
-    </div>
+    <a class="barra-navegacion__marca" routerLink="/inicio" (click)="cerrarMenu()" aria-label="Ir al inicio">
+      <span class="barra-navegacion__logo-imagen">
+        @if (mostrarLogo()) {
+          <img [src]="configuracionEmpresa().logoUrl" [alt]="'Logo de ' + configuracionEmpresa().nombreEmpresa">
+        } @else {
+          <span>{{ inicialesEmpresa() }}</span>
+        }
+      </span>
+      <span class="barra-navegacion__textos">
+        <span class="barra-navegacion__logo">{{ configuracionEmpresa().nombreEmpresa }}</span>
+        <span class="barra-navegacion__slogan">Mercado Ayaymama</span>
+      </span>
+    </a>
     <button type="button" class="barra-navegacion__menu" (click)="alternarMenu()" [attr.aria-expanded]="menuAbierto" aria-label="Abrir menu"><mat-icon>{{ menuAbierto ? 'close' : 'menu' }}</mat-icon></button>
     <nav class="barra-navegacion__nav" [class.abierto]="menuAbierto" aria-label="Navegacion principal">
       <ul class="nav flex-wrap gap-2 barra-navegacion__enlaces">

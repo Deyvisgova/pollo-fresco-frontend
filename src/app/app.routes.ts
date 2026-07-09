@@ -176,6 +176,12 @@ export const routes: Routes = [
       {
         path: 'reportes',
         component: PrivadoReportes
+      },
+      {
+        path: 'mantenimiento',
+        loadComponent: () =>
+          import('./privado/paginas/mantenimiento/mantenimiento')
+            .then((modulo) => modulo.PrivadoMantenimiento)
       }
     ]
   }

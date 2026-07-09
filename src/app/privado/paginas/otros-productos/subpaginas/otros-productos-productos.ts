@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmacionServicio } from '../../../../servicios/confirmacion.servicio';
 import { SesionServicio } from '../../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../../compartido/directivas/select-bonito.directive';
 
 interface ProductoRegistro {
   id: number;
@@ -28,7 +29,7 @@ interface ProductoFormulario {
 @Component({
   selector: 'app-privado-otros-productos-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './otros-productos-productos.html',
   styleUrl: './otros-productos-productos.css'
 })

@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SesionServicio } from '../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../compartido/directivas/select-bonito.directive';
 
 type TipoComprobante = 'factura' | 'boleta' | 'nota-venta';
 type TipoDocumentoCliente = 'ruc' | 'dni';
@@ -113,7 +114,7 @@ interface PreparacionPedido {
   selector: 'app-privado-venta',
   // Componente informativo para la seccion de venta.
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './venta.html',
   styleUrl: './venta.css'
 })

@@ -19,7 +19,7 @@
             </div>
 
             <form
-              *ngIf="!esperandoSeleccionRol"
+              *ngIf="!esperandoSeleccionRol && !esperandoCodigoCorreo"
               class="d-grid gap-3"
               [formGroup]="formulario"
               (ngSubmit)="enviarIngreso()"
@@ -88,7 +88,7 @@
               </div>
             </form>
 
-            <section class="seleccion-rol" *ngIf="esperandoSeleccionRol">
+            <section class="seleccion-rol" *ngIf="esperandoSeleccionRol && !esperandoCodigoCorreo">
               <div class="seleccion-rol__encabezado">
                 <h3>Elige como ingresar</h3>
                 <p>Tu usuario tiene mas de un permiso. Selecciona el rol que usaras en esta sesion.</p>
@@ -110,6 +110,46 @@
               <button type="button" class="seleccion-rol__volver" (click)="volverACredenciales()" [disabled]="estaCargando">
                 Cambiar usuario o contrasena
               </button>
+            </section>
+
+            <section class="segundo-factor" *ngIf="esperandoCodigoCorreo">
+              <div class="segundo-factor__encabezado">
+                <mat-icon>mark_email_read</mat-icon>
+                <div>
+                  <h3>Revisa tu correo</h3>
+                  <p>Enviamos un codigo de 6 digitos a <strong>{{ correoEnmascarado }}</strong>. Vence en 10 minutos.</p>
+                </div>
+              </div>
+
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Codigo de 6 digitos</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="codigoCorreo"
+                  [ngModelOptions]="{ standalone: true }"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength="6"
+                  (keyup.enter)="verificarCodigoCorreo()"
+                />
+                <mat-icon matPrefix>password</mat-icon>
+              </mat-form-field>
+
+              <label class="segundo-factor__confiar">
+                <input type="checkbox" [(ngModel)]="confiarDispositivo" [ngModelOptions]="{ standalone: true }" />
+                <span>Confiar en este dispositivo durante 30 dias</span>
+              </label>
+
+              <div class="alert alert-danger py-2 mb-0" role="alert" *ngIf="mensajeError">
+                {{ mensajeError }}
+              </div>
+
+              <div class="segundo-factor__acciones">
+                <button mat-button type="button" (click)="volverACredenciales()" [disabled]="estaCargando">Volver</button>
+                <button mat-raised-button color="primary" type="button" (click)="verificarCodigoCorreo()" [disabled]="estaCargando">
+                  {{ estaCargando ? 'Validando...' : 'Validar codigo' }}
+                </button>
+              </div>
             </section>
 
             <mat-divider class="my-4"></mat-divider>

@@ -2309,3 +2309,342 @@ app-root {
     color: #cbd5e1 !important;
   }
 }
+
+/* Controles nativos coherentes en todo el sistema. */
+:root {
+  --control-bg: #ffffff;
+  --control-border: #c8d5e8;
+  --control-border-hover: #8fa8ce;
+  --control-focus: #2563eb;
+  --control-text: #172033;
+}
+
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 42px;
+  max-width: 100%;
+  padding: 9px 42px 9px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background-color: var(--control-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23173668' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 17px;
+  color: var(--control-text);
+  font: inherit;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+select:not([multiple]):hover:not(:disabled) {
+  border-color: var(--control-border-hover);
+}
+
+select:not([multiple]):focus-visible {
+  outline: none;
+  border-color: var(--control-focus);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+}
+
+select:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+  background-color: #eef2f7;
+}
+
+select option,
+select optgroup {
+  background: var(--control-bg);
+  color: var(--control-text);
+  font: inherit;
+}
+
+select option {
+  padding: 9px 12px;
+}
+
+button:not(.mat-mdc-button-base):not([class]),
+button:not(.mat-mdc-button-base)[class=''] {
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid #c8d5e8;
+  border-radius: 8px;
+  background: #eaf0f8;
+  color: #12315f;
+  font: inherit;
+  font-weight: 800;
+  line-height: 1.15;
+  cursor: pointer;
+  transition: transform .14s ease, border-color .14s ease, background-color .14s ease, box-shadow .14s ease;
+}
+
+button:not(.mat-mdc-button-base):not([class]):hover:not(:disabled),
+button:not(.mat-mdc-button-base)[class='']:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #a8bbd8;
+  background: #dfe8f5;
+  box-shadow: 0 7px 16px rgba(20, 52, 97, .12);
+}
+
+button:not(.mat-mdc-button-base):not([class]):focus-visible,
+button:not(.mat-mdc-button-base)[class='']:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .2);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.panel--tema-oscuro {
+  --control-bg: #253247;
+  --control-border: #52637c;
+  --control-border-hover: #7890b2;
+  --control-focus: #60a5fa;
+  --control-text: #f8fafc;
+}
+
+.panel--tema-oscuro select:not([multiple]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+}
+
+.panel--tema-oscuro button:not(.mat-mdc-button-base):not([class]),
+.panel--tema-oscuro button:not(.mat-mdc-button-base)[class=''] {
+  border-color: #52637c;
+  background: #2a3950;
+  color: #f8fafc;
+}
+
+/* Lista desplegable personalizada para evitar el menú nativo de Windows. */
+.select-bonito {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.select-bonito__native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.select-bonito__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 9px 42px 9px 12px;
+  overflow: hidden;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+.select-bonito__trigger::after {
+  content: '';
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-68%) rotate(45deg);
+  transition: transform .16s ease;
+}
+
+.select-bonito__trigger:hover:not(:disabled) {
+  border-color: var(--control-border-hover);
+  background: #fbfdff;
+}
+
+.select-bonito__trigger:focus-visible,
+.select-bonito__trigger--abierto {
+  outline: none;
+  border-color: var(--control-focus);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+}
+
+.select-bonito__trigger--abierto::after {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.select-bonito__trigger:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+  background: #eef2f7;
+}
+
+.select-bonito__menu {
+  z-index: 12000;
+  display: none;
+  padding: 6px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid #c8d5e8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(15, 35, 70, .2), 0 2px 8px rgba(15, 35, 70, .08);
+  scrollbar-width: thin;
+  scrollbar-color: #a9b9d1 transparent;
+}
+
+.select-bonito__menu--abierto {
+  display: grid;
+  gap: 3px;
+}
+
+.select-bonito__grupo {
+  padding: 8px 10px 5px;
+  color: #64748b;
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.select-bonito__opcion {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #172033;
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.select-bonito__opcion:hover:not(:disabled),
+.select-bonito__opcion:focus-visible {
+  outline: none;
+  background: #edf4ff;
+  color: #123b8f;
+}
+
+.select-bonito__opcion--seleccionada {
+  position: relative;
+  padding-right: 34px;
+  background: #2455df;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.select-bonito__opcion--seleccionada::after {
+  content: '✓';
+  position: absolute;
+  right: 12px;
+  font-weight: 900;
+}
+
+.select-bonito__opcion--seleccionada:hover,
+.select-bonito__opcion--seleccionada:focus-visible {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.select-bonito__opcion:disabled {
+  color: #9aa8ba;
+  cursor: not-allowed;
+  opacity: .7;
+}
+
+.select-bonito__menu--oscuro {
+  border-color: #52637c;
+  background: #1e293b;
+  box-shadow: 0 20px 50px rgba(2, 6, 23, .58);
+  scrollbar-color: #64748b transparent;
+}
+
+.select-bonito__menu--oscuro .select-bonito__grupo {
+  color: #aebed2;
+}
+
+.select-bonito__menu--oscuro .select-bonito__opcion {
+  color: #edf3fb;
+}
+
+.select-bonito__menu--oscuro .select-bonito__opcion:hover:not(:disabled),
+.select-bonito__menu--oscuro .select-bonito__opcion:focus-visible {
+  background: #33445d;
+  color: #ffffff;
+}
+
+.select-bonito__menu--oscuro .select-bonito__opcion--seleccionada {
+  background: #2f61e6;
+  color: #ffffff;
+}
+
+.panel--tema-oscuro .select-bonito__trigger {
+  border-color: var(--control-border);
+  background: var(--control-bg);
+  color: var(--control-text);
+}
+
+.panel--tema-oscuro .select-bonito__trigger:hover:not(:disabled) {
+  background: #2d3c53;
+}
+
+.panel__topbar-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.panel__topbar-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.panel__topbar-logo span {
+  color: #12376c;
+  font-weight: 900;
+  font-size: .9rem;
+}
+
+@media (max-width: 600px) {
+  .panel__topbar-logo {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+}

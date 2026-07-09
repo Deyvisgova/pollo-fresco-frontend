@@ -298,11 +298,11 @@
             {{
               modoEdicion
                 ? 'Dejar en blanco si no deseas cambiarla.'
-                : 'Debe incluir letras y numeros.'
+                : 'Debe incluir 12 caracteres, mayuscula, minuscula, numero y simbolo.'
             }}
           </small>
           <small class="mensaje-error" *ngIf="!passwordValida">
-            La contrasena debe incluir letras y numeros (minimo 6 caracteres).
+            Usa al menos 12 caracteres, mayuscula, minuscula, numero y simbolo.
           </small>
           <small class="mensaje-error" *ngIf="passwordField.invalid && passwordField.touched">
             La contrasena es obligatoria y debe cumplir el formato solicitado.
@@ -346,7 +346,7 @@
             class="mensaje-error"
             *ngIf="confirmacionField.invalid && confirmacionField.touched"
           >
-            Confirma la contrasena (minimo 6 caracteres).
+            Confirma la contrasena segura.
           </small>
         </div>
         <div class="campo campo--switch">
@@ -394,7 +394,7 @@
         Las contrasenas deben coincidir para poder guardar.
       </small>
       <small class="formulario__ayuda" *ngIf="!passwordValida">
-        La contrasena debe contener letras y numeros.
+        La contrasena debe tener 12 caracteres, mayuscula, minuscula, numero y simbolo.
       </small>
 
       <div class="formulario__resumen" *ngIf="usuarioSeleccionado">

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { Carrusel } from '../../estructura/carrusel/carrusel';
 import { PaginaPublicaServicio } from '../../../servicios/pagina-publica.servicio';
 import { RouterLink } from '@angular/router';
@@ -9,7 +10,7 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule, Carrusel, MatCardModule, MatIconModule, RouterLink],
+  imports: [CommonModule, Carrusel, MatButtonModule, MatCardModule, MatIconModule, RouterLink],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css'
 })

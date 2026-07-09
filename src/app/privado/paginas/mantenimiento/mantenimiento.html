@@ -1,0 +1,128 @@
+<section class="mantenimiento">
+  <header class="mantenimiento__encabezado">
+    <div>
+      <p class="mantenimiento__eyebrow">Seguridad de datos</p>
+      <h1>Mantenimiento</h1>
+      <p>Respalda y recupera la informacion del negocio sin exponer la base de datos.</p>
+    </div>
+    <button class="boton boton--primario" type="button" (click)="crearRespaldo()" [disabled]="creando || procesando">
+      <span class="icono icono--respaldo" aria-hidden="true"></span>
+      {{ creando ? 'Creando respaldo...' : 'Crear respaldo ahora' }}
+    </button>
+  </header>
+
+  <p class="aviso aviso--exito" *ngIf="mensaje" role="status">{{ mensaje }}</p>
+  <p class="aviso aviso--error" *ngIf="error" role="alert">{{ error }}</p>
+
+  <section class="resumen" aria-label="Programacion de respaldos">
+    <article>
+      <span class="icono icono--escudo" aria-hidden="true"></span>
+      <div><strong>Archivos cifrados</strong><small>Solo este sistema puede restaurarlos.</small></div>
+    </article>
+    <article>
+      <span class="icono icono--reloj" aria-hidden="true"></span>
+      <div><strong>Respaldo diario</strong><small>{{ programacion['diario'] || '02:00' }}</small></div>
+    </article>
+    <article>
+      <span class="icono icono--calendario" aria-hidden="true"></span>
+      <div><strong>Copias de mayor plazo</strong><small>{{ programacion['semanal'] }} / {{ programacion['mensual'] }}</small></div>
+    </article>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque__titulo">
+      <div>
+        <h2>Respaldos disponibles</h2>
+        <p>Descarga una copia externa o restaura una version anterior.</p>
+      </div>
+      <span class="contador">{{ respaldos.length }}</span>
+    </div>
+
+    <div class="estado-vacio" *ngIf="cargando">Cargando respaldos...</div>
+    <div class="estado-vacio" *ngIf="!cargando && !respaldos.length">Aun no hay respaldos disponibles.</div>
+
+    <div class="respaldos" *ngIf="!cargando && respaldos.length">
+      <article class="respaldo" *ngFor="let respaldo of respaldos">
+        <div class="respaldo__icono"><span class="icono icono--base-datos" aria-hidden="true"></span></div>
+        <div class="respaldo__datos">
+          <strong>{{ etiquetaTipo(respaldo.tipo) }}</strong>
+          <span>{{ formatearFecha(respaldo.creado_en) }}</span>
+          <small>{{ formatearTamano(respaldo.tamano_bytes) }} · Verificado</small>
+        </div>
+        <div class="respaldo__acciones">
+          <button class="boton boton--suave" type="button" (click)="descargar(respaldo)" [disabled]="descargando === respaldo.archivo">
+            {{ descargando === respaldo.archivo ? 'Descargando...' : 'Descargar' }}
+          </button>
+          <button class="boton boton--advertencia" type="button" (click)="abrirRestauracion(respaldo)">Restaurar</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="bloque">
+    <div class="bloque__titulo">
+      <div>
+        <h2>Historial de actividad</h2>
+        <p>Ultimas operaciones realizadas sobre los respaldos.</p>
+      </div>
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Fecha</th><th>Usuario</th><th>Accion</th><th>Estado</th><th>Detalle</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let registro of auditoria">
+            <td>{{ formatearFecha(registro.creado_en) }}</td>
+            <td>{{ registro.usuario || 'Sistema' }}</td>
+            <td class="texto-capitalizado">{{ etiquetaAccion(registro.accion) }}</td>
+            <td><span class="estado" [class.estado--error]="registro.estado !== 'completado'">{{ registro.estado }}</span></td>
+            <td>{{ registro.detalle || registro.archivo || '-' }}</td>
+          </tr>
+          <tr *ngIf="!auditoria.length"><td colspan="5">Sin actividad registrada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="zona-peligro">
+    <div>
+      <h2>Reiniciar datos operativos</h2>
+      <p>Elimina ventas, pedidos, clientes, proveedores y configuraciones. Conserva al administrador actual y crea un respaldo previo.</p>
+    </div>
+    <button class="boton boton--peligro" type="button" (click)="abrirReinicio()">Reiniciar datos</button>
+  </section>
+</section>
+
+<div class="modal" *ngIf="modalAbierto" role="dialog" aria-modal="true" [attr.aria-label]="tituloModal">
+  <button class="modal__fondo" type="button" aria-label="Cerrar" (click)="cerrarModal()"></button>
+  <section class="modal__panel">
+    <header>
+      <div class="modal__alerta" aria-hidden="true">!</div>
+      <div><h2>{{ tituloModal }}</h2><p>Esta operacion modifica informacion real del sistema.</p></div>
+    </header>
+
+    <div class="modal__detalle" *ngIf="accionCritica === 'restaurar' && respaldoSeleccionado">
+      <span>Respaldo seleccionado</span>
+      <strong>{{ formatearFecha(respaldoSeleccionado.creado_en) }}</strong>
+    </div>
+    <div class="modal__detalle" *ngIf="accionCritica === 'reiniciar'">
+      <span>Se conservara</span>
+      <strong>El administrador autenticado</strong>
+    </div>
+
+    <label>
+      <span>Escribe {{ palabraConfirmacion }}</span>
+      <input type="text" [(ngModel)]="confirmacion" autocomplete="off" [placeholder]="palabraConfirmacion" />
+    </label>
+    <label>
+      <span>Contrasena del administrador</span>
+      <input type="password" [(ngModel)]="password" autocomplete="current-password" />
+    </label>
+
+    <footer>
+      <button class="boton boton--suave" type="button" (click)="cerrarModal()" [disabled]="procesando">Cancelar</button>
+      <button class="boton boton--peligro" type="button" (click)="ejecutarAccionCritica()" [disabled]="procesando">
+        {{ procesando ? 'Procesando...' : palabraConfirmacion }}
+      </button>
+    </footer>
+  </section>
+</div>

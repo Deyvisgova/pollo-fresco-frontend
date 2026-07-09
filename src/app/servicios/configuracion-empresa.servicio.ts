@@ -12,6 +12,11 @@ interface RespuestaSubidaLogo {
   logo_url: string;
 }
 
+interface RespuestaConfiguracionEmpresa {
+  nombre_empresa: string;
+  logo_url: string | null;
+}
+
 const CONFIGURACION_POR_DEFECTO: ConfiguracionEmpresa = {
   nombreEmpresa: 'Nombre de la empresa',
   logoUrl: ''
@@ -28,6 +33,7 @@ export class ConfiguracionEmpresaServicio {
     private readonly sesionServicio: SesionServicio
   ) {
     this.cargarConfiguracion();
+    this.sincronizarConServidor().subscribe({ error: () => undefined });
   }
 
   guardarConfiguracion(configuracion: ConfiguracionEmpresa): void {
@@ -38,6 +44,32 @@ export class ConfiguracionEmpresaServicio {
 
     localStorage.setItem(this.llaveConfiguracion, JSON.stringify(configuracionLimpia));
     this.configuracion.set(configuracionLimpia);
+  }
+
+  guardarConfiguracionServidor(configuracion: ConfiguracionEmpresa): Observable<ConfiguracionEmpresa> {
+    const nombreEmpresa = configuracion.nombreEmpresa.trim() || CONFIGURACION_POR_DEFECTO.nombreEmpresa;
+
+    return this.http
+      .put<RespuestaConfiguracionEmpresa>(`${this.apiBase}/configuracion/empresa`, {
+        nombre_empresa: nombreEmpresa
+      }, {
+        headers: this.obtenerHeadersAutenticados()
+      })
+      .pipe(
+        map((respuesta) => this.mapearRespuesta(respuesta)),
+        tap((configuracionActualizada) => this.guardarConfiguracion(configuracionActualizada))
+      );
+  }
+
+  sincronizarConServidor(): Observable<ConfiguracionEmpresa> {
+    return this.http
+      .get<RespuestaConfiguracionEmpresa>(`${this.apiBase}/configuracion/empresa`, {
+        headers: this.obtenerHeadersAutenticados()
+      })
+      .pipe(
+        map((respuesta) => this.mapearRespuesta(respuesta)),
+        tap((configuracionActualizada) => this.guardarConfiguracion(configuracionActualizada))
+      );
   }
 
   subirLogo(archivo: File): Observable<string> {
@@ -95,5 +127,12 @@ export class ConfiguracionEmpresaServicio {
     } catch {
       this.configuracion.set(CONFIGURACION_POR_DEFECTO);
     }
+  }
+
+  private mapearRespuesta(respuesta: RespuestaConfiguracionEmpresa): ConfiguracionEmpresa {
+    return {
+      nombreEmpresa: respuesta.nombre_empresa?.trim() || CONFIGURACION_POR_DEFECTO.nombreEmpresa,
+      logoUrl: respuesta.logo_url?.trim() || ''
+    };
   }
 }

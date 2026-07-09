@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmacionServicio } from '../../../servicios/confirmacion.servicio';
 import { SesionServicio } from '../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../compartido/directivas/select-bonito.directive';
 
 type FondoCodigo = 'POLLO_GALLINA' | 'CONGELADOS_HUEVOS';
 
@@ -82,7 +83,7 @@ interface ResumenGastosApi {
 @Component({
   selector: 'app-privado-gastos',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './gastos.html',
   styleUrl: './gastos.css'
 })

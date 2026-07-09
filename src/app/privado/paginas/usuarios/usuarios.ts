@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmacionServicio } from '../../../servicios/confirmacion.servicio';
 import { UsuariosServicio, UsuarioApi } from '../../../servicios/usuarios.servicio';
+import { SelectBonitoDirective } from '../../../compartido/directivas/select-bonito.directive';
 
 interface UsuarioFormulario {
   rol_id: number;
@@ -21,7 +22,7 @@ interface UsuarioFormulario {
 @Component({
   selector: 'app-privado-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SelectBonitoDirective],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css'
 })
@@ -38,7 +39,6 @@ export class PrivadoUsuarios implements OnInit {
   consultaCargando = false;
   usuarioSeleccionado: UsuarioApi | null = null;
   formulario: UsuarioFormulario = this.crearFormularioVacio();
-  private readonly tokenApiPeru = 'f3ba6fa1f3a2b2d1a6390dc06d831ebad2f218a9d3ba43e7f1f42b425dd03e26';
 
   roles = [
     { id: 1, nombre: 'Administrador' },
@@ -147,7 +147,7 @@ export class PrivadoUsuarios implements OnInit {
 
     this.http
       .get<{ data?: Record<string, unknown>; success?: boolean; message?: string }>(
-        `https://apiperu.dev/api/dni/${dni}?api_token=${this.tokenApiPeru}`
+        `/api/documentos/dni/${dni}`
       )
       .subscribe({
         next: (respuesta) => {
@@ -320,7 +320,7 @@ export class PrivadoUsuarios implements OnInit {
     if (this.modoEdicion && !this.formulario.password) {
       return true;
     }
-    return /^(?=.*[A-Za-z])(?=.*\d).{6,}$/.test(this.formulario.password);
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}$/.test(this.formulario.password);
   }
 
   get formularioValido(): boolean {

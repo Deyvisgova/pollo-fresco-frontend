@@ -57,7 +57,7 @@ export class RecuperarContrasena {
 
     this.formularioRestablecimiento = formBuilder.nonNullable.group({
       email: [email, [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(12), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)]],
       password_confirmation: ['', [Validators.required]]
     });
   }

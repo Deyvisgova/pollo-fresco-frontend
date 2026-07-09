@@ -4,6 +4,7 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, View
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
 import { SesionServicio } from '../../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../../compartido/directivas/select-bonito.directive';
 
 interface Producto {
   id: number;
@@ -103,7 +104,7 @@ interface DropdownPosicion {
 @Component({
   selector: 'app-privado-otros-productos-ventas-diarias',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './otros-productos-ventas-diarias.html',
   styleUrl: './otros-productos-ventas-diarias.css'
 })

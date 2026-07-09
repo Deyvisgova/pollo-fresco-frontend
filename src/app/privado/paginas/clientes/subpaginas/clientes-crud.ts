@@ -40,7 +40,6 @@ interface ClienteFormulario {
   styleUrl: './clientes-crud.css'
 })
 export class PrivadoClientesCrud implements OnInit {
-  private token = 'f3ba6fa1f3a2b2d1a6390dc06d831ebad2f218a9d3ba43e7f1f42b425dd03e26';
   private temporizadorBusqueda: ReturnType<typeof setTimeout> | null = null;
 
   consultaDocumento = '';
@@ -227,7 +226,7 @@ export class PrivadoClientesCrud implements OnInit {
   }
 
   private consultarApi(endpoint: string, autocompletar: (datos: Record<string, unknown>) => void): void {
-    const url = `https://apiperu.dev/api/${endpoint}?api_token=${this.token}`;
+    const url = `/api/documentos/${endpoint}`;
 
     this.consultaCargando = true;
     this.http.get<Record<string, unknown>>(url).subscribe({

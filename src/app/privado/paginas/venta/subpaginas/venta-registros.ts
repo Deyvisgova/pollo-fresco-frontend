@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule, HttpHeaders, HttpParams } from '@angular/
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SesionServicio } from '../../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../../compartido/directivas/select-bonito.directive';
 
 interface VentaGuardada {
   comprobante_venta_id: number;
@@ -40,7 +41,7 @@ interface ComunicacionBaja {
 @Component({
   selector: 'app-privado-venta-registros',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './venta-registros.html',
   styleUrl: './venta-registros.css'
 })

@@ -17,10 +17,14 @@ export interface RolDisponibleLogin {
 
 export interface RespuestaLoginApi {
   message: string;
-  user: UsuarioSesion;
+  user?: UsuarioSesion;
   token?: string;
   requires_role_selection?: boolean;
+  role_challenge?: string;
   roles?: RolDisponibleLogin[];
+  requires_email_code?: boolean;
+  challenge?: string;
+  masked_email?: string;
 }
 
 /**
@@ -45,7 +49,35 @@ export class AutenticacionServicio {
       .post<RespuestaLoginApi>(`${this.apiBase}/auth/login`, credenciales)
       .pipe(
         tap((respuesta) => {
-          if (respuesta.token) {
+          if (respuesta.token && respuesta.user) {
+            this.sesionServicio.guardarSesion(respuesta.user, respuesta.token);
+          }
+        })
+      );
+  }
+
+  seleccionarRol(challenge: string, role: string): Observable<RespuestaLoginApi> {
+    return this.http
+      .post<RespuestaLoginApi>(`${this.apiBase}/auth/select-role`, { challenge, role })
+      .pipe(
+        tap((respuesta) => {
+          if (respuesta.token && respuesta.user) {
+            this.sesionServicio.guardarSesion(respuesta.user, respuesta.token);
+          }
+        })
+      );
+  }
+
+  verificarCodigoCorreo(challenge: string, code: string, trustDevice: boolean): Observable<RespuestaLoginApi> {
+    return this.http
+      .post<RespuestaLoginApi>(`${this.apiBase}/auth/email-code/verify`, {
+        challenge,
+        code,
+        trust_device: trustDevice
+      })
+      .pipe(
+        tap((respuesta) => {
+          if (respuesta.token && respuesta.user) {
             this.sesionServicio.guardarSesion(respuesta.user, respuesta.token);
           }
         })

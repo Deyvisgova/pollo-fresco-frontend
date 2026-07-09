@@ -10,28 +10,45 @@ export interface UsuarioSesion {
 
 /**
  * Servicio encargado de persistir la informacion de sesion.
- * Se guarda en localStorage para mantener el acceso mientras el usuario navega.
+ * La sesion se conserva solo en la pestana actual y expira junto con el token.
  */
 @Injectable({ providedIn: 'root' })
 export class SesionServicio {
-  // Llaves usadas en localStorage para mantener coherencia en toda la app.
   private readonly llaveUsuario = 'usuario_actual';
   private readonly llaveToken = 'token_api';
+  private readonly llaveExpiracion = 'token_expira_en';
+  private readonly duracionSesionMs = 8 * 60 * 60 * 1000;
+
+  constructor() {
+    localStorage.removeItem(this.llaveUsuario);
+    localStorage.removeItem(this.llaveToken);
+  }
 
   /**
    * Guarda el usuario y token emitidos por el backend luego del inicio de sesion.
    */
   guardarSesion(usuario: UsuarioSesion, token: string): void {
-    localStorage.setItem(this.llaveUsuario, JSON.stringify(usuario));
-    localStorage.setItem(this.llaveToken, token);
+    sessionStorage.setItem(this.llaveUsuario, JSON.stringify(usuario));
+    sessionStorage.setItem(this.llaveToken, token);
+    sessionStorage.setItem(this.llaveExpiracion, String(Date.now() + this.duracionSesionMs));
   }
 
   /**
    * Obtiene el usuario guardado, si existe.
    */
   obtenerUsuario(): UsuarioSesion | null {
-    const data = localStorage.getItem(this.llaveUsuario);
-    return data ? (JSON.parse(data) as UsuarioSesion) : null;
+    const data = sessionStorage.getItem(this.llaveUsuario);
+    if (!data || this.sesionExpirada()) {
+      this.limpiarSesion();
+      return null;
+    }
+
+    try {
+      return JSON.parse(data) as UsuarioSesion;
+    } catch {
+      this.limpiarSesion();
+      return null;
+    }
   }
 
   obtenerRol(): string {
@@ -53,14 +70,25 @@ export class SesionServicio {
    * Obtiene el token actual para llamadas autenticadas.
    */
   obtenerToken(): string | null {
-    return localStorage.getItem(this.llaveToken);
+    if (this.sesionExpirada()) {
+      this.limpiarSesion();
+      return null;
+    }
+
+    return sessionStorage.getItem(this.llaveToken);
   }
 
   /**
    * Limpia toda la sesion local.
    */
   limpiarSesion(): void {
-    localStorage.removeItem(this.llaveUsuario);
-    localStorage.removeItem(this.llaveToken);
+    sessionStorage.removeItem(this.llaveUsuario);
+    sessionStorage.removeItem(this.llaveToken);
+    sessionStorage.removeItem(this.llaveExpiracion);
+  }
+
+  private sesionExpirada(): boolean {
+    const expiracion = Number(sessionStorage.getItem(this.llaveExpiracion) ?? 0);
+    return expiracion > 0 && Date.now() >= expiracion;
   }
 }

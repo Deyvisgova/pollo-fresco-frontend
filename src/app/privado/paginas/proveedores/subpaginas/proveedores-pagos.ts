@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SesionServicio } from '../../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../../compartido/directivas/select-bonito.directive';
 
 interface PagoProveedor {
   pago_id: number;
@@ -28,7 +29,7 @@ interface ProveedorFiltro {
 @Component({
   selector: 'app-privado-proveedores-pagos',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './proveedores-pagos.html',
   styleUrl: './proveedores-pagos.css'
 })

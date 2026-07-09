@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import type * as Leaflet from 'leaflet';
 import { SesionServicio } from '../../../servicios/sesion.servicio';
+import { SelectBonitoDirective } from '../../../compartido/directivas/select-bonito.directive';
 
 interface PedidoCliente {
   cliente_id: number;
@@ -169,13 +170,11 @@ interface EstadoVentaDiariaPedidoApi {
 @Component({
   selector: 'app-privado-pedidos',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SelectBonitoDirective],
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.css',
 })
 export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
-  private token =
-    'f3ba6fa1f3a2b2d1a6390dc06d831ebad2f218a9d3ba43e7f1f42b425dd03e26';
 
   subpaginaActiva: 'registrar' | 'registros' | 'cuentas' | 'delivery' =
     'registrar';
@@ -2477,7 +2476,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
     endpoint: string,
     autocompletar: (data: Record<string, unknown>) => void,
   ): void {
-    const url = `https://apiperu.dev/api/${endpoint}?api_token=${this.token}`;
+    const url = `/api/documentos/${endpoint}`;
     this.consultaCargando = true;
 
     this.http

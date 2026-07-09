@@ -633,10 +633,6 @@
     display: none;
   }
 
-  .panel__topbar--vendedor {
-    grid-template-columns: 1fr;
-  }
-
   .panel__toggle,
   .panel__usuario-trigger,
   .theme-toggle {
