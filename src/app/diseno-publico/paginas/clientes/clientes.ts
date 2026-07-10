@@ -14,4 +14,9 @@ import { CommonModule } from '@angular/common';
 export class Clientes {
   readonly contenido;
   constructor(servicio: PaginaPublicaServicio) { this.contenido = servicio.contenido; }
+  usarBannerFallback(evento: Event): void {
+    const imagen = evento.target as HTMLImageElement;
+    imagen.onerror = null;
+    imagen.src = 'assets/images/banners-paginas/clientes.svg';
+  }
 }

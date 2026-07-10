@@ -140,6 +140,7 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
   private readonly panelMaxHeight = 320;
   private readonly panelMinHeight = 150;
   private triggerDropdownActivo: HTMLElement | null = null;
+  private mensajeTimer: ReturnType<typeof setTimeout> | null = null;
   presentacionesHuevo = [
     { id: 'UNIDAD' as PresentacionHuevo, etiqueta: 'Unidad', factor: 1 },
     { id: 'MEDIO_CASILLERO' as PresentacionHuevo, etiqueta: 'Medio casillero', factor: 15 },
@@ -171,6 +172,10 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.desregistrarListenersReubicacion();
+    if (this.mensajeTimer) {
+      clearTimeout(this.mensajeTimer);
+      this.mensajeTimer = null;
+    }
     if (this.relojIntervalId) {
       clearInterval(this.relojIntervalId);
       this.relojIntervalId = null;
@@ -238,6 +243,14 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
 
   get esVendedor(): boolean {
     return this.sesionServicio.usuarioEsRol('vendedor');
+  }
+
+  private notificarError(mensaje: string): void {
+    this.mensajeError = mensaje;
+    if (this.mensajeTimer) clearTimeout(this.mensajeTimer);
+    this.mensajeTimer = setTimeout(() => {
+      if (this.mensajeError === mensaje) this.mensajeError = '';
+    }, 6500);
   }
 
   agregarFila(): void {
@@ -365,7 +378,7 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
   private mostrarAlertaStockAgotado(nombreProducto: string): void {
     const swal = (window as unknown as { Swal?: { fire: (options: Record<string, unknown>) => Promise<{ isConfirmed: boolean }> } }).Swal;
     if (!swal) {
-      window.alert(`Sin stock disponible para ${nombreProducto}.`);
+      this.notificarError(`Sin stock disponible para ${nombreProducto}.`);
       return;
     }
 
@@ -384,7 +397,7 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
   private mostrarAlertaCantidadExcedida(stockDisponible: number): void {
     const swal = (window as unknown as { Swal?: { fire: (options: Record<string, unknown>) => Promise<{ isConfirmed: boolean }> } }).Swal;
     if (!swal) {
-      window.alert(`La cantidad supera el stock disponible (${stockDisponible.toFixed(2)}).`);
+      this.notificarError(`La cantidad supera el stock disponible (${stockDisponible.toFixed(2)}).`);
       return;
     }
 
@@ -488,7 +501,7 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
     }
 
     if (this.cerrado) {
-      window.alert('El dia ya esta cerrado. Debes reabrir el dia para editar.');
+      this.notificarError('El dia ya esta cerrado. Debes reabrir el dia para editar.');
       return;
     }
 
@@ -643,7 +656,7 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
     }
 
     if (!this.tieneLoteRegistrado(producto.id)) {
-      window.alert(`El producto "${producto.nombre}" no tiene lote registrado. Registra un lote antes de vender.`);
+      this.notificarError(`El producto "${producto.nombre}" no tiene lote registrado. Registra un lote antes de vender.`);
       return;
     }
 
@@ -862,7 +875,7 @@ export class PrivadoOtrosProductosVentasDiarias implements OnInit, OnDestroy {
 
     const filasSinLote = this.ventas.filter((fila) => fila.productoId && !this.tieneLoteRegistrado(fila.productoId));
     if (filasSinLote.length > 0) {
-      window.alert('Hay productos sin lote registrado. No se guardo el registro de ventas diarias.');
+      this.notificarError('Hay productos sin lote registrado. No se guardo el registro de ventas diarias.');
       return;
     }
 

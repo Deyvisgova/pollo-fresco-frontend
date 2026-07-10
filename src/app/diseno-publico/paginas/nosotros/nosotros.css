@@ -1,4 +1,35 @@
 .nosotros__tarjeta {
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid #dfe7f1;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 22px;
+  box-shadow: 0 16px 34px rgba(25, 45, 76, 0.1);
+}
+
+.nosotros__tarjeta .mat-mdc-card-title {
+  display: block;
+  margin: 0;
+  padding: 0 0 8px;
+  color: #10213d;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.nosotros__tarjeta .mat-mdc-card-content {
+  padding: 0 !important;
+  color: #53637c;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 575.98px) {
+  .nosotros__tarjeta {
+    padding: 18px;
+  }
+
+  .nosotros__tarjeta .mat-mdc-card-title {
+    padding-bottom: 8px;
+  }
 }

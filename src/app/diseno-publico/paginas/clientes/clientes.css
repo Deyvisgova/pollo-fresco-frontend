@@ -1,18 +1,62 @@
 .clientes__card {
-  border-radius: 8px;
-  padding: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #dfe7f1;
+  border-radius: 16px;
+  background: #ffffff;
   text-align: center;
-  border: 1px solid #e0e8f2;
-  box-shadow: 0 12px 28px rgba(25, 45, 76, 0.09);
+  box-shadow: 0 16px 36px rgba(25, 45, 76, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clientes__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 46px rgba(25, 45, 76, 0.14);
+}
+
+.clientes__card .mat-mdc-card-content {
+  display: grid;
+  min-height: 214px;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 30px 26px !important;
 }
 
 .clientes__icono {
-  font-size: 2.5rem;
-  color: #ff6f00;
+  position: relative;
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, #eaf1ff 0%, #dcfce7 100%);
+  color: #2455df;
+  box-shadow: inset 0 0 0 1px rgba(37, 85, 223, 0.12);
+}
+
+.clientes__icono mat-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+}
+
+.clientes__card p {
+  max-width: 300px;
+  margin: 0;
+  color: #273852;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.clientes__card strong {
+  color: #10213d;
+  font-weight: 900;
 }
 
 @media (max-width: 575.98px) {
-  .clientes__card {
-    padding: 1.25rem;
+  .clientes__card .mat-mdc-card-content {
+    min-height: 190px;
+    padding: 24px 20px !important;
   }
 }

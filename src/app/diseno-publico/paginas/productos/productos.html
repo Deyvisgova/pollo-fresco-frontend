@@ -1,1 +1,73 @@
-<section id="productos" class="productos pb-5"><div class="container"><div class="pagina-banner pagina-banner--full-bleed"><img [src]="contenido().banner_productos_url" alt="Banner de Productos"></div><div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4"><div><h2 class="fw-bold">{{ contenido().titulo_productos }}</h2><p class="text-muted mb-0">{{ contenido().descripcion_productos }}</p></div></div><div class="row g-4"><div class="col-12 col-md-6 col-lg-4" *ngFor="let p of contenido().productos_destacados"><mat-card class="productos__card h-100"><img mat-card-image [src]="p.imagen_url" [alt]="p.nombre"><mat-card-content><h3 class="h5 fw-bold">{{ p.nombre }}</h3><p>{{ p.descripcion }}</p><div class="d-flex justify-content-between align-items-center"><span class="productos__precio">{{ p.precio }}</span><button mat-raised-button color="primary" (click)="pedir(p.nombre)">Pedir</button></div></mat-card-content></mat-card></div></div></div></section>
+<section id="productos" class="productos">
+  <div class="pagina-banner pagina-banner--portada pagina-banner--productos">
+    <img
+      [src]="contenido().banner_productos_url"
+      alt="Banner de Productos"
+      loading="eager"
+      fetchpriority="high"
+      decoding="sync"
+      (error)="usarImagenFallback($event, 'banner')"
+    >
+  </div>
+
+  <div class="container">
+    <div class="productos__cabecera">
+      <div>
+        <span class="productos__etiqueta">Catalogo fresco</span>
+        <h1>Productos frescos por linea de venta</h1>
+        <p>Atendemos pollo y gallina, congelados y huevos con disponibilidad diaria para hogares y negocios.</p>
+      </div>
+      <button mat-raised-button color="primary" type="button" (click)="pedir('productos disponibles')">
+        <mat-icon>chat</mat-icon>
+        Consultar disponibilidad
+      </button>
+    </div>
+
+    <div class="productos__lineas" aria-label="Lineas principales de productos">
+      <article class="productos__linea" *ngFor="let linea of lineas" [class]="'productos__linea productos__linea--' + linea.clase">
+        <div class="productos__linea-media">
+          <img [src]="linea.imagen" [alt]="linea.nombre" (error)="usarImagenFallback($event, 'producto')">
+          <span class="productos__linea-etiqueta">{{ linea.etiqueta }}</span>
+          <span class="productos__linea-icono" aria-hidden="true">
+            <mat-icon>{{ linea.icono }}</mat-icon>
+          </span>
+        </div>
+        <div class="productos__linea-contenido">
+          <span class="productos__linea-destacado">{{ linea.destacado }}</span>
+          <h2>{{ linea.nombre }}</h2>
+          <p>{{ linea.descripcion }}</p>
+          <div class="productos__chips">
+            <span *ngFor="let ejemplo of linea.ejemplos">{{ ejemplo }}</span>
+          </div>
+          <button mat-raised-button type="button" (click)="pedir(linea.nombre)">
+            <mat-icon>chat</mat-icon>
+            Consultar {{ linea.nombre }}
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <div class="productos__subtitulo">
+      <span class="productos__etiqueta">Destacados</span>
+      <h2>{{ contenido().titulo_productos }}</h2>
+      <p>{{ contenido().descripcion_productos }}</p>
+    </div>
+
+    <div class="productos__grid">
+      <article class="productos__card" *ngFor="let p of contenido().productos_destacados">
+        <div class="productos__imagen">
+          <img [src]="p.imagen_url" [alt]="p.nombre" (error)="usarImagenFallback($event, 'producto')">
+        </div>
+        <div class="productos__contenido">
+          <span class="productos__precio">{{ p.precio }}</span>
+          <h2>{{ p.nombre }}</h2>
+          <p>{{ p.descripcion }}</p>
+          <button mat-raised-button type="button" (click)="pedir(p.nombre)">
+            <mat-icon>shopping_bag</mat-icon>
+            Pedir por WhatsApp
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

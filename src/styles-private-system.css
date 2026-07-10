@@ -1,0 +1,1652 @@
+/* ==========================================================================
+   Sistema privado - capa visual final
+   --------------------------------------------------------------------------
+   Este archivo concentra los ajustes transversales del panel interno:
+   botones, tarjetas, KPIs, graficos, modales, tablas, modo oscuro y responsive.
+   Se carga despues de styles.css para normalizar pantallas sin tocar logica.
+   ========================================================================== */
+
+/* Variables del panel privado */
+.panel__rutas {
+  --accion-azul: #2554df;
+  --accion-azul-hover: #1d4ed8;
+  --accion-naranja: #f97316;
+  --accion-naranja-hover: #ea580c;
+  --accion-rojo: #dc2626;
+  --accion-rojo-hover: #b91c1c;
+  --accion-verde: #16a34a;
+  --accion-verde-hover: #15803d;
+  --accion-gris: #e8eef7;
+  --accion-gris-hover: #dce6f3;
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 30px;
+  --card-padding: clamp(16px, 1.4vw, 22px);
+  --section-gap: clamp(16px, 1.7vw, 24px);
+  --control-height: 42px;
+}
+
+/* Espaciado general */
+.panel__rutas {
+  display: block;
+}
+
+.panel__rutas > :is(h1, h2, h3, p) {
+  margin-top: 0 !important;
+}
+
+.panel__rutas > :is(h1, .pagina-titulo, .panel__titulo) {
+  margin-bottom: var(--space-1) !important;
+  line-height: 1.08 !important;
+}
+
+.panel__rutas > :is(p, .pagina-subtitulo, .panel__subtitulo) {
+  margin-bottom: var(--space-5) !important;
+  line-height: 1.45 !important;
+}
+
+.panel__rutas :is(
+  .seccion,
+  .pagina,
+  .contenido,
+  .vista,
+  .modulo,
+  .bloque,
+  [class*='seccion'],
+  [class*='pagina']
+) {
+  gap: var(--section-gap) !important;
+}
+
+.panel__rutas :is(
+  .seccion__encabezado,
+  .tarjeta__encabezado,
+  .panel__encabezado,
+  .cabecera,
+  .header-seccion,
+  [class*='encabezado']
+) {
+  margin-bottom: var(--space-3) !important;
+}
+
+.panel__rutas :is(
+  .seccion__encabezado,
+  .tarjeta__encabezado,
+  .panel__encabezado,
+  .cabecera,
+  .header-seccion
+) :is(h1, h2, h3, h4) {
+  margin: 0 !important;
+  line-height: 1.12 !important;
+}
+
+.panel__rutas :is(
+  .seccion__encabezado,
+  .tarjeta__encabezado,
+  .panel__encabezado,
+  .cabecera,
+  .header-seccion
+) :is(p, small) {
+  margin: var(--space-1) 0 0 !important;
+  line-height: 1.45 !important;
+}
+
+.panel__rutas :is(
+  .tarjeta,
+  .seccion__tarjeta,
+  .card,
+  .panel-card,
+  .resumen-card,
+  .metric-card,
+  .kpi-card,
+  .grafico-card,
+  .chart-card,
+  [class*='tarjeta'],
+  [class*='card']
+) {
+  padding: var(--card-padding) !important;
+}
+
+.panel__rutas :is(
+  .tarjeta,
+  .seccion__tarjeta,
+  .card,
+  .panel-card,
+  [class*='tarjeta'],
+  [class*='card']
+) + :is(
+  .tarjeta,
+  .seccion__tarjeta,
+  .card,
+  .panel-card,
+  [class*='tarjeta'],
+  [class*='card']
+) {
+  margin-top: var(--space-4) !important;
+}
+
+.panel__rutas :is(
+  .formulario-grid,
+  .form-grid,
+  .filtros,
+  .filtros-grid,
+  .consulta,
+  .toolbar,
+  .acciones,
+  .acciones-principales,
+  .tarjeta__acciones,
+  .seccion__acciones,
+  .tabs,
+  .pestanas,
+  [class*='filtro'],
+  [class*='acciones']
+) {
+  gap: var(--space-3) !important;
+}
+
+.panel__rutas :is(
+  input,
+  select,
+  textarea,
+  .select-bonito__trigger,
+  .mat-mdc-form-field
+) {
+  min-height: var(--control-height) !important;
+}
+
+.panel__rutas :is(
+  button:not(.boton-icono):not(.boton-icono--ojo):not(.boton-icono-accion):not(.boton--icono):not(.icono-btn):not(.accion-icono):not(.theme-toggle):not(.panel__toggle):not(.panel__usuario-trigger):not(.switch):not([class*='toggle']):not([class*='switch']),
+  a[class*='boton'],
+  a[class*='btn']
+) {
+  min-height: var(--control-height) !important;
+}
+
+.panel__rutas :is(
+  .tarjeta,
+  .seccion__tarjeta,
+  .card,
+  .panel-card,
+  .resumen-card,
+  .metric-card,
+  .kpi-card,
+  .grafico-card,
+  .chart-card,
+  [class*='tarjeta'],
+  [class*='card']
+) {
+  min-width: 0 !important;
+}
+
+.panel__rutas :is(.formulario-grid, .form-grid, .filtros-grid, .consulta, .toolbar, [class*='filtro']) > * {
+  min-width: 0 !important;
+}
+
+.panel__rutas :is(button, a[class*='boton'], a[class*='btn']) {
+  max-width: 100% !important;
+}
+
+.panel__rutas :is(.grid, .resumen-grid, .kpi-grid, .metric-grid, .cards-grid, .tarjetas-grid, [class*='grid']) {
+  gap: var(--section-gap) !important;
+}
+
+.panel__rutas :is(
+  .acciones,
+  .acciones-principales,
+  .acciones-superiores,
+  .tarjeta__acciones,
+  .seccion__acciones,
+  .modal__acciones,
+  .formulario__acciones,
+  .tabla__acciones,
+  .tabla-acciones,
+  .acciones-tabla,
+  .seccion__acciones-fila,
+  [class*='acciones']
+) {
+  align-items: center !important;
+}
+
+.panel__rutas :is(
+  .acciones,
+  .acciones-principales,
+  .acciones-superiores,
+  .tarjeta__acciones,
+  .seccion__acciones,
+  .modal__acciones,
+  .formulario__acciones
+) {
+  flex-wrap: wrap !important;
+}
+
+.panel__rutas :is(.tabla__acciones, .tabla-acciones, .acciones-tabla, .seccion__acciones-fila, .tabla__acciones-contenido) {
+  min-width: max-content !important;
+}
+
+.panel__rutas :is(h1, h2, h3, h4, h5, h6, p, span, small, strong, label, td, th) {
+  overflow-wrap: break-word;
+}
+
+.panel__rutas :is(.estado-vacio, .tabla-vacia, .mensaje-vacio, .empty-state, [class*='vacio']) {
+  border: 1px dashed #cbd7ef !important;
+  border-radius: 12px !important;
+  background: #f8fbff !important;
+  color: #52657f !important;
+  padding: 14px 16px !important;
+  line-height: 1.45 !important;
+}
+
+.panel__rutas :is(.estado-vacio, .tabla-vacia, .mensaje-vacio, .empty-state, [class*='vacio']) :is(p, span, small) {
+  color: inherit !important;
+}
+
+/* Botones */
+.panel__rutas :is(
+  .boton,
+  .btn,
+  .accion-sistema,
+  .formulario__boton,
+  .mat-mdc-button-base,
+  button[class*='boton'],
+  button[class*='btn'],
+  a[class*='boton'],
+  a[class*='btn']
+) {
+  min-height: 40px;
+  border-radius: 9px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.15 !important;
+  text-decoration: none !important;
+}
+
+.panel__rutas :is(
+  .accion-primaria,
+  .boton--primario,
+  .btn--primario,
+  .mat-mdc-raised-button.mat-primary,
+  .mat-mdc-unelevated-button.mat-primary
+) {
+  background: var(--accion-azul) !important;
+  color: #ffffff !important;
+  border-color: var(--accion-azul) !important;
+  box-shadow: 0 8px 18px rgba(37, 84, 223, 0.18) !important;
+}
+
+.panel__rutas :is(.accion-primaria, .boton--primario, .btn--primario):hover {
+  background: var(--accion-azul-hover) !important;
+}
+
+.panel__rutas :is(
+  .accion-editar,
+  .boton--editar,
+  .btn--editar,
+  button[title*='Editar'],
+  button[aria-label*='Editar']
+) {
+  background: var(--accion-naranja) !important;
+  color: #ffffff !important;
+  border-color: var(--accion-naranja) !important;
+  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.16) !important;
+}
+
+.panel__rutas :is(.accion-editar, .boton--editar, .btn--editar):hover {
+  background: var(--accion-naranja-hover) !important;
+}
+
+.panel__rutas :is(
+  .accion-eliminar,
+  .boton--peligro,
+  .boton--peligro-solido,
+  .btn--peligro,
+  .btn-danger,
+  .boton-eliminar,
+  button[class*='eliminar'],
+  button[class*='anular']
+) {
+  background: var(--accion-rojo) !important;
+  color: #ffffff !important;
+  border-color: var(--accion-rojo) !important;
+  box-shadow: 0 8px 16px rgba(220, 38, 38, 0.16) !important;
+}
+
+.panel__rutas :is(.accion-eliminar, .boton--peligro, .boton--peligro-solido, .btn--peligro, .btn-danger, .boton-eliminar):hover {
+  background: var(--accion-rojo-hover) !important;
+}
+
+.panel__rutas :is(
+  .boton--whatsapp,
+  .accion-confirmar,
+  .accion-pago,
+  .boton--confirmar,
+  .boton--pago,
+  .btn--confirmar,
+  .btn--success,
+  .btn-success,
+  button[class*='whatsapp'],
+  button[class*='pago'],
+  button[class*='confirmar']
+) {
+  background: var(--accion-verde) !important;
+  color: #ffffff !important;
+  border-color: var(--accion-verde) !important;
+  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.16) !important;
+}
+
+.panel__rutas :is(.boton--whatsapp, .accion-confirmar, .accion-pago, .boton--confirmar, .boton--pago, .btn--confirmar, .btn--success, .btn-success):hover {
+  background: var(--accion-verde-hover) !important;
+}
+
+.panel__rutas :is(
+  .accion-secundaria,
+  .accion-buscar,
+  .boton--secundario,
+  .boton--suave,
+  .btn--secundario,
+  .formulario__boton--secundario,
+  button[class*='cancelar'],
+  button[class*='limpiar']
+) {
+  background: var(--accion-gris) !important;
+  color: #0f2d5c !important;
+  border-color: var(--accion-gris) !important;
+  box-shadow: none !important;
+}
+
+.panel__rutas :is(.accion-secundaria, .accion-buscar, .boton--secundario, .boton--suave, .btn--secundario, .formulario__boton--secundario):hover {
+  background: var(--accion-gris-hover) !important;
+}
+
+/* Tarjetas, KPIs y graficos */
+.panel__rutas :is(.seccion, .tarjeta, .seccion__tarjeta, .card, [class*='tarjeta'], [class*='card']) {
+  border-color: #dce5f2 !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.055) !important;
+}
+
+.panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) {
+  border: 1px solid #dce5f2 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%) !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.055) !important;
+}
+
+.panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) span,
+.panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) small {
+  color: #5b6b83 !important;
+}
+
+.panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) strong,
+.panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) b {
+  color: #0f172a !important;
+}
+
+.panel__rutas :is(.grafico-card, .chart-card, [class*='grafico'], [class*='chart']) {
+  border-color: #dce5f2 !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.055) !important;
+}
+
+/* Modales */
+.panel__rutas :is(.modal, .modal-fondo) {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2500 !important;
+}
+
+.panel__rutas :is(.modal--abierto, .modal-fondo--abierto),
+.confirmacion-sistema {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2500 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 20px !important;
+}
+
+.panel__rutas :is(.modal-fondo, .modal__overlay, .modal__fondo),
+.confirmacion-sistema__fondo {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  background: rgba(15, 23, 42, 0.58) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+.panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) {
+  width: min(920px, calc(100vw - 32px)) !important;
+  max-height: min(90vh, 820px) !important;
+  overflow: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 20px !important;
+  border: 1px solid #dce5f2 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.26) !important;
+}
+
+.panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) > :is(header, .modal__encabezado, .modal-header, .cuenta-modal-header, .tarjeta__encabezado--acciones),
+.panel__rutas :is(.modal__encabezado, .modal-header, .cuenta-modal-header, .tarjeta__encabezado--acciones) {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) :is(h2, h3, h4, .modal__titulo) {
+  margin: 0 !important;
+  color: #162033 !important;
+  font-size: clamp(1.15rem, 1vw + 1rem, 1.55rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.18 !important;
+}
+
+.panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) :is(p, .modal__subtitulo) {
+  margin: 4px 0 0 !important;
+  color: #607089 !important;
+  line-height: 1.45 !important;
+}
+
+.panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) > :is(.modal__cuerpo, .modal-body, form) {
+  min-height: 0 !important;
+}
+
+.panel__rutas :is(.modal__acciones, .modal-footer, .formulario__acciones, .cuenta-modal-footer) {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: auto !important;
+  padding-top: 12px !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+.panel__rutas :is(.modal__acciones, .modal-footer, .formulario__acciones, .cuenta-modal-footer) :is(button, a) {
+  min-width: 118px !important;
+}
+
+.panel__rutas :is(
+  .modal__encabezado,
+  .modal-header,
+  .cuenta-modal-header,
+  .tarjeta__encabezado--acciones
+) > :is(button, .boton, .btn):last-child,
+.panel__rutas :is(button.boton--cerrar, .modal__cerrar, .btn-cerrar) {
+  min-width: 44px !important;
+  min-height: 38px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: #e8eef7 !important;
+  color: #0f2d5c !important;
+  box-shadow: none !important;
+}
+
+.confirmacion-sistema__panel {
+  position: relative !important;
+  z-index: 1 !important;
+  width: min(520px, calc(100vw - 32px)) !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 14px !important;
+  padding: 22px !important;
+  border: 1px solid #dce5f2 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28) !important;
+}
+
+.confirmacion-sistema__icono {
+  display: grid !important;
+  place-items: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+  background: #fff7ed !important;
+  color: #f97316 !important;
+  font-weight: 900 !important;
+}
+
+.confirmacion-sistema__panel--peligro .confirmacion-sistema__icono {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.confirmacion-sistema__contenido {
+  display: grid !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.confirmacion-sistema__contenido h3 {
+  margin: 0 !important;
+  color: #162033 !important;
+  font-size: 1.15rem !important;
+  font-weight: 900 !important;
+}
+
+.confirmacion-sistema__contenido p,
+.confirmacion-sistema__contenido small {
+  margin: 0 !important;
+  color: #53647d !important;
+  line-height: 1.45 !important;
+}
+
+.confirmacion-sistema__acciones {
+  grid-column: 1 / -1 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding-top: 8px !important;
+}
+
+.confirmacion-sistema__acciones .boton {
+  min-width: 116px !important;
+}
+
+/* Modo oscuro */
+.panel--tema-oscuro {
+  --surface-card: #1b2638;
+  --surface-muted: #223149;
+  --surface-table-head: #2c3d56;
+  --border-soft: #4a5d78;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd7e6;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.seccion, .tarjeta, .seccion__tarjeta, .card, [class*='tarjeta'], [class*='card']) {
+  background: #1b2638 !important;
+  border-color: #4a5d78 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.28) !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(h1, h2, h3, h4, h5, h6, strong, b, label) {
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(p, small, span, li, div) {
+  border-color: #4a5d78;
+}
+
+.panel--tema-oscuro .panel__rutas :is(p, small, .texto-secundario, [class*='descripcion'], [class*='subtitulo'], [class*='ayuda']) {
+  color: #cbd7e6 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(input, select, textarea, .select-bonito__trigger) {
+  background: #243349 !important;
+  color: #f8fafc !important;
+  border-color: #5a6d88 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(input::placeholder, textarea::placeholder) {
+  color: #aebed2 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) {
+  background: linear-gradient(180deg, #223149 0%, #1c293b 100%) !important;
+  border-color: #4a5d78 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) span,
+.panel--tema-oscuro .panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) small {
+  color: #cbd7e6 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) strong,
+.panel--tema-oscuro .panel__rutas :is(.kpi, .kpi-card, .resumen-card, .metric-card, [class*='kpi'], [class*='metric']) b {
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.grafico-card, .chart-card, [class*='grafico'], [class*='chart']) {
+  background: #1b2638 !important;
+  border-color: #4a5d78 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) {
+  background: #1b2638 !important;
+  border-color: #5a6d88 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.modal-fondo, .modal__overlay, .modal__fondo),
+.panel--tema-oscuro .confirmacion-sistema__fondo {
+  background: rgba(2, 6, 23, 0.72) !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.modal__encabezado, .modal-header, .cuenta-modal-header, .tarjeta__encabezado--acciones),
+.panel--tema-oscuro .panel__rutas :is(.modal__acciones, .modal-footer, .formulario__acciones, .cuenta-modal-footer) {
+  border-color: #4a5d78 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) :is(h2, h3, h4, .modal__titulo) {
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) :is(p, .modal__subtitulo) {
+  color: #cbd7e6 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.estado-vacio, .tabla-vacia, .mensaje-vacio, .empty-state, [class*='vacio']) {
+  border-color: #52657f !important;
+  background: #111c2d !important;
+  color: #d7e3f5 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .modal__encabezado,
+  .modal-header,
+  .cuenta-modal-header,
+  .tarjeta__encabezado--acciones
+) > :is(button, .boton, .btn):last-child,
+.panel--tema-oscuro .panel__rutas :is(button.boton--cerrar, .modal__cerrar, .btn-cerrar) {
+  background: #2c3d56 !important;
+  color: #eef4ff !important;
+}
+
+.panel--tema-oscuro .confirmacion-sistema__panel {
+  background: #1b2638 !important;
+  border-color: #4a5d78 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .confirmacion-sistema__contenido h3 {
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .confirmacion-sistema__contenido p,
+.panel--tema-oscuro .confirmacion-sistema__contenido small {
+  color: #cbd7e6 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(table, .tabla, .tabla-sistema, .seccion__tabla, .tabla-contenedor, .tabla__contenedor, .tabla-scroll) {
+  background: #1b2638 !important;
+  border-color: #4a5d78 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(th, thead th) {
+  background: #2c3d56 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(td, tbody td) {
+  background: #1b2638 !important;
+  color: #eef4ff !important;
+  border-color: #3f5068 !important;
+}
+
+.panel--tema-oscuro .panel__rutas tbody tr:hover td {
+  background: #243349 !important;
+}
+
+/* Pasada final de contraste para pantallas privadas con estilos propios */
+.panel--tema-oscuro .panel__rutas :is(
+  .filtros,
+  .formulario,
+  .formulario-card,
+  .formulario-panel,
+  .historial-panel,
+  .operacion-sunat,
+  .estado-emision,
+  .cliente-identificado,
+  .pedido-origen,
+  .detalle-vacio,
+  .resumen,
+  .resumen-item,
+  .cuenta-card,
+  .cuenta-card__metricas span,
+  .cuenta-card__ultimo,
+  .cuenta-card__detalle,
+  .cuenta-card__saldo,
+  .cuenta-modal-resumen span,
+  .cuenta-modal-panel,
+  .cuenta-modal-panel__titulo,
+  .cuenta-pedido,
+  .cuenta-pedido__total,
+  .cuenta-pago,
+  .delivery-ruta-toolbar,
+  .delivery-atrasados,
+  .delivery-atrasados__card,
+  .delivery-atrasados__pedido,
+  .mapa-delivery-layout,
+  .mapa-delivery-lista,
+  .mapa-delivery-card,
+  .selector-producto__menu,
+  .selector-proveedor__menu,
+  .selector-producto__item,
+  .selector-proveedor__item,
+  .selector-producto__sin-resultados,
+  .selector-proveedor__sin-resultados,
+  .producto-card,
+  .lote-card,
+  .movimiento-card,
+  .capital-card,
+  .cierre-card,
+  .configuracion-card,
+  .configuracion-bloque,
+  .certificado-card,
+  .mantenimiento-card,
+  .alerta,
+  .vacio
+) {
+  background: #1b2638 !important;
+  border-color: #4a5d78 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.24) !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .filtros,
+  .cuenta-modal-panel__titulo,
+  .historial-panel__cabecera,
+  .operacion-sunat__acciones,
+  .delivery-ruta-toolbar,
+  .tabla-ventas,
+  .tabla-pedidos,
+  .tabla-sistema
+) {
+  background: #223149 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .cuenta-pedido__saldo,
+  .cuenta-modal-resumen__saldo,
+  .estado--alerta,
+  .alerta--advertencia,
+  .stock-bajo,
+  .badge--warning
+) {
+  background: #3a2d18 !important;
+  border-color: #b7791f !important;
+  color: #fde68a !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .alerta--error,
+  .mensaje-error,
+  .error,
+  .texto-rojo
+) {
+  background: #3b1720 !important;
+  border-color: #f87171 !important;
+  color: #fecaca !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .estado--activo,
+  .badge--success,
+  .estado.activo,
+  .estado--pagado,
+  .estado--completo
+) {
+  background: #123524 !important;
+  border-color: #22c55e !important;
+  color: #bbf7d0 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .estado,
+  .badge,
+  [class*='badge'],
+  [class*='estado']
+) {
+  color: inherit;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .cuenta-card__saldo strong,
+  .cuenta-modal-resumen__saldo strong,
+  .cuenta-pedido__saldo strong,
+  .cuenta-pedido__saldo small,
+  .cuenta-pedido__total strong,
+  .cuenta-pago strong,
+  .resumen__total,
+  .resumen strong,
+  .kpi strong,
+  .panel strong
+) {
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .cuenta-pedido__cabecera span,
+  .cuenta-pedido__cabecera small,
+  .cuenta-pedido__producto span,
+  .cuenta-pedido__total span,
+  .cuenta-pago span,
+  .delivery-ruta-toolbar span,
+  .selector-producto__item small,
+  .selector-proveedor__item small,
+  .estado-emision span,
+  .cliente-identificado span,
+  .pedido-origen span
+) {
+  color: #cbd7e6 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .selector-producto__item:hover,
+  .selector-producto__item--activo,
+  .selector-proveedor__item:hover,
+  .selector-proveedor__item--activo
+) {
+  background: #2554df !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .selector-producto__buscador,
+  .selector-proveedor__buscador,
+  .buscador-producto__control,
+  .buscador-producto__control input
+) {
+  background: #243349 !important;
+  border-color: #5a6d88 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .mat-mdc-card,
+  .mat-mdc-menu-panel,
+  .mat-mdc-dialog-container .mdc-dialog__surface,
+  .mat-mdc-select-panel,
+  .cdk-overlay-pane .mat-mdc-select-panel
+) {
+  background: #1b2638 !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .mat-mdc-option,
+  .mat-mdc-select-value,
+  .mat-mdc-select-arrow,
+  .mat-mdc-form-field-label,
+  .mat-mdc-input-element
+) {
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .mat-mdc-option:hover,
+  .mat-mdc-option.mdc-list-item--selected
+) {
+  background: #2554df !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .metodos-pago__opcion,
+  .metodos-pago__opcion .metodos-pago__texto,
+  .metodos-pago__opcion .metodos-pago__icono,
+  .metodos-pago__opcion .metodos-pago__icono svg
+) {
+  color: #dbeafe !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__opcion {
+  background: #243349 !important;
+  border-color: #5a6d88 !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__opcion--activa {
+  background: #14532d !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__opcion--activa :is(.metodos-pago__texto, .metodos-pago__icono, svg) {
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .grafico-barra,
+  .grafico-dona,
+  .barra-progreso,
+  .progress
+) {
+  background: #334155 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(hr, .separador, .divider) {
+  border-color: #4a5d78 !important;
+}
+
+/* Sistema unificado de iconos del sistema privado */
+.panel__rutas :is(
+  svg,
+  .metodos-pago__icono svg,
+  .boton--icono svg,
+  .boton-icono svg,
+  .boton-icono--ojo svg,
+  .boton-icono-accion svg,
+  .icono-btn svg,
+  .accion-icono svg,
+  button[aria-label] svg
+) {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2.15 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  color: currentColor !important;
+}
+
+.panel__rutas .panel__link-icono::before {
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  color: currentColor !important;
+}
+
+.panel__rutas :is(
+  .boton-icono,
+  .boton-icono--ojo,
+  .boton-icono-accion,
+  .boton--icono,
+  .icono-btn,
+  .accion-icono,
+  button[aria-label]
+) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  border-radius: 10px !important;
+  border: 1px solid #cfe0f5 !important;
+  background: #eef4ff !important;
+  color: #123b7a !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08) !important;
+}
+
+.panel__rutas :is(
+  .boton-icono:hover,
+  .boton-icono--ojo:hover,
+  .boton-icono-accion:hover,
+  .boton--icono:hover,
+  .icono-btn:hover,
+  .accion-icono:hover,
+  button[aria-label]:hover
+) {
+  border-color: #93b7f8 !important;
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  transform: translateY(-1px);
+}
+
+.panel__rutas :is(.boton-icono--danger, .icono-btn--cerrar, button[aria-label*='Eliminar'], button[title*='Eliminar']) {
+  border-color: #fecaca !important;
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+.panel__rutas :is(.boton-icono--danger:hover, .icono-btn--cerrar:hover, button[aria-label*='Eliminar']:hover, button[title*='Eliminar']:hover) {
+  border-color: #ef4444 !important;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.panel__rutas .metodos-pago__opciones {
+  align-items: stretch !important;
+}
+
+.panel__rutas .metodos-pago__opcion {
+  border-radius: 12px !important;
+  border: 1px solid #d8e4f3 !important;
+  background: #f8fafc !important;
+  color: #0f2f5f !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06) !important;
+}
+
+.panel__rutas .metodos-pago__opcion:hover {
+  border-color: #93b7f8 !important;
+  background: #eef4ff !important;
+  color: #1d4ed8 !important;
+}
+
+.panel__rutas .metodos-pago__opcion--activa {
+  border-color: #22c55e !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
+.panel__rutas .metodos-pago__icono {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+  color: currentColor !important;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28) !important;
+}
+
+.panel__rutas .metodos-pago__texto {
+  color: currentColor !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .boton-icono,
+  .boton-icono--ojo,
+  .boton-icono-accion,
+  .boton--icono,
+  .icono-btn,
+  .accion-icono,
+  button[aria-label]
+) {
+  border-color: #52637c !important;
+  background: #243349 !important;
+  color: #dbeafe !important;
+  box-shadow: none !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .boton-icono:hover,
+  .boton-icono--ojo:hover,
+  .boton-icono-accion:hover,
+  .boton--icono:hover,
+  .icono-btn:hover,
+  .accion-icono:hover,
+  button[aria-label]:hover
+) {
+  border-color: #93c5fd !important;
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.boton-icono--danger, .icono-btn--cerrar, button[aria-label*='Eliminar'], button[title*='Eliminar']) {
+  border-color: #7f1d1d !important;
+  background: #3b1720 !important;
+  color: #fecaca !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(.boton-icono--danger:hover, .icono-btn--cerrar:hover, button[aria-label*='Eliminar']:hover, button[title*='Eliminar']:hover) {
+  border-color: #fca5a5 !important;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__opcion {
+  border-color: #52637c !important;
+  background: #243349 !important;
+  color: #eaf2ff !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__opcion:hover {
+  border-color: #93c5fd !important;
+  background: #2d3d56 !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__opcion--activa {
+  border-color: #34d399 !important;
+  background: #14532d !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago__icono {
+  background: #0f172a !important;
+  color: currentColor !important;
+  box-shadow: inset 0 0 0 1px rgba(203, 213, 225, 0.2) !important;
+}
+
+/* Tablas unificadas del sistema privado */
+.panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+) {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: auto !important;
+  max-height: min(68vh, 680px) !important;
+  border: 1px solid #dbe5f2 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  scrollbar-gutter: stable both-edges !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+)::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+)::-webkit-scrollbar-track {
+  background: #edf3fb;
+  border-radius: 999px;
+}
+
+.panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+)::-webkit-scrollbar-thumb {
+  min-height: 44px;
+  border: 3px solid #edf3fb;
+  border-radius: 999px;
+  background: #9fb0c8;
+}
+
+.panel__rutas :is(
+  table,
+  table.tabla,
+  table.tabla-sistema,
+  .seccion__tabla table,
+  .tabla-contenedor table,
+  .tabla__contenedor table,
+  .tabla-scroll table
+) {
+  width: 100% !important;
+  min-width: 960px !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  table-layout: auto !important;
+  background: transparent !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) thead {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 21 !important;
+  min-height: 44px !important;
+  padding: 13px 14px !important;
+  border-bottom: 1px solid #cbdaf0 !important;
+  background: #eaf2ff !important;
+  color: #173668 !important;
+  font-size: 0.88rem !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  box-shadow: 0 7px 16px rgba(15, 23, 42, 0.08) !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody td {
+  padding: 13px 14px !important;
+  border-bottom: 1px solid #dbe5f2 !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 0.9rem !important;
+  line-height: 1.38 !important;
+  vertical-align: middle !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody tr:nth-child(even) td {
+  background: #fbfdff !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody tr:hover td {
+  background: #f1f6ff !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema) :is(th, td):first-child {
+  padding-left: 16px !important;
+}
+
+.panel__rutas :is(table, table.tabla, table.tabla-sistema) :is(th, td):last-child {
+  padding-right: 16px !important;
+}
+
+.panel__rutas :is(
+  td[data-label='Acciones'],
+  td[data-label='Accion'],
+  td[data-label='Opciones'],
+  .tabla__acciones,
+  .tabla-acciones,
+  .acciones-tabla,
+  .seccion__acciones-fila,
+  .tabla__acciones-contenido
+) {
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+.panel__rutas :is(
+  .tabla__acciones,
+  .tabla-acciones,
+  .acciones-tabla,
+  .seccion__acciones-fila,
+  .tabla__acciones-contenido
+) {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+}
+
+.panel__rutas :is(
+  td[data-label='Acciones'],
+  td[data-label='Accion'],
+  td[data-label='Opciones']
+) :is(button, a),
+.panel__rutas :is(
+  .tabla__acciones,
+  .tabla-acciones,
+  .acciones-tabla,
+  .seccion__acciones-fila,
+  .tabla__acciones-contenido
+) :is(button, a) {
+  min-width: 74px !important;
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  white-space: nowrap !important;
+}
+
+.panel__rutas :is(
+  td[data-label='Acciones'],
+  td[data-label='Accion'],
+  td[data-label='Opciones']
+) :is(.boton-icono, button[aria-label], .accion-icono),
+.panel__rutas :is(.tabla__acciones, .tabla-acciones, .acciones-tabla, .seccion__acciones-fila) :is(.boton-icono, button[aria-label], .accion-icono) {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+) {
+  background: #1b2638 !important;
+  border-color: #4a5d78 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+)::-webkit-scrollbar-track {
+  background: #162133;
+}
+
+.panel--tema-oscuro .panel__rutas :is(
+  .tabla-contenedor,
+  .tabla__contenedor,
+  .tabla-scroll,
+  .tabla-ventas,
+  .tabla-pedidos__contenedor,
+  .seccion__tabla,
+  .modal__tabla,
+  [class*='tabla-contenedor'],
+  [class*='tabla__contenedor']
+)::-webkit-scrollbar-thumb {
+  border-color: #162133;
+  background: #64748b;
+}
+
+.panel--tema-oscuro .panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) thead th {
+  background: #2c3d56 !important;
+  border-color: #5a6d88 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 7px 16px rgba(2, 6, 23, 0.24) !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody td {
+  background: #1b2638 !important;
+  border-color: #3f5068 !important;
+  color: #eef4ff !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody tr:nth-child(even) td {
+  background: #202e43 !important;
+}
+
+.panel--tema-oscuro .panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) tbody tr:hover td {
+  background: #263850 !important;
+}
+
+/* Tablet */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .panel__rutas {
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --card-padding: 18px;
+    --section-gap: 18px;
+    --control-height: 40px;
+  }
+
+  .panel__rutas > :is(p, .pagina-subtitulo, .panel__subtitulo) {
+    margin-bottom: var(--space-4) !important;
+  }
+
+  .panel__rutas :is(.formulario-grid, .form-grid, .filtros, .filtros-grid, .consulta, .toolbar, [class*='filtro']) {
+    gap: 12px !important;
+  }
+
+  .panel__rutas :is(.tabla-contenedor, .tabla__contenedor, .tabla-scroll, .tabla-ventas, .tabla-pedidos__contenedor, .seccion__tabla, .modal__tabla, [class*='tabla-contenedor'], [class*='tabla__contenedor']) {
+    overflow: auto !important;
+    max-height: min(64vh, 620px) !important;
+    border-radius: 12px !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .panel__rutas :is(table, table.tabla, table.tabla-sistema, .seccion__tabla table) {
+    min-width: 960px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .panel__rutas :is(th, td) {
+    padding: 10px 12px !important;
+  }
+
+  .panel__rutas :is(.tabla__acciones, .tabla-acciones, .acciones-tabla, .seccion__acciones-fila) {
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* Movil */
+@media (max-width: 600px) {
+  .panel__rutas {
+    --space-3: 10px;
+    --space-4: 14px;
+    --space-5: 16px;
+    --space-6: 20px;
+    --card-padding: 14px;
+    --section-gap: 14px;
+    --control-height: 40px;
+  }
+
+  .panel__rutas > :is(h1, .pagina-titulo, .panel__titulo) {
+    margin-bottom: 4px !important;
+  }
+
+  .panel__rutas > :is(p, .pagina-subtitulo, .panel__subtitulo) {
+    margin-bottom: var(--space-4) !important;
+  }
+
+  .panel__rutas :is(.seccion__encabezado, .tarjeta__encabezado, .panel__encabezado, .cabecera, .header-seccion, [class*='encabezado']) {
+    margin-bottom: var(--space-2) !important;
+  }
+
+  .panel__rutas :is(.formulario-grid, .form-grid, .filtros, .filtros-grid, .consulta, .toolbar, .acciones, .acciones-principales, .tarjeta__acciones, .seccion__acciones, [class*='filtro'], [class*='acciones']) {
+    gap: 10px !important;
+  }
+
+  .panel__rutas :is(button, a[class*='boton'], a[class*='btn']) {
+    min-height: 40px !important;
+  }
+
+  .panel__rutas :is(
+    .boton-icono,
+    .boton-icono--ojo,
+    .boton-icono-accion,
+    .boton--icono,
+    .icono-btn,
+    .accion-icono,
+    .theme-toggle,
+    .panel__toggle,
+    .panel__usuario-trigger,
+    .switch,
+    [class*='toggle'],
+    [class*='switch']
+  ) {
+    min-height: unset !important;
+  }
+
+  .panel__rutas :is(.seccion, .tarjeta, .seccion__tarjeta, .card, [class*='tarjeta'], [class*='card']) {
+    border-radius: 14px !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.055) !important;
+  }
+
+  .panel__rutas :is(.modal--abierto, .modal-fondo--abierto),
+  .confirmacion-sistema {
+    align-items: end !important;
+    padding: 10px !important;
+  }
+
+  .panel__rutas :is(.modal__contenido, .modal__contenedor, .modal-contenido, .modal__panel) {
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    padding: 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .panel__rutas :is(.modal__acciones, .modal-footer, .formulario__acciones, .cuenta-modal-footer) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .panel__rutas :is(.modal__acciones, .modal-footer, .formulario__acciones, .cuenta-modal-footer) :is(button, a) {
+    width: 100% !important;
+  }
+
+  .panel__rutas :is(
+    .modal__encabezado,
+    .modal-header,
+    .cuenta-modal-header,
+    .tarjeta__encabezado--acciones
+  ) {
+    align-items: flex-start !important;
+  }
+
+  .panel__rutas :is(
+    .modal__encabezado,
+    .modal-header,
+    .cuenta-modal-header,
+    .tarjeta__encabezado--acciones
+  ) > :is(button, .boton, .btn):last-child {
+    flex: 0 0 auto !important;
+  }
+
+  .confirmacion-sistema__panel {
+    width: calc(100vw - 20px) !important;
+    grid-template-columns: 1fr !important;
+    padding: 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .confirmacion-sistema__acciones {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .confirmacion-sistema__acciones .boton {
+    width: 100% !important;
+  }
+
+  .panel__rutas :is(.tabla-contenedor, .tabla__contenedor, .tabla-scroll, .tabla-ventas, .tabla-pedidos__contenedor, .seccion__tabla, .modal__tabla, [class*='tabla-contenedor'], [class*='tabla__contenedor']):has(table td[data-label]) {
+    overflow: visible !important;
+    max-height: none !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .panel__rutas table:has(td[data-label]),
+  .panel__rutas table:has(td[data-label]) thead,
+  .panel__rutas table:has(td[data-label]) tbody,
+  .panel__rutas table:has(td[data-label]) tr,
+  .panel__rutas table:has(td[data-label]) th,
+  .panel__rutas table:has(td[data-label]) td {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) {
+    min-width: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) thead {
+    display: none !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody {
+    display: grid !important;
+    gap: 12px !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody tr {
+    display: grid !important;
+    gap: 0 !important;
+    padding: 12px !important;
+    border: 1px solid #d6e3f5 !important;
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.055) !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td {
+    display: grid !important;
+    grid-template-columns: minmax(104px, 38%) minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 10px !important;
+    padding: 9px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #e1e9f5 !important;
+    background: transparent !important;
+    color: #0f172a !important;
+    font-size: 0.9rem !important;
+    line-height: 1.35 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td::before {
+    content: attr(data-label) ":" !important;
+    color: #53647d !important;
+    font-weight: 900 !important;
+    line-height: 1.35 !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td:is(
+    [data-label='Acciones'],
+    [data-label='Accion'],
+    [data-label='Opciones']
+  ) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td:is(
+    [data-label='Acciones'],
+    [data-label='Accion'],
+    [data-label='Opciones']
+  )::before {
+    margin-bottom: 2px !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td:is(
+    [data-label='Acciones'],
+    [data-label='Accion'],
+    [data-label='Opciones']
+  ) :is(.tabla__acciones, .tabla-acciones, .acciones-tabla, .seccion__acciones-fila, .tabla__acciones-contenido),
+  .panel__rutas table:has(td[data-label]) tbody td:is(
+    [data-label='Acciones'],
+    [data-label='Accion'],
+    [data-label='Opciones']
+  ) {
+    justify-content: stretch !important;
+  }
+
+  .panel__rutas table:has(td[data-label]) tbody td:is(
+    [data-label='Acciones'],
+    [data-label='Accion'],
+    [data-label='Opciones']
+  ) :is(button, a) {
+    width: 100% !important;
+    min-height: 38px !important;
+  }
+
+  .panel--tema-oscuro .panel__rutas table:has(td[data-label]) tbody tr {
+    border-color: #40536d !important;
+    background: #1b2638 !important;
+    box-shadow: 0 8px 22px rgba(2, 6, 23, 0.28) !important;
+  }
+
+  .panel--tema-oscuro .panel__rutas table:has(td[data-label]) tbody td {
+    border-color: #394b63 !important;
+    color: #eef4ff !important;
+  }
+
+  .panel--tema-oscuro .panel__rutas table:has(td[data-label]) tbody td::before {
+    color: #b9c7dc !important;
+  }
+}

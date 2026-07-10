@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ecfdf5"/>
+      <stop offset=".54" stop-color="#e0f2fe"/>
+      <stop offset="1" stop-color="#fff7ed"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#10213d" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="420" fill="url(#bg)"/>
+  <path d="M0 304c188-82 352-68 548-46 230 26 398-50 630-66 168-12 296 26 422 82v146H0Z" fill="#bbf7d0" opacity=".62"/>
+  <path d="M0 366c210-42 430-34 690-54 280-22 460-75 728-38 72 10 132 25 182 42v104H0Z" fill="#93c5fd" opacity=".36"/>
+  <circle cx="1322" cy="86" r="132" fill="#86efac" opacity=".58"/>
+  <circle cx="245" cy="360" r="104" fill="#bbf7d0" opacity=".72"/>
+  <g transform="translate(96 92)">
+    <rect width="236" height="56" rx="28" fill="#2554df"/>
+    <text x="118" y="37" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="900" fill="#fff">CLIENTES</text>
+    <text x="0" y="132" font-family="Arial, sans-serif" font-size="64" font-weight="900" fill="#10213d">Clientes que confian</text>
+    <text x="3" y="184" font-family="Arial, sans-serif" font-size="34" fill="#53647d">Hogares, restaurantes y negocios atendidos todos los dias</text>
+  </g>
+  <g transform="translate(930 76)" filter="url(#s)">
+    <rect width="456" height="254" rx="32" fill="#ffffff" opacity=".95"/>
+    <g transform="translate(42 54)">
+      <rect x="0" y="64" width="110" height="86" rx="16" fill="#e0f2fe"/>
+      <path d="M12 64h86l12 28H0z" fill="#2554df"/>
+      <rect x="148" y="38" width="110" height="112" rx="16" fill="#dcfce7"/>
+      <path d="M160 38h84l14 30H148z" fill="#16a34a"/>
+      <rect x="296" y="70" width="110" height="80" rx="16" fill="#ffedd5"/>
+      <path d="M310 70h82l14 28H296z" fill="#f97316"/>
+      <path d="M20 190h360" stroke="#dbe3ef" stroke-width="12" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

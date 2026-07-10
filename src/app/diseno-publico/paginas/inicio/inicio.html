@@ -4,27 +4,54 @@
   <section class="inicio__presentacion">
     <div class="container">
       <div class="inicio__encabezado">
-        <span class="inicio__etiqueta">Calidad y atencion diaria</span>
-        <h1>{{ contenido().titulo_portada }}</h1>
+        <span class="inicio__etiqueta">Atencion diaria para hogares y negocios</span>
+        <h2>{{ contenido().titulo_portada }}</h2>
         <p>{{ contenido().descripcion_portada }}</p>
-        <div class="inicio__acciones">
-          <button mat-raised-button color="primary" type="button" (click)="abrirWhatsApp()">Cotizar por WhatsApp</button>
-          <a mat-stroked-button color="primary" routerLink="/productos">Conocer productos</a>
-        </div>
       </div>
 
       <div class="inicio__beneficios">
-        <article><mat-icon>verified</mat-icon><div><h2>Calidad controlada</h2><p>Seleccionamos cuidadosamente cada producto antes de ofrecerlo.</p></div></article>
-        <article><mat-icon>local_shipping</mat-icon><div><h2>Entrega coordinada</h2><p>Atendemos hogares y negocios con rutas planificadas.</p></div></article>
-        <article><mat-icon>support_agent</mat-icon><div><h2>Atencion cercana</h2><p>Resolvemos tus consultas y coordinamos pedidos por WhatsApp.</p></div></article>
+        <article>
+          <mat-icon>verified</mat-icon>
+          <div>
+            <h3>Calidad controlada</h3>
+            <p>Seleccionamos cada producto antes de atender tu pedido.</p>
+          </div>
+        </article>
+        <article>
+          <mat-icon>local_shipping</mat-icon>
+          <div>
+            <h3>Entrega coordinada</h3>
+            <p>Organizamos la ruta para hogares, negocios y pedidos frecuentes.</p>
+          </div>
+        </article>
+        <article>
+          <mat-icon>support_agent</mat-icon>
+          <div>
+            <h3>Pedido rapido</h3>
+            <p>Atendemos consultas, disponibilidad y reservas por WhatsApp.</p>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
   <section class="inicio__cta">
-    <div class="container">
-      <div><span>Atencion para hogares y negocios</span><h2>¿Necesitas realizar un pedido?</h2><p>Consulta disponibilidad y coordina tu entrega directamente con nuestro equipo.</p></div>
-      <button mat-raised-button type="button" (click)="abrirWhatsApp()">Hablar por WhatsApp</button>
+    <div class="container inicio__cta-contenido">
+      <div>
+        <span>Compra simple y directa</span>
+        <h2>Coordina tu pedido con nuestro equipo</h2>
+        <p>Te ayudamos a elegir productos, cantidades y horario de entrega.</p>
+      </div>
+      <div class="inicio__acciones">
+        <button mat-raised-button type="button" (click)="abrirWhatsApp()">
+          <mat-icon>chat</mat-icon>
+          Hablar por WhatsApp
+        </button>
+        <a mat-stroked-button routerLink="/productos">
+          <mat-icon>storefront</mat-icon>
+          Ver productos
+        </a>
+      </div>
     </div>
   </section>
 </section>

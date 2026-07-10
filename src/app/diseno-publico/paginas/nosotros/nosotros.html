@@ -1,8 +1,16 @@
 <section *ngIf="contenido().mostrar_nosotros" id="nosotros" class="nosotros pb-5 bg-light">
+  <div class="pagina-banner pagina-banner--portada pagina-banner--nosotros">
+    <img
+      [src]="contenido().banner_nosotros_url"
+      alt="Banner de Nosotros"
+      loading="eager"
+      fetchpriority="high"
+      decoding="sync"
+      (error)="usarBannerFallback($event)"
+    >
+  </div>
+
   <div class="container">
-    <div class="pagina-banner pagina-banner--full-bleed">
-      <img [src]="contenido().banner_nosotros_url" alt="Banner de Nosotros">
-    </div>
     <div class="row g-4 align-items-center">
       <div class="col-12 col-lg-6">
         <h2 class="fw-bold">{{ contenido().titulo_nosotros }}</h2>

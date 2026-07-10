@@ -1,46 +1,53 @@
 <section class="carrusel" aria-label="Promociones destacadas">
-  <div class="container-fluid carrusel__contenido">
-    <div class="row g-4 align-items-center">
-      <div class="col-12 col-lg-5">
-        <mat-chip-set class="mb-3">
-          <mat-chip color="accent" selected>Frescura diaria</mat-chip>
-        </mat-chip-set>
-        <h2 class="display-6 fw-bold">Promociones destacadas de hoy</h2>
-        <p class="lead">
-          {{ activeSlide.summary }}
-        </p>
-        <div class="d-flex flex-wrap gap-2 carrusel__acciones">
-          <button mat-raised-button color="primary" type="button">Ver cortes</button>
-          <button mat-stroked-button color="accent" type="button">Reservar pedido</button>
-        </div>
-        <div class="carrusel__controles">
-          <button mat-icon-button type="button" (click)="previousSlide()" aria-label="Anterior">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button mat-icon-button type="button" (click)="nextSlide()" aria-label="Siguiente">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-        <div class="carrusel__indicadores">
-          <button
-            *ngFor="let slide of slides; index as i"
-            type="button"
-            class="carrusel__indicador"
-            [class.carrusel__indicador--activo]="i === activeIndex"
-            (click)="goToSlide(i)"
-            [attr.aria-label]="'Ir a la diapositiva ' + (i + 1)"
-          ></button>
-        </div>
+  <div class="carrusel__fondo">
+    <img [src]="activeSlide.image" [alt]="activeSlide.title" (error)="usarSlideFallback($event)">
+  </div>
+
+  <div class="container carrusel__contenido">
+    <div class="carrusel__texto">
+      <span class="carrusel__etiqueta">Frescura diaria</span>
+      <h1>{{ activeSlide.title }}</h1>
+      <p>{{ activeSlide.summary }}</p>
+      <div class="carrusel__acciones">
+        <a mat-raised-button color="primary" routerLink="/productos">
+          <mat-icon>storefront</mat-icon>
+          Ver productos
+        </a>
+        <button mat-stroked-button type="button" (click)="abrirWhatsApp()">
+          <mat-icon>chat</mat-icon>
+          Pedir por WhatsApp
+        </button>
       </div>
-      <div class="col-12 col-lg-7">
-        <mat-card class="carrusel__tarjeta carrusel__tarjeta--activa">
-          <img mat-card-image [src]="activeSlide.image" [alt]="activeSlide.title">
-          <mat-card-content>
-            <h3 class="h5 fw-bold mb-2">{{ activeSlide.title }}</h3>
-            <p class="mb-0">{{ activeSlide.detail }}</p>
-          </mat-card-content>
-        </mat-card>
+    </div>
+
+    <article class="carrusel__panel" aria-live="polite">
+      <span>Producto destacado</span>
+      <h2>{{ activeSlide.title }}</h2>
+      <p>{{ activeSlide.detail }}</p>
+      <div class="carrusel__panel-imagen">
+        <img [src]="activeSlide.image" [alt]="activeSlide.title" (error)="usarSlideFallback($event)">
       </div>
+    </article>
+  </div>
+
+  <div class="container carrusel__navegacion">
+    <div class="carrusel__controles">
+      <button mat-icon-button type="button" (click)="previousSlide()" aria-label="Anterior">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-icon-button type="button" (click)="nextSlide()" aria-label="Siguiente">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+    <div class="carrusel__indicadores">
+      <button
+        *ngFor="let slide of slides; index as i"
+        type="button"
+        class="carrusel__indicador"
+        [class.carrusel__indicador--activo]="i === activeIndex"
+        (click)="goToSlide(i)"
+        [attr.aria-label]="'Ir a la diapositiva ' + (i + 1)"
+      ></button>
     </div>
   </div>
 </section>

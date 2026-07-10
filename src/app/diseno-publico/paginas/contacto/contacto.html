@@ -1,8 +1,16 @@
 <section *ngIf="contenido().mostrar_contacto" id="contacto" class="contacto pb-5">
+  <div class="pagina-banner pagina-banner--portada pagina-banner--contacto">
+    <img
+      [src]="contenido().banner_contacto_url"
+      alt="Banner de Contacto"
+      loading="eager"
+      fetchpriority="high"
+      decoding="sync"
+      (error)="usarBannerFallback($event)"
+    >
+  </div>
+
   <div class="container">
-    <div class="pagina-banner pagina-banner--full-bleed">
-      <img [src]="contenido().banner_contacto_url" alt="Banner de Contacto">
-    </div>
     <div class="row g-4">
       <div class="col-12 col-lg-5">
         <h2 class="fw-bold">{{ contenido().titulo_contacto }}</h2>

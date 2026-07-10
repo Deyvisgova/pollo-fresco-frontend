@@ -1,15 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { PaginaPublicaServicio } from '../../../servicios/pagina-publica.servicio';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-carrusel',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatCardModule, MatChipsModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, RouterLink],
   templateUrl: './carrusel.html',
   styleUrl: './carrusel.css'
 })
@@ -44,6 +43,18 @@ export class Carrusel implements OnInit, OnDestroy {
   goToSlide(index: number): void {
     this.activeIndex = index;
     this.restartAutoSlide();
+  }
+
+  abrirWhatsApp(): void {
+    const numero = this.pagina.contenido().whatsapp.replace(/\D/g, '');
+    const mensaje = `Hola, quiero consultar por ${this.activeSlide.title}.`;
+    window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
+  }
+
+  usarSlideFallback(evento: Event): void {
+    const imagen = evento.target as HTMLImageElement;
+    imagen.onerror = null;
+    imagen.src = 'assets/images/carusel/carousel-2.svg';
   }
 
   private startAutoSlide(): void {

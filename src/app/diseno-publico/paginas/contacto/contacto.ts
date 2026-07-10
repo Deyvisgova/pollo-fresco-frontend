@@ -17,4 +17,9 @@ export class Contacto {
   readonly contenido;
   constructor(servicio: PaginaPublicaServicio) { this.contenido = servicio.contenido; }
   abrirWhatsApp(): void { window.open(`https://wa.me/${this.contenido().whatsapp.replace(/\D/g, '')}`, '_blank'); }
+  usarBannerFallback(evento: Event): void {
+    const imagen = evento.target as HTMLImageElement;
+    imagen.onerror = null;
+    imagen.src = 'assets/images/banners-paginas/contacto.svg';
+  }
 }

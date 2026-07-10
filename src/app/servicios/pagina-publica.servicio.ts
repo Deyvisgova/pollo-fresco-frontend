@@ -34,9 +34,9 @@ export const PAGINA_PUBLICA_BASE: PaginaPublicaContenido = {
   titulo_productos: 'Productos frescos y listos para vender', descripcion_productos: 'Seleccionamos y preparamos cada pedido con cuidado.',
   titulo_clientes: 'Clientes que confian en nosotros', descripcion_clientes: 'Negocios y familias que valoran nuestra calidad.',
   productos_destacados: [
-    { nombre: 'Pollo entero', descripcion: 'Ideal para asados, guisos y negocios.', precio: 'Desde S/ 12.00', imagen_url: 'assets/images/carusel/carousel-2.svg' },
-    { nombre: 'Pechuga premium', descripcion: 'Corte limpio para porciones saludables.', precio: 'Desde S/ 14.50', imagen_url: 'assets/images/carusel/carousel-1.svg' },
-    { nombre: 'Pierna y muslo', descripcion: 'Jugosos y rendidores.', precio: 'Desde S/ 11.00', imagen_url: 'assets/images/carusel/carousel-3.svg' }
+    { nombre: 'Pollo y gallina', descripcion: 'Pollo entero, gallina y cortes para venta diaria.', precio: 'Consultar precio', imagen_url: 'assets/images/productos/pollo-gallina.svg' },
+    { nombre: 'Congelados', descripcion: 'Pavita, mollejitas, patitas y mondonguito.', precio: 'Consultar precio', imagen_url: 'assets/images/productos/congelados.svg' },
+    { nombre: 'Huevos', descripcion: 'Pequeno, mediano y extra por unidad, casillero o java.', precio: 'Consultar precio', imagen_url: 'assets/images/productos/huevos.svg' }
   ],
   testimonios: [
     { autor: 'Polleria Don Lucho', texto: 'Siempre encuentro productos frescos y el pedido llega puntual.' },
@@ -54,7 +54,14 @@ export const PAGINA_PUBLICA_BASE: PaginaPublicaContenido = {
 export class PaginaPublicaServicio {
   readonly contenido = signal<PaginaPublicaContenido>(PAGINA_PUBLICA_BASE);
   constructor(private http: HttpClient, private sesion: SesionServicio) { this.cargar(); }
-  cargar(): void { this.http.get<PaginaPublicaContenido>('/api/pagina-publica').subscribe({ next: r => this.contenido.set(r) }); }
+  cargar(): void {
+    this.precargarBanners(PAGINA_PUBLICA_BASE);
+    this.http.get<PaginaPublicaContenido>('/api/pagina-publica').subscribe({
+      next: r => {
+        this.precargarBanners(r).finally(() => this.contenido.set(r));
+      }
+    });
+  }
   obtener(): Observable<PaginaPublicaContenido> { return this.http.get<PaginaPublicaContenido>('/api/pagina-publica').pipe(tap(r => this.contenido.set(r))); }
   guardar(datos: PaginaPublicaContenido): Observable<any> { return this.http.put('/api/pagina-publica', datos, { headers: this.headers() }).pipe(tap(() => this.contenido.set(datos))); }
   subirImagen(archivo: File, carpeta: 'slider' | 'banners' | 'productos' = 'productos'): Observable<any> {
@@ -64,4 +71,21 @@ export class PaginaPublicaServicio {
     return this.http.post('/api/pagina-publica/imagen', f, { headers: this.headers() });
   }
   private headers(): HttpHeaders { const t = this.sesion.obtenerToken(); return new HttpHeaders(t ? { Authorization: `Bearer ${t}` } : {}); }
+  private precargarBanners(datos: PaginaPublicaContenido): Promise<unknown[]> {
+    const urls = [
+      datos.banner_nosotros_url,
+      datos.banner_productos_url,
+      datos.banner_clientes_url,
+      datos.banner_contacto_url,
+      ...datos.slides.map(slide => slide.imagen_url),
+      ...datos.productos_destacados.map(producto => producto.imagen_url)
+    ].filter(Boolean);
+
+    return Promise.allSettled(urls.map(url => new Promise<void>(resolve => {
+      const imagen = new Image();
+      imagen.onload = () => resolve();
+      imagen.onerror = () => resolve();
+      imagen.src = url;
+    })));
+  }
 }
