@@ -234,6 +234,7 @@ td:nth-child(7) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
+  min-width: 0;
 }
 
 .consulta-reniec {
@@ -276,6 +277,7 @@ td:nth-child(7) {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .campo input,
@@ -303,6 +305,7 @@ td:nth-child(7) {
 
 .campo--roles {
   grid-column: span 2;
+  min-width: 0;
 }
 
 .roles-permitidos {
@@ -318,11 +321,23 @@ td:nth-child(7) {
   border-radius: 12px;
   background: #f8fafc;
   color: #0f172a;
-  display: flex;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   font-weight: 700;
   cursor: pointer;
+  min-width: 0;
+  width: 100%;
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.roles-permitidos__opcion span {
+  min-width: 0;
+  justify-self: start;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .roles-permitidos__opcion--activo {
@@ -331,10 +346,16 @@ td:nth-child(7) {
   color: #1e3a8a;
 }
 
-.roles-permitidos__opcion input {
-  width: 18px;
-  height: 18px;
+.roles-permitidos__opcion input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0;
+  margin: 0;
+  border-radius: 5px;
   accent-color: #1d4ed8;
+  justify-self: start;
 }
 
 .roles-tabla {
@@ -516,6 +537,23 @@ td:nth-child(7) {
 .boton--cerrar {
   background: #f8fafc;
   color: #475569;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  font-size: 0;
+  line-height: 1;
+}
+
+.boton--cerrar span {
+  display: block;
+  color: #334155;
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .boton--secundario {
@@ -687,8 +725,86 @@ td:nth-child(7) {
 
   .modal__contenedor {
     width: 100%;
+    max-width: calc(100vw - 24px);
     max-height: calc(100vh - 24px);
     padding: 18px;
     border-radius: 16px;
+  }
+
+  .modal__encabezado {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 42px;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .modal__encabezado > div,
+  .modal__encabezado h3,
+  .modal__encabezado p {
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .formulario__descripcion {
+    margin-bottom: 0;
+  }
+
+  .modal__contenedor form,
+  .formulario__grid,
+  .consulta-reniec,
+  .consulta-reniec__control,
+  .roles-permitidos {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .formulario__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .campo--roles {
+    grid-column: 1 / -1;
+  }
+
+  .roles-permitidos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .roles-permitidos__opcion {
+    width: 100%;
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .campo input,
+  .campo select,
+  .consulta-reniec__control input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .roles-permitidos__opcion input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+  }
+
+  .campo__password {
+    width: 100%;
+  }
+
+  .campo__password input {
+    min-width: 0;
+  }
+
+  .formulario__acciones {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .formulario__acciones .boton {
+    width: 100%;
   }
 }

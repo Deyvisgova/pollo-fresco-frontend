@@ -3018,6 +3018,70 @@ button:disabled {
   background-image: none !important;
 }
 
+/* Metodos de pago: estos botones no deben heredar el verde global de acciones de pago. */
+.panel__rutas .metodos-pago .metodos-pago__opcion {
+  background: #f8fafc !important;
+  border: 1px solid #d8e4f3 !important;
+  color: #0f2f5f !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06) !important;
+}
+
+.panel__rutas .metodos-pago .metodos-pago__opcion:hover {
+  background: #eef4ff !important;
+  border-color: #93b7f8 !important;
+  color: #1d4ed8 !important;
+}
+
+.panel__rutas .metodos-pago .metodos-pago__opcion--activa {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #14532d !important;
+}
+
+.panel__rutas .metodos-pago .metodos-pago__icono {
+  background: #ffffff !important;
+  color: #0f2f5f !important;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.28) !important;
+}
+
+.panel__rutas .metodos-pago .metodos-pago__icono svg {
+  color: inherit !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+
+.panel__rutas .metodos-pago .metodos-pago__texto {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+.panel__rutas .metodos-pago .metodos-pago__opcion--activa .metodos-pago__icono {
+  background: #ffffff !important;
+  color: #14532d !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago .metodos-pago__opcion {
+  background: #253247 !important;
+  border-color: #52637c !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago .metodos-pago__opcion--activa {
+  background: #14532d !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago .metodos-pago__icono {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+.panel--tema-oscuro .panel__rutas .metodos-pago .metodos-pago__opcion--activa .metodos-pago__icono {
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
 .panel--tema-oscuro .panel__rutas .resumen,
 .panel--tema-oscuro .panel__rutas .detalle-vacio,
 .panel--tema-oscuro .panel__rutas .cuenta-card,
