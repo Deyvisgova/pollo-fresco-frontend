@@ -857,6 +857,7 @@ export class PrivadoVenta implements OnInit {
         } else {
           this.autocompletarDesdeRuc(datos);
         }
+        this.consultaDocumento = '';
       },
       error: () => {
         this.mensajeError = 'No pudimos consultar SUNAT/RENIEC. Revisa el número o la configuración del servidor.';

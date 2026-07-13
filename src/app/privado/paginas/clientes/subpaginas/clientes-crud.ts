@@ -229,10 +229,11 @@ export class PrivadoClientesCrud implements OnInit {
     const url = `/api/documentos/${endpoint}`;
 
     this.consultaCargando = true;
-    this.http.get<Record<string, unknown>>(url).subscribe({
+    this.http.get<Record<string, unknown>>(url, { headers: this.obtenerHeaders() }).subscribe({
       next: (respuesta) => {
         const datos = (respuesta?.['data'] as Record<string, unknown>) ?? {};
         autocompletar(datos);
+        this.consultaDocumento = '';
       },
       error: () => {
         this.mensajeError = 'No pudimos conectar con la SUNAT/RENIEC. Revisa el numero e intenta nuevamente.';

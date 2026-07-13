@@ -510,7 +510,8 @@
 }
 
 .panel-vendedor__texto {
-  min-width: 0;
+  min-width:0;
+  display: grid;
 }
 
 .panel--tema-oscuro .panel-vendedor {
@@ -645,13 +646,13 @@
     justify-content: center;
   }
 
-  .panel__toggle {
-    font-size: 1.15rem;
-  }
-
   .panel__acciones-usuario {
     justify-self: end;
     gap: 6px;
+  }
+
+  .panel__topbar--vendedor .panel__acciones-usuario {
+    grid-column: 3;
   }
 
   .theme-toggle {
@@ -699,36 +700,37 @@
   }
 
   .panel-vendedor {
-    padding: 14px;
+    padding:14px;
   }
 
   .panel-vendedor__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:12px;
   }
 
   .panel-vendedor__card {
     min-height: 116px;
     flex-direction: column;
     text-align: center;
-    padding: 12px 10px;
+    padding:12px 10px;
+    justify-content: center;
   }
 
 }
 
-.panel__link-icono[data-icon='inicio'] {
+.panel__link-icono[data-icon='inicio']{
   --icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 10.5 9-7 9 7'/%3E%3Cpath d='M5 9.5V21h14V9.5'/%3E%3Cpath d='M9 21v-7h6v7'/%3E%3C/svg%3E");
 }
 
-.panel__link-icono[data-icon='proveedores'] {
+.panel__link-icono[data-icon='proveedores']{
   --icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7h11v10H3z'/%3E%3Cpath d='M14 10h4l3 3v4h-7z'/%3E%3Ccircle cx='7' cy='18' r='2'/%3E%3Ccircle cx='18' cy='18' r='2'/%3E%3C/svg%3E");
 }
 
-.panel__link-icono[data-icon='clientes'],
-.panel__link-icono[data-icon='usuarios'] {
+.panel__link-icono[data-icon='clientes'],.panel__link-icono[data-icon='usuarios']{
   --icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
 }
 
-.panel__link-icono[data-icon='venta'] {
+.panel__link-icono[data-icon='venta']{
   --icon-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M7 8h10M7 12h4M15 12h2M7 16h3M14 16h3'/%3E%3C/svg%3E");
 }
 

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmacionServicio } from '../../../servicios/confirmacion.servicio';
+import { SesionServicio } from '../../../servicios/sesion.servicio';
 import { UsuariosServicio, UsuarioApi } from '../../../servicios/usuarios.servicio';
 import { SelectBonitoDirective } from '../../../compartido/directivas/select-bonito.directive';
 
@@ -49,7 +50,8 @@ export class PrivadoUsuarios implements OnInit {
   constructor(
     private readonly usuariosServicio: UsuariosServicio,
     private readonly confirmacionServicio: ConfirmacionServicio,
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    private readonly sesionServicio: SesionServicio
   ) {}
 
   ngOnInit(): void {
@@ -147,7 +149,8 @@ export class PrivadoUsuarios implements OnInit {
 
     this.http
       .get<{ data?: Record<string, unknown>; success?: boolean; message?: string }>(
-        `/api/documentos/dni/${dni}`
+        `/api/documentos/dni/${dni}`,
+        { headers: this.obtenerHeaders() }
       )
       .subscribe({
         next: (respuesta) => {
@@ -158,6 +161,7 @@ export class PrivadoUsuarios implements OnInit {
           }
 
           this.autocompletarDesdeDni(datos, dni);
+          this.consultaDni = '';
         },
         error: () => {
           this.mensajeError = 'No pudimos conectar con RENIEC. Revisa el DNI e intenta nuevamente.';
@@ -425,5 +429,10 @@ export class PrivadoUsuarios implements OnInit {
     }
 
     return 'No se pudo completar la accion. Intenta nuevamente.';
+  }
+
+  private obtenerHeaders(): HttpHeaders {
+    const token = this.sesionServicio.obtenerToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
   }
 }

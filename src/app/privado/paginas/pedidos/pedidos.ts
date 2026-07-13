@@ -2484,7 +2484,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
         data?: Record<string, unknown>;
         success?: boolean;
         message?: string;
-      }>(url)
+      }>(url, { headers: this.obtenerHeaders() })
       .subscribe({
         next: (response) => {
           if (!response?.success || !response?.data) {
@@ -2493,6 +2493,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
             return;
           }
           autocompletar(response.data);
+          this.consultaDocumento = '';
         },
         error: () => {
           this.mensajeError =
