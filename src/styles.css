@@ -485,48 +485,50 @@ app-root {
   .panel__rutas [class*='tabla-contenedor'],
   .panel__rutas [class*='tabla__contenedor'] {
     overflow-x: auto !important;
-    overflow-y: hidden !important;
-    max-height: none !important;
+    overflow-y: auto !important;
+    max-height: min(64vh, 620px) !important;
     position: relative !important;
+    scrollbar-gutter: stable both-edges;
   }
 
   .panel__rutas table,
   .panel__rutas table.tabla,
   .panel__rutas table.tabla-sistema {
-    display: block !important;
-    width: 100% !important;
+    display: table !important;
+    width: max-content !important;
+    min-width: 100% !important;
     border-collapse: separate !important;
     border-spacing: 0 !important;
-    table-layout: fixed !important;
+    table-layout: auto !important;
   }
 
   .panel__rutas table thead,
   .panel__rutas table.tabla-sistema thead {
-    display: table !important;
-    width: calc(100% - 15px) !important;
-    table-layout: fixed !important;
-    position: relative !important;
+    display: table-header-group !important;
+    width: auto !important;
+    table-layout: auto !important;
+    position: static !important;
     z-index: 30 !important;
   }
 
   .panel__rutas table thead th,
   .panel__rutas table.tabla-sistema thead th {
-    position: static !important;
+    position: sticky !important;
+    top: 0 !important;
     z-index: 31 !important;
     background: #eef4ff !important;
     background-clip: padding-box !important;
     box-shadow: 0 1px 0 #d7e1f2, 0 8px 14px rgba(15, 23, 42, 0.08) !important;
+    white-space: nowrap !important;
   }
 
   .panel__rutas table tbody,
   .panel__rutas table.tabla tbody,
   .panel__rutas table.tabla-sistema tbody {
-    display: block !important;
-    width: 100% !important;
-    max-height: min(64vh, 620px) !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    scrollbar-gutter: stable;
+    display: table-row-group !important;
+    width: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   .panel__rutas table thead tr,
@@ -535,9 +537,43 @@ app-root {
   .panel__rutas table.tabla tbody tr,
   .panel__rutas table.tabla-sistema thead tr,
   .panel__rutas table.tabla-sistema tbody tr {
-    display: table !important;
-    width: 100% !important;
-    table-layout: fixed !important;
+    display: table-row !important;
+    width: auto !important;
+    table-layout: auto !important;
+  }
+
+  .panel__rutas table th,
+  .panel__rutas table td,
+  .panel__rutas table.tabla-sistema th,
+  .panel__rutas table.tabla-sistema td {
+    display: table-cell !important;
+    min-width: 120px;
+    max-width: 360px;
+    white-space: normal !important;
+    vertical-align: middle !important;
+  }
+
+  .panel__rutas table th:first-child,
+  .panel__rutas table td:first-child {
+    min-width: 64px;
+    max-width: 88px;
+    text-align: center;
+  }
+
+  .panel__rutas table th:last-child,
+  .panel__rutas table td:last-child,
+  .panel__rutas table td[data-label='Acciones'],
+  .panel__rutas table td[data-label='Accion'],
+  .panel__rutas table td[data-label='Opciones'] {
+    min-width: 220px;
+    max-width: none;
+    white-space: nowrap !important;
+  }
+
+  .panel__rutas table td[data-label='Acciones']::before,
+  .panel__rutas table td[data-label='Accion']::before,
+  .panel__rutas table td[data-label='Opciones']::before {
+    content: none !important;
   }
 }
 
@@ -699,6 +735,38 @@ app-root {
   opacity: 0.58;
   transform: none;
   box-shadow: none;
+}
+
+.panel__rutas input.ng-invalid.ng-touched,
+.panel__rutas select.ng-invalid.ng-touched,
+.panel__rutas textarea.ng-invalid.ng-touched,
+.panel__rutas form.ng-submitted input.ng-invalid,
+.panel__rutas form.ng-submitted select.ng-invalid,
+.panel__rutas form.ng-submitted textarea.ng-invalid,
+.panel__rutas input[aria-invalid='true'],
+.panel__rutas select[aria-invalid='true'],
+.panel__rutas textarea[aria-invalid='true'] {
+  border-color: #dc2626 !important;
+  background: #fff7f7 !important;
+  color: #0f172a !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+}
+
+.panel__rutas input.ng-invalid.ng-touched:focus,
+.panel__rutas select.ng-invalid.ng-touched:focus,
+.panel__rutas textarea.ng-invalid.ng-touched:focus,
+.panel__rutas form.ng-submitted input.ng-invalid:focus,
+.panel__rutas form.ng-submitted select.ng-invalid:focus,
+.panel__rutas form.ng-submitted textarea.ng-invalid:focus {
+  outline: none;
+  border-color: #b91c1c !important;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18) !important;
+}
+
+.panel__rutas .mensaje-error,
+.panel__rutas .campo__error,
+.panel__rutas [class*='error'] {
+  color: #b91c1c;
 }
 
 .panel__rutas .accion-primaria,
@@ -3100,6 +3168,116 @@ button:disabled {
 
 .panel--tema-oscuro .panel__rutas .cuenta-card__saldo strong {
   color: #bfdbfe !important;
+}
+
+/* Tablas privadas en escritorio: el contenedor desplaza horizontalmente y la cabecera queda visible. */
+@media (min-width: 901px) {
+  .panel__cuerpo {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) !important;
+  }
+
+  .panel__cuerpo--compacto {
+    grid-template-columns: 86px minmax(0, 1fr) !important;
+  }
+
+  .panel__cuerpo--vendedor {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .panel__contenido,
+  .panel__rutas,
+  .panel__rutas > *,
+  .panel__rutas :is(.seccion, .tarjeta, .seccion__tarjeta, .card, [class*='tarjeta'], [class*='card']) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .panel__rutas :is(
+    .tabla-contenedor,
+    .tabla__contenedor,
+    .tabla-scroll,
+    .seccion__tabla,
+    .tabla-ventas,
+    .tabla-responsive,
+    .table-responsive
+  ) {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: auto;
+    max-height: min(62vh, 620px) !important;
+    padding-bottom: 10px;
+    scrollbar-gutter: stable both-edges;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel__rutas :is(
+    .tabla-contenedor,
+    .tabla__contenedor,
+    .tabla-scroll,
+    .seccion__tabla,
+    .tabla-ventas,
+    .tabla-responsive,
+    .table-responsive
+  ) table {
+    display: table !important;
+    width: max-content !important;
+    min-width: max(100%, 980px) !important;
+    table-layout: auto !important;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .panel__rutas .tabla-ventas table,
+  .panel__rutas .tabla-sistema {
+    min-width: max(100%, 1100px) !important;
+  }
+
+  .panel__rutas .seccion__tabla table,
+  .panel__rutas .tabla-contenedor table,
+  .panel__rutas .tabla__contenedor table,
+  .panel__rutas .tabla-scroll table,
+  .panel__rutas .tabla-ventas table {
+    max-width: none !important;
+  }
+
+  .panel__rutas :is(
+    .tabla-contenedor,
+    .tabla__contenedor,
+    .tabla-scroll,
+    .seccion__tabla,
+    .tabla-ventas,
+    .tabla-responsive,
+    .table-responsive
+  ) thead th {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    white-space: nowrap;
+  }
+
+  .panel__rutas :is(
+    .tabla-contenedor,
+    .tabla__contenedor,
+    .tabla-scroll,
+    .seccion__tabla,
+    .tabla-ventas,
+    .tabla-responsive,
+    .table-responsive
+  ) th:last-child,
+  .panel__rutas :is(
+    .tabla-contenedor,
+    .tabla__contenedor,
+    .tabla-scroll,
+    .seccion__tabla,
+    .tabla-ventas,
+    .tabla-responsive,
+    .table-responsive
+  ) td:last-child {
+    min-width: 190px;
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 900px) {

@@ -388,6 +388,14 @@
   height:16px;
   fill:currentColor
 }
+.delivery-card__acciones .delivery-accion-icono {
+  min-height:42px;
+  border-radius:12px
+}
+.delivery-card__acciones .delivery-accion-icono svg {
+  width:22px;
+  height:22px
+}
 .delivery-switch {
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -798,6 +806,29 @@
   padding:10px;
   color:#334155;
   font-size:0.82rem
+}
+.acciones-ubicacion {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px
+}
+.acciones-ubicacion .boton {
+  min-width:52px;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px
+}
+.acciones-ubicacion .boton svg {
+  width:22px;
+  height:22px;
+  fill:currentColor
+}
+.boton-icono-delivery {
+  width:52px;
+  padding:0
 }
 
 @media (max-width:1200px) {

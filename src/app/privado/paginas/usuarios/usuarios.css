@@ -92,11 +92,11 @@
 }
 table {
   width: max-content;
-  min-width: 1184px;
+  min-width: 1260px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.92rem;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 thead {
@@ -129,12 +129,12 @@ td:nth-child(1) {
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 230px;
+  width: 250px;
 }
 
 th:nth-child(3),
 td:nth-child(3) {
-  width: 170px;
+  width: 220px;
 }
 
 th:nth-child(4),
@@ -154,7 +154,8 @@ td:nth-child(6) {
 
 th:nth-child(7),
 td:nth-child(7) {
-  width: 220px;
+  width: 260px;
+  min-width: 260px;
 }
 
 .tabla__vacia {
@@ -174,10 +175,11 @@ td:nth-child(7) {
 
 .tabla__acciones-contenido {
   display: grid;
-  grid-template-columns: 54px 82px 96px;
+  grid-template-columns: 58px 86px 100px;
   align-items: center;
   gap: 8px;
   width: max-content;
+  min-width: 252px;
 }
 
 .usuario-identidad {

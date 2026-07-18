@@ -57,13 +57,17 @@
   position: relative;
   border: 1px solid #d7e1f2;
   border-radius: 10px;
+  background: #ffffff;
+  scrollbar-gutter: stable both-edges;
 }
 
 table {
-  width: 100%;
+  width: max-content;
+  min-width: 1280px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
+  table-layout: auto;
 }
 
 thead {
@@ -88,6 +92,9 @@ td {
 .tabla__acciones {
   display: flex;
   gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-width: max-content;
 }
 
 .etiqueta {
@@ -129,14 +136,19 @@ td {
 }
 
 .boton--accion {
-  background: #f1f5f9;
-  padding: 6px 10px;
-  border-radius: 10px;
-  color: #0f172a;
+  background: #f97316;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #ffffff;
+  min-height: 34px;
+  min-width: 70px;
+  box-shadow: 0 6px 14px rgba(249, 115, 22, 0.18);
 }
 
 .boton--peligro {
-  color: #dc2626;
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.18);
 }
 
 .boton:disabled {

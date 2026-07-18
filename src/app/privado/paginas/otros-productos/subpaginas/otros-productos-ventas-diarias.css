@@ -52,13 +52,50 @@
   position: relative;
   z-index: 3;
   overscroll-behavior: contain;
+  border: 1px solid #d7e1f2;
+  border-radius: 12px;
+  background: #ffffff;
+  scrollbar-gutter: stable both-edges;
 }
 
 .seccion__tabla table {
-  width: 100%;
+  width: max-content;
+  min-width: 1320px;
   border-collapse: separate;
   border-spacing: 0;
-  table-layout: fixed;
+  table-layout: auto;
+}
+
+.seccion__tabla th:nth-child(1),
+.seccion__tabla td:nth-child(1) {
+  width: 210px;
+  min-width: 210px;
+}
+
+.seccion__tabla th:nth-child(2),
+.seccion__tabla td:nth-child(2) {
+  width: 230px;
+  min-width: 230px;
+}
+
+.seccion__tabla th:nth-child(3),
+.seccion__tabla td:nth-child(3) {
+  width: 260px;
+  min-width: 260px;
+}
+
+.seccion__tabla th:nth-child(5),
+.seccion__tabla td:nth-child(5),
+.seccion__tabla th:nth-child(6),
+.seccion__tabla td:nth-child(6) {
+  width: 170px;
+  min-width: 170px;
+}
+
+.seccion__tabla th:nth-child(7),
+.seccion__tabla td:nth-child(7) {
+  width: 230px;
+  min-width: 230px;
 }
 
 .seccion__tabla th,
@@ -78,6 +115,7 @@
 .seccion__tabla td select,
 .seccion__tabla td .selector-producto__boton {
   width: 100%;
+  min-width: 140px;
   box-sizing: border-box;
 }
 
@@ -109,28 +147,34 @@
 .fecha-usuario {
   display: flex;
   align-items: center;
-  min-width: 180px;
+  min-width: 0;
+  width: 100%;
 }
 
 .fecha-usuario__fecha {
-  width: 190px;
-  min-width: 190px;
+  width: 100%;
+  min-width: 0;
   padding: 7px 8px !important;
   font-size: 12px !important;
 }
 
 .fecha-usuario__nombre {
   display: inline-flex;
-  max-width: 180px;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 36px;
   padding: 7px 10px;
   border-radius: 999px;
   border: 1px solid #cbd5f5;
   background: #eef2ff;
   color: #334155;
   font-size: 12px;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
 }
 
 .seccion__acciones-fila {

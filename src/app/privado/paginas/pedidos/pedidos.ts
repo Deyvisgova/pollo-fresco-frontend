@@ -213,7 +213,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
   guardandoCliente = false;
   formularioCliente: ClienteFormulario = this.crearFormularioCliente();
 
-  estadoDestino: 2 | 3 | 4 | 5 = 2;
+  estadoDestino: 2 | 3 | 5 = 2;
   motivoCancelacion = '';
   montoRecibido: number | null = null;
   latitud: number | null = null;
@@ -927,8 +927,8 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
 
   seleccionarPedido(pedido: PedidoDelivery): void {
     this.pedidoSeleccionado = pedido;
-    this.estadoDestino = [2, 3, 4, 5].includes(pedido.estado_id)
-      ? (pedido.estado_id as 2 | 3 | 4 | 5)
+    this.estadoDestino = [2, 3, 5].includes(pedido.estado_id)
+      ? (pedido.estado_id as 2 | 3 | 5)
       : 2;
     this.motivoCancelacion = pedido.motivo_cancelacion ?? '';
     this.montoRecibido = null;
@@ -954,11 +954,13 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   pedidosPendientesDelivery(): PedidoDelivery[] {
-    return this.pedidosFiltrados.filter((pedido) => pedido.estado_id === 1);
+    return this.pedidosFiltrados.filter(
+      (pedido) => pedido.estado_id === 1 || pedido.estado_id === 4,
+    );
   }
 
   pedidosEnRutaDelivery(): PedidoDelivery[] {
-    return this.pedidosFiltrados.filter((pedido) => pedido.estado_id === 4);
+    return [];
   }
 
   pedidosEntregadosDelivery(): PedidoDelivery[] {
@@ -989,7 +991,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
 
     if (!pedidosConUbicacion.length) {
       this.mensajeError =
-        'No hay pedidos pendientes o en ruta con coordenadas guardadas.';
+        'No hay pedidos pendientes con coordenadas guardadas.';
       return;
     }
 
@@ -1015,8 +1017,8 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
     navigator.geolocation.getCurrentPosition(
       (posicion) => {
         this.ubicacionActualDelivery = {
-          latitud: Number(posicion.coords.latitude.toFixed(7)),
-          longitud: Number(posicion.coords.longitude.toFixed(7)),
+          latitud: Number(posicion.coords.latitude.toFixed(8)),
+          longitud: Number(posicion.coords.longitude.toFixed(8)),
         };
         this.puntosRutaDelivery = this.ordenarPuntosRuta(
           this.puntosRutaDelivery.map((punto) => ({ ...punto })),
@@ -1284,7 +1286,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
       });
   }
 
-  cambiarEstadoDelivery(pedido: PedidoDelivery, estadoId: 2 | 4 | 5): void {
+  cambiarEstadoDelivery(pedido: PedidoDelivery, estadoId: 2 | 5): void {
     if (!this.pedidoTomadoPorMi(pedido)) {
       this.mensajeError = 'Primero debes tomar el pedido.';
       return;
@@ -1344,7 +1346,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
       .patch(
         `/api/pedidos-delivery/${pedido.pedido_id}/gestion`,
         {
-          estado_id: pedido.estado_id,
+          estado_id: pedido.estado_id === 4 ? 1 : pedido.estado_id,
           motivo_cancelacion:
             pedido.estado_id === 3 ? pedido.motivo_cancelacion : null,
           estado_pago: 'COMPLETO',
@@ -1580,8 +1582,8 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
 
     navigator.geolocation.getCurrentPosition(
       (posicion) => {
-        this.latitud = Number(posicion.coords.latitude.toFixed(7));
-        this.longitud = Number(posicion.coords.longitude.toFixed(7));
+        this.latitud = Number(posicion.coords.latitude.toFixed(8));
+        this.longitud = Number(posicion.coords.longitude.toFixed(8));
       },
       () => {
         this.mensajeError =
@@ -1646,7 +1648,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
     }
     this.abrirUrlWhatsapp(
       numero,
-      `Hola, tu pedido #${this.obtenerNumeroVisualPedido(pedido)} esta en ruta.`,
+      `Hola, tu pedido #${this.obtenerNumeroVisualPedido(pedido)} esta asignado para entrega.`,
     );
   }
 
@@ -1886,7 +1888,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
       return 'CANCELADO';
     }
     if (estadoId === 4) {
-      return 'EN RUTA';
+      return 'PENDIENTE';
     }
     if (estadoId === 5) {
       return 'NO ENTREGADO';
@@ -1910,7 +1912,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
       return 'badge--danger';
     }
     if (estadoId === 4) {
-      return 'badge--info';
+      return 'badge--warning';
     }
     if (estadoId === 5) {
       return 'badge--danger';
@@ -2822,7 +2824,7 @@ export class PrivadoPedidos implements OnInit, OnDestroy, AfterViewChecked {
     return (
       this.usuarioEsDelivery() &&
       !pedido.delivery_usuario_id &&
-      pedido.estado_id === 1
+      (pedido.estado_id === 1 || pedido.estado_id === 4)
     );
   }
 }

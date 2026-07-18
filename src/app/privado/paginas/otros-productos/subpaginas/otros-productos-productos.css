@@ -46,57 +46,56 @@
   width: 100%;
   max-height: none;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   position: relative;
   border: 1px solid #d7e1f2;
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  scrollbar-gutter: stable both-edges;
 }
 
 .tabla-productos {
-  width: 100%;
-  min-width: 860px;
+  width: max-content;
+  min-width: 920px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
-  table-layout: fixed;
-  display: block;
+  table-layout: auto;
+  display: table;
 }
 
 .tabla-productos colgroup {
-  display: none;
+  display: table-column-group;
 }
 
 .tabla-productos thead {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  position: relative;
+  display: table-header-group;
+  width: auto;
+  table-layout: auto;
+  position: static;
   z-index: 5;
 }
 
 .tabla-productos tbody {
-  display: block;
-  width: 100%;
-  max-height: min(62vh, 560px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-gutter: stable;
+  display: table-row-group;
+  width: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 @media (min-width: 761px) {
   :host .seccion__tabla {
     max-height: none !important;
     overflow-x: auto !important;
-    overflow-y: hidden !important;
+    overflow-y: auto !important;
   }
 }
 
 .tabla-productos tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
+  display: table-row;
+  width: auto;
+  table-layout: auto;
 }
 
 .tabla-productos th:nth-child(1),
@@ -121,11 +120,13 @@
 
 .tabla-productos th:nth-child(5),
 .tabla-productos td:nth-child(5) {
-  width: 250px;
+  width: 280px;
+  min-width: 280px;
 }
 
 .tabla-productos thead th {
-  position: static !important;
+  position: sticky !important;
+  top: 0;
   background: #eef4ff;
   color: #0d2c6f;
   font-weight: 800;
@@ -239,40 +240,54 @@ tbody tr:last-child td {
 }
 
 :host .tabla-productos .toggle {
-  width: 54px;
-  min-width: 54px;
-  height: 30px;
+  width: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+  height: 30px !important;
   border-radius: 999px;
-  border: 1px solid #cbd5e1;
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 3px;
+  border: 1px solid #fca5a5;
+  background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%);
+  display: inline-block !important;
+  padding: 0 !important;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  vertical-align: middle;
+  transition: 0.22s ease;
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12);
 }
 
 :host .tabla-productos .toggle__circulo {
-  width: 22px;
-  height: 22px;
+  width: 22px !important;
+  height: 22px !important;
   border-radius: 999px;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
-  transform: translateX(0);
-  transition: transform 0.2s ease;
+  transform: translateX(0) !important;
+  transition: 0.22s ease;
+  position: absolute;
+  left: 4px;
+  bottom: 3px;
+  z-index: 2;
 }
 
 :host .tabla-productos .toggle__texto {
-  display: none;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
 }
 
 :host .tabla-productos .toggle--activo {
-  background: linear-gradient(180deg, #34d399 0%, #16a34a 100%);
-  border-color: #15803d;
-  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
+  border-color: #0284c7;
+  box-shadow: 0 8px 16px rgba(14, 165, 233, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+}
+
+:host .tabla-productos .toggle--activo .toggle__texto {
+  color: #ffffff;
 }
 
 :host .tabla-productos .toggle:not(.toggle--activo) {
@@ -281,12 +296,45 @@ tbody tr:last-child td {
 }
 
 :host .tabla-productos .toggle--activo .toggle__circulo {
-  transform: translateX(24px);
+  transform: translateX(24px) !important;
 }
 
 :host .tabla-productos .toggle:focus-visible {
   outline: 3px solid rgba(37, 99, 235, 0.24);
   outline-offset: 2px;
+}
+
+:host .tabla-productos td.tabla__acciones .toggle {
+  width: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  border: 1px solid #fca5a5 !important;
+  background: linear-gradient(180deg, #fee2e2 0%, #fecaca 100%) !important;
+  color: transparent !important;
+}
+
+:host .tabla-productos td.tabla__acciones .toggle.toggle--activo {
+  border-color: #0284c7 !important;
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%) !important;
+  box-shadow: 0 8px 16px rgba(14, 165, 233, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.25) !important;
+}
+
+:host .tabla-productos td.tabla__acciones .toggle .toggle__circulo {
+  position: absolute !important;
+  left: 4px !important;
+  bottom: 3px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+}
+
+:host .tabla-productos td.tabla__acciones .toggle.toggle--activo .toggle__circulo {
+  transform: translateX(24px) !important;
 }
 
 @media (max-width: 760px) {

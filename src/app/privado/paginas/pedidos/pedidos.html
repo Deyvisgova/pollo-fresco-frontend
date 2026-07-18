@@ -380,7 +380,7 @@
         >
           Mapa de ruta
         </button>
-        <span>{{ pedidosRutaDelivery().length }} pedido(s) pendientes o en ruta</span>
+        <span>{{ pedidosRutaDelivery().length }} pedido(s) pendientes para ruta</span>
       </div>
 
       <section class="delivery-bloque delivery-bloque--cobros" *ngIf="vistaDeliveryActiva === 'cobros' && cobrosAtrasadosFiltrados().length">
@@ -437,28 +437,9 @@
             <ng-container *ngTemplateOutlet="accesosDirectosDelivery; context: { pedido: pedido }"></ng-container>
             <div class="delivery-card__acciones delivery-card__acciones--movil">
               <button *ngIf="pedidoDisponibleParaTomar(pedido)" type="button" (click)="$event.stopPropagation(); tomarPedido(pedido)">Tomar</button>
-              <button *ngIf="pedidoTomadoPorMi(pedido)" type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 4)">En ruta</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="delivery-bloque" *ngIf="pedidosEnRutaDelivery().length">
-        <h5>En ruta</h5>
-        <div class="delivery-grid delivery-grid--movil">
-          <div class="delivery-card delivery-card--movil delivery-card--en-ruta" *ngFor="let pedido of pedidosEnRutaDelivery()" (click)="seleccionarPedido(pedido)">
-            <div class="delivery-card__cabecera">
-              <h5>Pedido {{ obtenerNumeroVisualPedido(pedido) }}</h5>
-              <strong class="badge" [ngClass]="obtenerClaseBadgeEstado(pedido.estado_id)">{{ obtenerEtiquetaEstado(pedido.estado_id) }}</strong>
-            </div>
-            <div class="delivery-card__fila"><span>Cliente</span><strong>{{ pedido.cliente.nombres }} {{ pedido.cliente.apellidos || '' }}</strong></div>
-            <div class="delivery-card__fila"><span>Estado pago</span><strong class="badge badge--wrap" [ngClass]="obtenerClaseBadgePago(pedido)">{{ obtenerResumenEstadoPago(pedido) }}</strong></div>
-            <div class="delivery-card__fila"><span>Por cobrar</span><strong>S/ {{ obtenerSaldoPendiente(pedido) | number: '1.2-2' }}</strong></div>
-            <ng-container *ngTemplateOutlet="accesosDirectosDelivery; context: { pedido: pedido }"></ng-container>
-            <div class="delivery-card__acciones delivery-card__acciones--movil">
-              <button type="button" (click)="$event.stopPropagation(); abrirRegistroPagoCuenta(pedido)">Pago</button>
-              <button type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 2)">Entregado</button>
-              <button type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 5)">No entregado</button>
+              <button *ngIf="pedidoTomadoPorMi(pedido)" type="button" (click)="$event.stopPropagation(); abrirRegistroPagoCuenta(pedido)">Pago</button>
+              <button *ngIf="pedidoTomadoPorMi(pedido)" type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 2)">Entregado</button>
+              <button *ngIf="pedidoTomadoPorMi(pedido)" type="button" (click)="$event.stopPropagation(); cambiarEstadoDelivery(pedido, 5)">No entregado</button>
             </div>
           </div>
         </div>
@@ -507,7 +488,7 @@
     <header class="tarjeta__encabezado tarjeta__encabezado--acciones">
       <div>
         <h4>Mapa de ruta delivery</h4>
-        <p>Pedidos pendientes y en ruta ordenados por cercania.</p>
+        <p>Pedidos pendientes ordenados por cercania.</p>
       </div>
       <button type="button" class="boton boton--secundario" (click)="cerrarMapaDelivery()">Cerrar</button>
     </header>
@@ -555,13 +536,11 @@
 
 <ng-template #accesosDirectosDelivery let-pedido="pedido">
   <div class="delivery-card__acciones delivery-card__acciones--movil">
-    <button type="button" title="Abrir ruta en Google Maps" aria-label="Abrir ruta en Google Maps" (click)="$event.stopPropagation(); abrirUbicacionPedido(pedido)">
+    <button type="button" class="delivery-accion-icono" title="Abrir ruta en Google Maps" aria-label="Abrir ruta en Google Maps" (click)="$event.stopPropagation(); abrirUbicacionPedido(pedido)">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
-      <span>Mapa</span>
     </button>
-    <button type="button" title="Ver foto del frontis" aria-label="Ver foto del frontis" (click)="$event.stopPropagation(); verFotoFrontis(pedido)">
+    <button type="button" class="delivery-accion-icono" title="Ver foto del frontis" aria-label="Ver foto del frontis" (click)="$event.stopPropagation(); verFotoFrontis(pedido)">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2ZM8.5 11.5l2.5 3.01L14.5 10l4.5 6H5l3.5-4.5Z"/></svg>
-      <span>Foto</span>
     </button>
     <button type="button" title="Enviar WhatsApp" aria-label="Enviar WhatsApp" (click)="$event.stopPropagation(); abrirWhatsapp(pedido)">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.88 11.88 0 0 0 12.06 0 11.94 11.94 0 0 0 1.73 17.9L0 24l6.3-1.65A11.95 11.95 0 0 0 24 12.06a11.88 11.88 0 0 0-3.48-8.58ZM12.06 21.8a9.7 9.7 0 0 1-4.95-1.35l-.36-.22-3.74.98 1-3.65-.24-.38a9.73 9.73 0 1 1 8.29 4.62Zm5.34-7.27c-.3-.15-1.77-.87-2.05-.97s-.48-.15-.69.15-.78.97-.96 1.17-.36.22-.66.07a7.95 7.95 0 0 1-2.34-1.44 8.67 8.67 0 0 1-1.6-1.98c-.17-.3 0-.47.13-.62.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.52-.08-.15-.7-1.68-.96-2.3-.25-.59-.5-.52-.69-.53h-.58a1.11 1.11 0 0 0-.81.37 3.33 3.33 0 0 0-1.03 2.48c0 1.47 1.08 2.89 1.23 3.09.15.2 2.12 3.23 5.14 4.53.72.3 1.29.48 1.73.62.73.23 1.39.2 1.91.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg>
@@ -774,7 +753,6 @@
             <div class="campo">
               <label>Estado</label>
               <select [(ngModel)]="estadoDestino">
-                <option [ngValue]="4">EN RUTA</option>
                 <option [ngValue]="2">ENTREGADO</option>
                 <option [ngValue]="5">NO ENTREGADO</option>
                 <option [ngValue]="3">CANCELADO</option>
@@ -831,20 +809,23 @@
     <section class="bloque">
       <h5>Ficha de domicilio</h5>
       <div class="acciones-ubicacion">
-        <button type="button" class="boton boton--secundario" (click)="capturarUbicacionActual()">Y Capturar GPS</button>
+        <button type="button" class="boton boton--secundario boton-icono-delivery" title="Capturar GPS" aria-label="Capturar GPS" (click)="capturarUbicacionActual()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.94 3A9.01 9.01 0 0 0 13 3.06V1h-2v2.06A9.01 9.01 0 0 0 3.06 11H1v2h2.06A9.01 9.01 0 0 0 11 20.94V23h2v-2.06A9.01 9.01 0 0 0 20.94 13H23v-2h-2.06ZM12 19a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg>
+        </button>
         <button type="button" class="boton boton--secundario" [disabled]="comprimiendoFotoFrontis || guardandoUbicacion" (click)="frontisInput.click()">
-          {{ comprimiendoFotoFrontis || guardandoUbicacion ? 'Guardando frontis...' : 'Tomar y guardar frontis' }}
+          <span *ngIf="comprimiendoFotoFrontis || guardandoUbicacion">Guardando frontis...</span>
+          <svg *ngIf="!comprimiendoFotoFrontis && !guardandoUbicacion" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5h-3.17l-1.84-2H9.01L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm-8 13a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
         </button>
         <input #frontisInput type="file" accept="image/*" capture="environment" hidden (change)="manejarFotoFrontis($event)" />
       </div>
       <div class="formulario-grid formulario-grid--comprobante">
         <div class="campo">
           <label>Latitud</label>
-          <input type="number" step="0.0000001" [(ngModel)]="latitud" />
+          <input type="number" step="0.00000001" [(ngModel)]="latitud" />
         </div>
         <div class="campo">
           <label>Longitud</label>
-          <input type="number" step="0.0000001" [(ngModel)]="longitud" />
+          <input type="number" step="0.00000001" [(ngModel)]="longitud" />
         </div>
         <div class="campo campo--doble">
           <label>URL foto frontis</label>
